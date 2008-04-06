@@ -2,7 +2,7 @@ package CPAN::Metabase::TestFact;
 use Moose;
 
 use MIME::Base64 ();
-use Data::Dumper;
+use Data::Dumper ();
 
 has odor => (
   is  => 'ro',
@@ -13,7 +13,8 @@ has odor => (
 sub as_string {
   my ($self) = @_;
 
-  return MIME::Base64::encode_base64($self->dump);
+  my $hash = { odor => $self->odor };
+  return MIME::Base64::encode_base64(Data::Dumper::Dumper($hash));
 }
 
 sub from_string { 
