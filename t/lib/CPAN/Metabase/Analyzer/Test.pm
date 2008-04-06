@@ -4,6 +4,8 @@ extends 'CPAN::Metabase::Analyzer';
 
 our $VERSION = '0.001';
 
+sub fact_class { 'CPAN::Metabase::TestFact' }
+
 sub handles_type {
   return 1 if $_[1] eq 'CPAN::Metabase::Test';
   return;

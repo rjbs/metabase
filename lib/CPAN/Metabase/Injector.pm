@@ -40,7 +40,8 @@ sub _write_file {
   my ($self, $report, $report_file) = @_;
 
   my $fh = $report_file->openw;
-  print $fh $report->as_string or die "couldn't write to $report_file: $!";
+  print $fh $report->fact->as_string
+    or die "couldn't write to $report_file: $!";
   close $fh or die "couldn't close $report_file: $!";
 
   $self->_write_meta($report, $report_file);
