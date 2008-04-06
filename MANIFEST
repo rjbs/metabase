@@ -10,3 +10,5 @@ Todo
 lib/CPAN/Metabase.pm
 xt/pod-coverage.t
 xt/pod-format.t
+lib/CPAN/Metabase/Fact.pm
+t/CPAN-Metabase-Fact.t
