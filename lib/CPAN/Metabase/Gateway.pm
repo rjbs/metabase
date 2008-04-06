@@ -11,7 +11,15 @@ my %USER_FOR_KEY = (
 has analyzers => (
   is  => 'ro',
   isa => 'ArrayRef[CPAN::Metabase::Analyzer]',
-  auto_deref  => 1,
+  auto_deref => 1,
+  required   => 1,
+);
+
+has injector => (
+  is       => 'ro',
+  # isa      => 'CPAN::Metabase::Injector',
+  default  => sub { CPAN::Metabase::Injector->new },
+  required => 1,
 );
 
 # This is no good.  The analyzers won't be set because the TC on analyzers

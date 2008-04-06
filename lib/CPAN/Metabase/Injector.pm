@@ -1,6 +1,5 @@
-use strict;
-use warnings;
 package CPAN::Metabase::Injector;
+use Moose;
 
 use DateTime;
 use Path::Class;
