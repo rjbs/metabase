@@ -16,6 +16,16 @@ sub analyze {
   return { }
 }
 
+sub fact_class { die 'no fact class supplied'; }
+
+sub fact_from_content {
+  my ($self, $content_ref) = @_;
+  
+  my $class = $self->fact_class;
+  eval "require $class; 1" or die;
+  $self->fact_class->from_string($content_ref);
+}
+
 sub produce_report {
   my ($self, $request) = @_;
 
@@ -28,7 +38,7 @@ sub produce_report {
 
   my $report = CPAN::Metabase::Report->new({
     (map { $_ => $request->{$_} } qw(dist_name dist_author type guid)),
-    content  => $request->{content},
+    fact     => $self->fact_from_content(\$request->{content}),
     metadata => {
       %$analysis,
       # user => $user,

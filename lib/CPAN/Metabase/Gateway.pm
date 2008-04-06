@@ -61,7 +61,7 @@ sub handle {
   die "unknown dist" unless $self->_validate_dist($request);
   die "unknown datatype" unless my $analyzer = $self->analyzer_for($request);
 
-  $request->{guid} = Data::GUID->new->as_string;
+  $request->{guid} = Data::GUID->new;
 
   my $report = $analyzer->produce_report($request);
 

@@ -25,7 +25,7 @@ $gateway->handle({
   dist_name   => 'Foo-Bar-2.345.tar.gz',
   dist_author => 'KWIJIBO',
   type        => 'CPAN::Metabase::Test',
-  content     => "This...\n\t...is...\n\t\t...CPANtown!\n",
+  content     => "eyBvZG9yID0+ICJhd2Z1bCIgfQ==",
 });
 
 1;
