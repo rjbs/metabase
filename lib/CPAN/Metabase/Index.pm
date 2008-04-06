@@ -4,25 +4,12 @@
 # A copy of the License was distributed with this file or you may obtain a 
 # copy of the License from http://dev.perl.org/licenses/
 
-package CPAN::Metabase::Fact;
+package CPAN::Metabase::Index;
 use strict;
 use warnings;
-use Carp;
 
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
-
-# should accept/provide scalars or refs to scalars
-
-sub as_string { 
-    my $self = shift;
-    die "as_string() not implemented by " . ref $self;
-}
-
-sub from_string { 
-    my $self = shift;
-    die "from_string() not implemented by " . ref $self;
-}
 
 1;
 
@@ -32,22 +19,10 @@ __END__
 
 =head1 NAME
 
-CPAN::Metabase::Fact - Abstract base class for CPAN::Metabase facts
+CPAN::Metabase::Index - Abstract base class for CPAN::Metabase indexing
 
 =head1 SYNOPSIS
 
- package CPAN::Metabase::Fact::Custom;
- use base 'CPAN::Metabase::Fact';
-
- sub as_string { 
-     # implementation goes here
- }
-
- sub from-string {
-     # implementation goes here
- }
- 
- 1;
 
 =head1 DESCRIPTION
 
@@ -97,4 +72,3 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 =cut
-

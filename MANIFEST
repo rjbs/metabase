@@ -8,7 +8,15 @@ Makefile.PL
 README
 Todo
 lib/CPAN/Metabase.pm
+lib/CPAN/Metabase/Fact.pm
+lib/CPAN/Metabase/Index.pm
+lib/CPAN/Metabase/Index/FlatFile.pm
+lib/CPAN/Metabase/Storage.pm
+lib/CPAN/Metabase/Storage/Filesystem.pm
+t/CPAN-Metabase-Fact.t
+t/CPAN-Metabase-Index-FlatFile.t
+t/CPAN-Metabase-Index.t
+t/CPAN-Metabase-Storage-Filesystem.t
+t/CPAN-Metabase-Storage.t
 xt/pod-coverage.t
 xt/pod-format.t
-lib/CPAN/Metabase/Fact.pm
-t/CPAN-Metabase-Fact.t
