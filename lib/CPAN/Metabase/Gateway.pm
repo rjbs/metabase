@@ -3,11 +3,6 @@ use Moose;
 
 use Data::GUID;
 
-my %USER_FOR_KEY = (
-  xyzzy => 'rjbs',
-  plugh => 'D. A. Golden',
-);
-
 has analyzers => (
   is  => 'ro',
   isa => 'ArrayRef[CPAN::Metabase::Analyzer]',
@@ -43,13 +38,27 @@ sub analyzer_for {
   return $analyzer;
 }
 
+sub _validate_dist {
+  my ($self, $request) = @_;
+
+  # XXX Well... yeah, eventually we'll want to reject reports for dists that
+  # don't, you know, exist. -- rjbs, 2008-04-06
+  1;
+}
+
+my %USER_FOR = (
+  xyzzy => 'rjbs',
+  plugh => 'D. A. Golden',
+);
+
 sub handle {
   my ($self, $request) = @_;
 
   # XXX Yeah, uh, in the future this won't be a hashref. -- rjbs, 2008-04-06
   $request ||= {};
 
-  die "unknown user" unless my $user = $USER_FOR_KEY{ $request->{'auth.key'} };
+  die "unknown user" unless my $user = $USER_FOR{ $request->{'auth.key'} };
+  die "unknown dist" unless $self->_validate_dist($request);
   die "unknown datatype" unless my $analyzer = $self->analyzer_for($request);
 
   $request->{guid} = Data::GUID->new->as_string;
