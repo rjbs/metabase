@@ -15,7 +15,7 @@ use CPAN::Metabase::Analyzer::Test;
 my $root = $ENV{CPAN_METABASE_ROOT} = './eg';
 
 my $gateway = CPAN::Metabase::Gateway->new({
-  analyzers => [ qw(CPAN::Metabase::Analyzer::Test) ],
+  analyzers => [ CPAN::Metabase::Analyzer::Test->new ],
 });
 
 $gateway->handle({

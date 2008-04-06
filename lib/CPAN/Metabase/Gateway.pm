@@ -1,6 +1,8 @@
 package CPAN::Metabase::Gateway;
 use Moose;
 
+use Data::GUID;
+
 my %USER_FOR_KEY = (
   xyzzy => 'rjbs',
   plugh => 'D. A. Golden',
@@ -9,7 +11,7 @@ my %USER_FOR_KEY = (
 has analyzers => (
   is  => 'ro',
   isa => 'ArrayRef[CPAN::Metabase::Analyzer]',
-  auto_deref => 1,
+  auto_deref  => 1,
 );
 
 # This is no good.  The analyzers won't be set because the TC on analyzers
