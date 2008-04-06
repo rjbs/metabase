@@ -1,15 +1,19 @@
-use strict;
-use warnings;
-
 package CPAN::Metabase::Gateway;
+use Moose;
 
 my %USER_FOR_KEY = (
   xyzzy => 'rjbs',
   plugh => 'D. A. Golden',
 );
 
-my %HANDLER_FOR = (
-  'CPAN::Metabase::Test' => 'CPAN::Metabase::Test::Analyzer',
+has analyzers => (
+  is  => 'ro',
+  isa => 'ArrayRef[CPAN::Metabase::Analyzer]',
+  auto_deref => 1,
+  trigger    => sub {
+    my ($self) = @_;
+    eval "require $_; 1" or die for $self->analyzers;
+  },
 );
 
 sub handle {
@@ -20,13 +24,19 @@ sub handle {
 
   die "unknown user" unless my $user = $USER_FOR_KEY{ $request->{'auth.key'} };
 
-  die "unknown datatype" unless my $handler = $HANDLER_FOR{ $request->{type} };
+  my $analyzer;
+  CANDIDATE: for my $candidate ($self->analyzers) {
+    if ($candidate->handles_type($request->{type})) {
+      $analyzer = $candidate;
+      last CANDIDATE;
+    }
+  }
+
+  die "unknown datatype" unless $analyzer;
 
   $request->{guid} = Data::GUID->new->as_string;
 
-  eval "require $handler; 1" or die;
-
-  my $metadata = $handler->analyze($request);
+  my $metadata = $analyzer->analyze($request);
 
   die "invalid keys in response from analyzer"
     if grep { /^[a-z]/ } keys %$metadata;
@@ -38,7 +48,7 @@ sub handle {
       %$metadata,
       user => $user,
       type => $request->{type},
-      handler => $handler,
+      handler => $analyzer,
     },
   });
   

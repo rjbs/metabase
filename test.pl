@@ -1,12 +1,19 @@
 
 use strict;
 use warnings;
+
 use lib 'lib';
+use lib 't/lib';
+
 use CPAN::Metabase::Injector;
 use CPAN::Metabase::Report;
 use CPAN::Metabase::Gateway;
 
 my $root = $ENV{CPAN_METABASE_ROOT} = './eg';
+
+my $gateway = CPAN::Metabase::Gateway->new({
+
+})
 
 CPAN::Metabase::Gateway->handle({
   'auth.key'  => 'xyzzy',
