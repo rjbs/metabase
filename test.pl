@@ -12,10 +12,10 @@ use CPAN::Metabase::Gateway;
 my $root = $ENV{CPAN_METABASE_ROOT} = './eg';
 
 my $gateway = CPAN::Metabase::Gateway->new({
-
+  analyzers => [ qw(CPAN::Metabase::Analyzer::Test) ],
 })
 
-CPAN::Metabase::Gateway->handle({
+$gateway->handle({
   'auth.key'  => 'xyzzy',
   dist_name   => 'Foo-Bar-2.345.tar.gz',
   dist_author => 'KWIJIBO',

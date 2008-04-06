@@ -10,11 +10,12 @@ has analyzers => (
   is  => 'ro',
   isa => 'ArrayRef[CPAN::Metabase::Analyzer]',
   auto_deref => 1,
-  trigger    => sub {
-    my ($self) = @_;
-    eval "require $_; 1" or die for $self->analyzers;
-  },
 );
+
+sub BUILD {
+  my ($self) = @_;
+  eval "require $_; 1" or die for $self->analyzers;
+}
 
 sub handle {
   my ($self, $request) = @_;
