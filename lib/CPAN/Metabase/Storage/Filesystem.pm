@@ -5,8 +5,26 @@
 # copy of the License from http://dev.perl.org/licenses/
 
 package CPAN::Metabase::Storage::Filesystem;
-use strict;
-use warnings;
+use Moose;
+use Moose::Util::TypeConstraints;
+use Path::Class;
+
+extends 'CPAN::Metabase::Storage';
+
+subtype 'ExistingDir' 
+    => as 'Object' 
+        => where { $_->isa('Path::Class') and -d "$_" };
+
+coerce 'ExistingDir' 
+    => from 'Str' 
+        => via { dir($_) };
+
+has 'root_dir' => (
+    is => 'ro', 
+    isa => 'ExistingDir',
+    coerce => 1,
+    required => 1, 
+);
 
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
