@@ -5,15 +5,18 @@ use warnings;
 use lib 'lib';
 use lib 't/lib';
 
+use CPAN::Metabase::Analyzer;
 use CPAN::Metabase::Injector;
 use CPAN::Metabase::Report;
 use CPAN::Metabase::Gateway;
+
+use CPAN::Metabase::Analyzer::Test;
 
 my $root = $ENV{CPAN_METABASE_ROOT} = './eg';
 
 my $gateway = CPAN::Metabase::Gateway->new({
   analyzers => [ qw(CPAN::Metabase::Analyzer::Test) ],
-})
+});
 
 $gateway->handle({
   'auth.key'  => 'xyzzy',

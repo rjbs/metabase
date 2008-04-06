@@ -12,10 +12,12 @@ has analyzers => (
   auto_deref => 1,
 );
 
-sub BUILD {
-  my ($self) = @_;
-  eval "require $_; 1" or die for $self->analyzers;
-}
+# This is no good.  The analyzers won't be set because the TC on analyzers
+# can't pass if they weren't loaded. -- rjbs, 2008-04-06
+# sub BUILD {
+#   my ($self) = @_;
+#   eval "require $_; 1" or die for $self->analyzers;
+# }
 
 sub handle {
   my ($self, $request) = @_;
