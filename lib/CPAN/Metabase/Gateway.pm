@@ -41,22 +41,8 @@ sub handle {
 
   $request->{guid} = Data::GUID->new->as_string;
 
-  my $metadata = $analyzer->analyze($request);
+  my $report = $analyzer->produce_report($request);
 
-  die "invalid keys in response from analyzer"
-    if grep { /^[a-z]/ } keys %$metadata;
-
-  my $report = CPAN::Metabase::Report->new({
-    (map { $_ => $request->{$_} } qw(dist_name dist_author type guid)),
-    content  => $request->{content},
-    metadata => {
-      %$metadata,
-      user => $user,
-      type => $request->{type},
-      handler => $analyzer,
-    },
-  });
-  
   CPAN::Metabase::Injector->inject_report($report);
 
   return 1;
