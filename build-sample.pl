@@ -19,13 +19,13 @@ use Test::Metabase::Util;
 my $gateway = Test::Metabase::Util->test_gateway;
 
 $gateway->handle({
-  'auth.key'  => 'xyzzy',
+  user_id     => 'rjbs',
   dist_name   => 'Foo-Bar-2.345.tar.gz',
   dist_author => 'KWIJIBO',
   type        => 'CPAN::Metabase::Test',
   content     => "eyBvZG9yID0+ICJhd2Z1bCIgfQ==",
 });
 
-diag $_ for map { s/\Q$root//g; $_ } `find $root`;
+diag $_ for grep { $_ ne ".\n" } map { s/\Q$root/./g; $_ } `find $root`;
 
 1;
