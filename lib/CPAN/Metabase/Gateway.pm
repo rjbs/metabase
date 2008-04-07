@@ -46,10 +46,7 @@ sub _validate_dist {
   1;
 }
 
-my %USER_FOR = (
-  xyzzy => 'rjbs',
-  plugh => 'D. A. Golden',
-);
+my %USER = { map {; $_ => 1 } qw(rjbs dagolden);
 
 sub handle {
   my ($self, $request) = @_;
@@ -59,7 +56,7 @@ sub handle {
   # that's just fine. -- rjbs, 2008-04-06
   $request ||= {};
 
-  die "unknown user" unless my $user = $USER_FOR{ $request->{'auth.key'} };
+  die "unknown user" unless my $user = $USER{ $request->{user_id} };
   die "unknown dist" unless $self->_validate_dist($request);
   die "unknown datatype" unless my $analyzer = $self->analyzer_for($request);
 
