@@ -1,6 +1,7 @@
 package CPAN::Metabase::Gateway;
 use Moose;
 
+use CPAN::Metabase::Injector;
 use Data::GUID;
 
 has analyzers => (
@@ -46,7 +47,7 @@ sub _validate_dist {
   1;
 }
 
-my %USER = { map {; $_ => 1 } qw(rjbs dagolden);
+my %USER = map {; $_ => 1 } qw(rjbs dagolden);
 
 sub handle {
   my ($self, $request) = @_;
