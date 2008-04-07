@@ -10,6 +10,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use File::Temp ();
+use File::Path ();
 
 use lib 't/lib';
 use CPAN::Metabase::TestFact;
@@ -28,6 +29,7 @@ throws_ok {
 # store into a temp directory
 #my $temp_root = File::Temp->newdir() or die;
 my $temp_root = 'eg/store';
+File::Path::mkpath( $temp_root );
 
 my $storage;
 lives_ok { 
