@@ -5,11 +5,79 @@
 # copy of the License from http://dev.perl.org/licenses/
 
 package CPAN::Metabase::Storage::Filesystem;
-use strict;
-use warnings;
+use Moose;
+use Moose::Util::TypeConstraints;
+use Path::Class ();
+use File::Slurp ();
+use Data::GUID ();
+use Carp ();
 
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
+
+extends 'CPAN::Metabase::Storage';
+
+subtype 'ExistingDir' 
+    => as 'Object' 
+        => where { $_->isa( "Path::Class::Dir" ) && -d "$_" };
+
+coerce 'ExistingDir' 
+    => from 'Str' 
+        => via { Path::Class::dir($_) };
+
+has 'root_dir' => (
+    is => 'ro', 
+    isa => 'ExistingDir',
+    coerce => 1,
+    required => 1, 
+);
+
+# given fact, store it and return guid; return
+# XXX can we store a fact with a GUID already?  Replaces?  Or error?
+# here assign only if no GUID already
+sub store {
+    my ($self, $fact) = @_;
+
+    # add GUID to fact
+    my $guid = Data::GUID->new;  
+    $fact->guid( $guid ) unless $fact->guid;
+
+    # write the fact
+    File::Slurp::write_file( 
+        $self->_guid_path( $guid ), {binmode => ':raw'}, $fact->as_string 
+    );
+
+    return $guid;
+}
+
+# given guid, retrieve it and return it
+# type is directory path
+# class isa CPAN::Metabase::Fact::Subclass
+sub extract {
+    my ($self, $class, $guid) = @_;
+    
+    # read the fact
+    my $fact_string = File::Slurp::read_file( 
+        $self->_guid_path( $guid ),
+        binmode => ':raw', 
+    );
+    my $fact = $class->from_string( $fact_string );
+
+    return $fact;
+}
+
+sub _guid_path {
+    my ($self, $guid) = @_;
+
+    # convert guid from "abc-def-ghi" => "abc/def" as a place to put the file
+    my $guid_path = $guid;
+    $guid_path =~ s{-}{/}g;
+    $guid_path =~ s{-\w$}{$1};
+    my $fact_path = Path::Class::file( $self->root_dir, $guid_path, $guid );
+    $fact_path->dir->mkpath;
+    
+    return $fact_path->stringify;
+}
 
 1;
 
