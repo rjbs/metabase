@@ -5,19 +5,18 @@ use MIME::Base64 ();
 use Data::Dumper ();
 use Carp ();
 
-sub odor { if (@_ > 1) { $_[0]->{odor} = $_[1] }; return $_[0]->{odor} }
-
-sub new { 
-    my ($class, $args) = @_;
-    Carp::croak "$class\->new() takes a hashref" unless ref $args eq 'HASH';    
-    return bless { %$args, type => 'smell'}, $class;
+sub odor {
+    my $self = shift;
+    if ( @_ > 1 ) { $self->content->{odor} = shift };
+    return $self->content->{odor};
 }
+
+sub type { return 'smelly_fact' }
 
 sub as_string {
   my ($self) = @_;
 
-  my $hash = { odor => $self->odor };
-  return MIME::Base64::encode_base64(Data::Dumper::Dumper($hash));
+  return MIME::Base64::encode_base64(Data::Dumper::Dumper($self));
 }
 
 sub from_string { 

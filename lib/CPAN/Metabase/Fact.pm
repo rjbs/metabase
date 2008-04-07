@@ -7,33 +7,52 @@
 package CPAN::Metabase::Fact;
 use strict;
 use warnings;
-use Carp;
+use Params::Validate ();
+use Carp ();
 
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
 
-# should accept/provide scalars or refs to scalars
+use Object::Tiny qw{ content dist_author dist_file };
 
-BEGIN {
-    no strict 'refs';
-    for my $m (qw/guid type/) {
-        *{$m} = sub { if (@_ > 1) { $_[0]->{$m} = $_[1] }; return $_[0]->{$m} };
-    }
+# new takes a reference
+my @valid_args = qw/dist_author dist_file content/;
+sub new {
+    my ($class, @args) = @_;
+    my %args = Params::Validate::validate( @args, 
+        { type => 0, map { $_ => 1 } @valid_args } 
+    );
+    return bless { %args, type => $class->type }, $class;
 }
 
-sub new { 
-    my $class = shift;
-    die "new() not implemented by $class";
+# guid() has to be read/write as facts start without a GUID and have one
+# assigned depending on where/how they are stored
+sub guid {
+    my $self = shift;
+    if (@_ > 1) { $self->{guid} = shift }; 
+    return $self->{guid};
+}
+
+#--------------------------------------------------------------------------#
+# fatal stubs
+#--------------------------------------------------------------------------#
+
+sub type {
+    my $self = shift;
+    # normally called as a class function but just in case...
+    my $class = ref $self ? ref($self) : $self;
+    print "class is $class\n";
+    Carp::confess "type() not implemented by " . $class;
 }
 
 sub as_string { 
     my $self = shift;
-    die "as_string() not implemented by " . ref $self;
+    Carp::confess "as_string() not implemented by " . ref $self;
 }
 
 sub from_string { 
     my $self = shift;
-    die "from_string() not implemented by " . ref $self;
+    Carp::confess "from_string() not implemented by " . ref $self;
 }
 
 1;
@@ -50,6 +69,8 @@ CPAN::Metabase::Fact - Abstract base class for CPAN::Metabase facts
 
  package CPAN::Metabase::Fact::Custom;
  use base 'CPAN::Metabase::Fact';
+
+ sub type { return 'web-query-type-string' }
 
  sub as_string { 
      # implementation goes here

@@ -15,5 +15,6 @@ WriteMakefile (
         'File::Temp' => 0,
         'File::Slurp' => 0,
         'Path::Class' => 0,
+        'Object::Tiny' => 0,
     }
 );

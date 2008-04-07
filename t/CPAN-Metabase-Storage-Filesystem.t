@@ -15,6 +15,13 @@ use File::Path ();
 use lib 't/lib';
 use CPAN::Metabase::TestFact;
 
+#--------------------------------------------------------------------------#
+
+my $dist_author = 'UNKNOWN';
+my $dist_file = 'Foo-Bar-1.23.tar.gz';
+
+#--------------------------------------------------------------------------#
+
 plan tests => 9;
 
 require_ok( 'CPAN::Metabase::Storage::Filesystem' );
@@ -36,7 +43,11 @@ lives_ok {
     $storage = CPAN::Metabase::Storage::Filesystem->new(root_dir => "$temp_root");
 } "created store at '$temp_root'";
 
-my $fact = CPAN::Metabase::TestFact->new({ odor => 'sweet' });
+my $fact = CPAN::Metabase::TestFact->new( 
+    dist_author => $dist_author, 
+    dist_file => $dist_file, 
+    content => {odor => 'sweet'}
+);
 
 isa_ok( $fact, 'CPAN::Metabase::TestFact' );
 

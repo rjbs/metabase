@@ -1,4 +1,4 @@
-eg
-Makefile
-blib
+eg/*
+Makefile*
+blib/*
 pm_to_blib
