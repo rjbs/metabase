@@ -14,6 +14,18 @@ $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
 
 # should accept/provide scalars or refs to scalars
 
+BEGIN {
+    no strict 'refs';
+    for my $m (qw/guid type/) {
+        *{$m} = sub { if (@_ > 1) { $_[0]->{$m} = $_[1] }; return $_[0]->{$m} };
+    }
+}
+
+sub new { 
+    my $class = shift;
+    die "new() not implemented by $class";
+}
+
 sub as_string { 
     my $self = shift;
     die "as_string() not implemented by " . ref $self;

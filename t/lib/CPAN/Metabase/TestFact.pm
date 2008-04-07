@@ -1,5 +1,6 @@
 package CPAN::Metabase::TestFact;
 use Moose;
+use base 'CPAN::Metabase::Fact';
 
 use MIME::Base64 ();
 use Data::Dumper ();
