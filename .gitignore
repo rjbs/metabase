@@ -5,3 +5,7 @@ MANIFEST.bak
 cover_db/*
 blib/*
 pm_to_blib
+META.yml
+MANIFEST
+!MANIFEST.SKIP
+inc
