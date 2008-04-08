@@ -13,10 +13,12 @@ use Carp ();
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
 
-use Object::Tiny qw{ content dist_author dist_file };
+my @valid_args;
+BEGIN { @valid_args = qw/dist_author dist_file content/ }
+
+use Object::Tiny @valid_args;
 
 # new takes a reference
-my @valid_args = qw/dist_author dist_file content/;
 sub new {
     my ($class, @args) = @_;
     my %args = Params::Validate::validate( @args, 
