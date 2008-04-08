@@ -4,7 +4,7 @@
 # A copy of the License was distributed with this file or you may obtain a 
 # copy of the License from http://dev.perl.org/licenses/
 
-package CPAN::Metabase::Storage;
+package CPAN::Metabase::Archive;
 use Moose;
 
 our $VERSION = '0.01';
@@ -18,7 +18,7 @@ __END__
 
 =head1 NAME
 
-CPAN::Metabase::Storage - Abstract base class for CPAN::Metabase storage
+CPAN::Metabase::Archive - Abstract base class for CPAN::Metabase storage
 
 =head1 SYNOPSIS
 

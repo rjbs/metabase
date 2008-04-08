@@ -23,7 +23,7 @@ use Object::Tiny @valid_args;
 sub new {
     my ($class, @args) = @_;
     my %args = Params::Validate::validate( @args, 
-        { type => 0, guid => 0, map { $_ => 1 } @valid_args } 
+        { type => 0, guid => 0, user_id => 0, map { $_ => 1 } @valid_args } 
     );
     my $self = bless { %args, type => $class->type }, $class;
     eval { $self->validate_content( $self->content ) };

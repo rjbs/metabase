@@ -24,13 +24,13 @@ my $dist_file = 'Foo-Bar-1.23.tar.gz';
 
 plan tests => 10;
 
-require_ok( 'CPAN::Metabase::Storage::Filesystem' );
+require_ok( 'CPAN::Metabase::Archive::Filesystem' );
 
 # die on missing or non-existing directory
 my $re_bad_root_dir = qr/\QAttribute (root_dir)\E/;
-throws_ok { CPAN::Metabase::Storage::Filesystem->new() } $re_bad_root_dir;
+throws_ok { CPAN::Metabase::Archive::Filesystem->new() } $re_bad_root_dir;
 throws_ok { 
-    CPAN::Metabase::Storage::Filesystem->new(root_dir => 'doesntexist') 
+    CPAN::Metabase::Archive::Filesystem->new(root_dir => 'doesntexist') 
 } $re_bad_root_dir;
 
 # store into a temp directory
@@ -38,9 +38,9 @@ throws_ok {
 my $temp_root = 'eg/store';
 File::Path::mkpath( $temp_root );
 
-my $storage;
+my $archive;
 lives_ok { 
-    $storage = CPAN::Metabase::Storage::Filesystem->new(root_dir => "$temp_root");
+    $archive = CPAN::Metabase::Archive::Filesystem->new(root_dir => "$temp_root");
 } "created store at '$temp_root'";
 
 my $fact = CPAN::Metabase::Fact::TestFact->new( 
@@ -51,12 +51,12 @@ my $fact = CPAN::Metabase::Fact::TestFact->new(
 
 isa_ok( $fact, 'CPAN::Metabase::Fact::TestFact' );
 
-ok( my $guid = $storage->store( $fact ), "stored a fact" );
+ok( my $guid = $archive->store( $fact ), "stored a fact" );
 
 is( $fact->guid, $guid, "GUID returned matched GUID in fact" );
 
-ok( my $copy = $storage->extract( $guid ),
-    "got a fact from storage"
+ok( my $copy = $archive->extract( $guid ),
+    "got a fact from archive"
 );
 
 for my $p ( qw/type content/ ) {

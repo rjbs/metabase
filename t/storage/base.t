@@ -9,5 +9,5 @@ use warnings;
 
 use Test::More tests => 1;
 
-require_ok( 'CPAN::Metabase::Storage' );
+require_ok( 'CPAN::Metabase::Archive' );
 

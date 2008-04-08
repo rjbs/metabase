@@ -22,15 +22,15 @@ plan tests => 13;
 
 require_ok( 'CPAN::Metabase::Index::FlatFile' );
 
-ok( my $storage = Test::Metabase::Util->test_storage, 'created storage' );
-isa_ok( $storage, 'CPAN::Metabase::Storage::Filesystem' );
+ok( my $archive = Test::Metabase::Util->test_archive, 'created archive' );
+isa_ok( $archive, 'CPAN::Metabase::Archive::Filesystem' );
 
 ok( my $index = Test::Metabase::Util->test_index, 'created an index' );
 isa_ok( $index, 'CPAN::Metabase::Index::FlatFile' );
 
 ok( my $fact = Test::Metabase::Util->test_fact, "created a fact" );
 isa_ok( $fact, 'CPAN::Metabase::Fact::TestFact' );
-ok( my $guid = $storage->store( $fact ), "stored a fact" );
+ok( my $guid = $archive->store( $fact ), "stored a fact" );
 
 ok( $index->store( $fact ), "indexed fact" );
 

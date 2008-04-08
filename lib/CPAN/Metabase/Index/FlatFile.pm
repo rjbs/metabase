@@ -89,7 +89,7 @@ sub _match {
 
 =head1 NAME
 
-CPAN::Metabase::Storage::Index::FlatFile - CPAN::Metabase flat-file index
+CPAN::Metabase::Index::FlatFile - CPAN::Metabase flat-file index
 
 =head1 SYNOPSIS
 

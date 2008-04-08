@@ -1,37 +1,21 @@
 package CPAN::Metabase::Gateway;
 use Moose;
 
-use CPAN::Metabase::Analyzer;
-use CPAN::Metabase::Storage;
+use CPAN::Metabase::Archive; # XXX: will be Librarian
 use Data::GUID;
 
-has analyzers => (
+has fact_classes => (
   is  => 'ro',
-  isa => 'ArrayRef[CPAN::Metabase::Analyzer]',
+  isa => 'ArrayRef[Str]',
   auto_deref => 1,
   required   => 1,
 );
 
-has storage => (
+has archive => (
   is       => 'ro',
-  isa      => 'CPAN::Metabase::Storage',
+  isa      => 'CPAN::Metabase::Archive', # XXX: will be Librarian
   required => 1,
 );
-
-sub analyzer_for {
-  my ($self, $request) = @_;
-
-  my $analyzer;
-  CANDIDATE: for my $candidate ($self->analyzers) {
-    warn "checking $candidate for handling $request->{type}";
-    if ($candidate->handles_type($request->{type})) {
-      $analyzer = $candidate;
-      last CANDIDATE;
-    }
-  }
-
-  return $analyzer;
-}
 
 sub _validate_dist {
   my ($self, $request) = @_;
@@ -53,15 +37,18 @@ sub handle {
 
   die "unknown user" unless my $user = $USER{ $request->{user_id} };
   die "unknown dist" unless $self->_validate_dist($request);
-  die "unknown datatype" unless my $analyzer = $self->analyzer_for($request);
+
+  my $fact;
+  FACT_CLASS: for my $fact_class ($self->fact_classes) {
+    eval "require $fact_class; 1" or die;
+    next FACT_CLASS unless $fact_class->type eq $request->{type};
+    $fact = eval { $fact_class->new($request) };
+    die $@ unless $fact;
+  }
 
   $request->{guid} = Data::GUID->new;
 
-  my $report = $analyzer->produce_report($request);
-
-  $self->storage->store($report);
-
-  return 1;
+  my $guid = $self->archive->store($fact);
 }
 
 1;

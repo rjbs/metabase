@@ -41,11 +41,13 @@ The metabase server has a few parts:
 
 =over
 
+=item * the Gateway, which authorizes the addition of facts to the Archiver
+
 =item * the Archive, which stores and retrieves facts
 
 =item * the Index, which builds searchable indexes of facts
 
-=item * the Gateway, which authorizes the addition of facts to the Archiver
+=item * the Librarian, which coordinates access to the Archive and Index
 
 =back
 

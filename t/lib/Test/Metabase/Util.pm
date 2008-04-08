@@ -13,20 +13,18 @@ has test_gateway => (
   default => sub {
     require CPAN::Metabase::Analyzer::Test;
     my $gateway = CPAN::Metabase::Gateway->new({
-      # This ->new is stupid, but will be required until I implement the
-      # coersion I want, here. -- rjbs, 2008-04-06
-      analyzers => [ CPAN::Metabase::Analyzer::Test->new ],
+      fact_classes => [ 'CPAN::Metabase::Fact::TestFact' ],
     });
   }
 );
 
-has test_storage => (
+has test_archive => (
   is   => 'ro',
-  isa  => 'CPAN::Metabase::Storage::Filesystem',
+  isa  => 'CPAN::Metabase::Archive::Filesystem',
   lazy => 1,
   default => sub {
-    require CPAN::Metabase::Storage::Filesystem;
-    CPAN::Metabase::Storage::Filesystem->new(root_dir => "eg/store");
+    require CPAN::Metabase::Archive::Filesystem;
+    CPAN::Metabase::Archive::Filesystem->new(root_dir => "eg/store");
   },
 );
 

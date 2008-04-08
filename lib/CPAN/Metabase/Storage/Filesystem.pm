@@ -4,7 +4,7 @@
 # A copy of the License was distributed with this file or you may obtain a 
 # copy of the License from http://dev.perl.org/licenses/
 
-package CPAN::Metabase::Storage::Filesystem;
+package CPAN::Metabase::Archive::Filesystem;
 use Moose;
 use Moose::Util::TypeConstraints;
 use Path::Class ();
@@ -15,7 +15,7 @@ use Carp ();
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
 
-extends 'CPAN::Metabase::Storage';
+extends 'CPAN::Metabase::Archive';
 
 subtype 'ExistingDir' 
     => as 'Object' 
@@ -109,7 +109,7 @@ __END__
 
 =head1 NAME
 
-CPAN::Metabase::Storage::Filesystem - CPAN::Metabase file-based storage
+CPAN::Metabase::Archive::Filesystem - CPAN::Metabase file-based storage
 
 =head1 SYNOPSIS
 
