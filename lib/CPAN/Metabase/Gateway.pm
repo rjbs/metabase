@@ -11,10 +11,9 @@ has analyzers => (
   required   => 1,
 );
 
-has injector => (
+has storage => (
   is       => 'ro',
-  isa      => 'CPAN::Metabase::Injector',
-  default  => sub { CPAN::Metabase::Injector->new },
+  isa      => 'CPAN::Metabase::Storage',
   required => 1,
 );
 
@@ -66,7 +65,7 @@ sub handle {
 
   my $report = $analyzer->produce_report($request);
 
-  $self->injector->inject_report($report);
+  $self->storage->store($report);
 
   return 1;
 }
