@@ -1,7 +1,8 @@
 package CPAN::Metabase::Gateway;
 use Moose;
 
-use CPAN::Metabase::Injector;
+use CPAN::Metabase::Analyzer;
+use CPAN::Metabase::Storage;
 use Data::GUID;
 
 has analyzers => (
@@ -11,25 +12,18 @@ has analyzers => (
   required   => 1,
 );
 
-has injector => (
+has storage => (
   is       => 'ro',
-  isa      => 'CPAN::Metabase::Injector',
-  default  => sub { CPAN::Metabase::Injector->new },
+  isa      => 'CPAN::Metabase::Storage',
   required => 1,
 );
-
-# This is no good.  The analyzers won't be set because the TC on analyzers
-# can't pass if they weren't loaded. -- rjbs, 2008-04-06
-# sub BUILD {
-#   my ($self) = @_;
-#   eval "require $_; 1" or die for $self->analyzers;
-# }
 
 sub analyzer_for {
   my ($self, $request) = @_;
 
   my $analyzer;
   CANDIDATE: for my $candidate ($self->analyzers) {
+    warn "checking $candidate for handling $request->{type}";
     if ($candidate->handles_type($request->{type})) {
       $analyzer = $candidate;
       last CANDIDATE;
@@ -65,7 +59,7 @@ sub handle {
 
   my $report = $analyzer->produce_report($request);
 
-  $self->injector->inject_report($report);
+  $self->storage->store($report);
 
   return 1;
 }

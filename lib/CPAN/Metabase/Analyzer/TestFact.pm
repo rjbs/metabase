@@ -1,18 +1,11 @@
-package CPAN::Metabase::Analyzer::Test;
+package CPAN::Metabase::Analyzer::TestFact;
 use Moose;
 extends 'CPAN::Metabase::Analyzer';
 
+use CPAN::Metabase::Fact::TestFact;
+
 our $VERSION = '0.001';
 
-sub fact_class { 'CPAN::Metabase::TestFact' }
-
-sub handles_type {
-  return 1 if $_[1] eq 'CPAN::Metabase::Test';
-  return;
-}
-
-sub analyze {
-  return { ProvidedBy => __PACKAGE__ . " " . __PACKAGE__->VERSION };
-}
+sub fact_class { 'CPAN::Metabase::Fact::TestFact' }
 
 1;
