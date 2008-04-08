@@ -41,6 +41,14 @@ sub guid {
     return $self->{guid};
 }
 
+# user_id() has to be read/write as facts start without a user_id and have one
+# assigned depending on where/how they are stored
+sub user_id {
+    my $self = shift;
+    if (@_ > 1) { $self->{user_id} = shift }; 
+    return $self->{user_id};
+}
+
 # default schema
 sub schema_version { 1 }
 
