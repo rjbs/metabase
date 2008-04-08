@@ -59,7 +59,7 @@ has test_librarian => (
   default => sub {
     require CPAN::Metabase::Librarian;
     CPAN::Metabase::Librarian->new(
-        archive => Test::Metabase::Util->test_storage,
+        archive => Test::Metabase::Util->test_archive,
         'index' => Test::Metabase::Util->test_index,
     );
   },

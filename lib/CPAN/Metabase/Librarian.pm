@@ -8,7 +8,7 @@ package CPAN::Metabase::Librarian;
 use Moose;
 use Moose::Util::TypeConstraints;
 use Carp ();
-use CPAN::Metabase::Storage;
+use CPAN::Metabase::Archive;
 use CPAN::Metabase::Index;
 
 our $VERSION = '0.01';
@@ -16,13 +16,13 @@ $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
 
 has 'archive' => (
     is => 'ro', 
-#    isa => 'CPAN::Metabase::Storage[ClassName]',
+    isa => 'CPAN::Metabase::Archive',
     required => 1, 
 );
 
 has 'index' => (
     is => 'ro', 
-#    isa => 'CPAN::Metabase::Index[ClassName]',
+    isa => 'CPAN::Metabase::Index',
     required => 1, 
 );
 
@@ -66,7 +66,7 @@ __END__
 
 =head1 NAME
 
-CPAN::Metabase::Storage - Abstract base class for CPAN::Metabase storage
+CPAN::Metabase::Librarian - no human would stack books this way
 
 =head1 SYNOPSIS
 
