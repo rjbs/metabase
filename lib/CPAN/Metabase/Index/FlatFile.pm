@@ -43,7 +43,7 @@ sub store {
 
     $line .= " timestamp " . time;
         
-    my $fh = IO::File->new( $self->index_file, "a" )
+    my $fh = IO::File->new( $self->index_file, "a+" )
         or Carp::confess( "Couldn't append to '$self->{index_file}': $!" );
     $fh->binmode(1);
 
