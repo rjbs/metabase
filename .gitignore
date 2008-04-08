@@ -1,4 +1,5 @@
 eg/*
-Makefile*
+Makefile
+Makefile.old
 blib/*
 pm_to_blib
