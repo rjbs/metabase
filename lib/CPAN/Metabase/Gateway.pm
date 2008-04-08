@@ -1,7 +1,6 @@
 package CPAN::Metabase::Gateway;
 use Moose;
 
-use CPAN::Metabase::Injector;
 use Data::GUID;
 
 has analyzers => (
