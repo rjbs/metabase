@@ -19,12 +19,18 @@ BEGIN { @valid_args = qw/dist_author dist_file content/ }
 use Object::Tiny @valid_args;
 
 # new takes a reference
+# may have a type, but we'll set it anyway 
 sub new {
     my ($class, @args) = @_;
     my %args = Params::Validate::validate( @args, 
         { type => 0, map { $_ => 1 } @valid_args } 
     );
-    return bless { %args, type => $class->type }, $class;
+    my $self = bless { %args, type => $class->type }, $class;
+    eval { $self->validate_content or die "\n" };
+    if ($@) {
+        Carp::confess( "$class object content invalid: $@" );
+    }
+    return $self;
 }
 
 # guid() has to be read/write as facts start without a GUID and have one
@@ -55,6 +61,11 @@ sub as_string {
 sub from_string { 
     my $self = shift;
     Carp::confess "from_string() not implemented by " . ref $self;
+}
+
+sub validate_content {
+    my $self = shift;
+    Carp::confess "validate_content() not implemented by " . ref $self;
 }
 
 1;

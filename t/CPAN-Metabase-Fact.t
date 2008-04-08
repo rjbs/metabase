@@ -10,13 +10,33 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-plan tests => 3;
+plan tests => 8;
 
 require_ok( 'CPAN::Metabase::Fact' );
 
-my $obj = bless {}, 'CPAN::Metabase::Fact';
+#--------------------------------------------------------------------------#
 
-for my $m ( qw/as_string from_string/ ) {
+my ($obj, $err);
+
+#--------------------------------------------------------------------------#
+# required parameters missing
+#--------------------------------------------------------------------------#
+
+eval { $obj = CPAN::Metabase::Fact->new() };
+$err = $@;
+like( $err, qr/Mandatory parameters/, "new() without params throws error" );
+for my $p ( qw/ dist_author dist_file content / ) {
+    like( $err, qr/$p/, "... '$p' noted missing" );
+}
+
+#--------------------------------------------------------------------------#
+# fake object and test unimplemented
+#--------------------------------------------------------------------------#
+
+$obj = bless {}, 'CPAN::Metabase::Fact';
+
+for my $m ( qw/as_string from_string validate_content/ ) {
     throws_ok { $obj->$m } qr/$m\(\) not implemented by CPAN::Metabase::Fact/;
 }
+
 
