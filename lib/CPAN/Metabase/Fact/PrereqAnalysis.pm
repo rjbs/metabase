@@ -5,14 +5,18 @@ use base 'CPAN::Metabase::Fact';
 
 use YAML::XS ();
 
-sub as_string {
+# XXX: remove this after merging with dagolden -- rjbs, 2008-04-08
+sub type { 'CPAN-Metabase-Fact-PrereqAnalysis' }
+
+sub content_as_string {
   my ($self) = @_;
-  return YAML::XS::Dump($as_string);
+  return YAML::XS::Dump($self->content);
 }
 
-sub from_string {
-  my ($self) = @_;
-  return YAML::XS::Dump($as_string);
+sub content_from_string {
+  my ($self, $string) = @_;
+
+  YAML::XS::Load($string);
 }
 
 sub validate_content {
