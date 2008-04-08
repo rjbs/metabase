@@ -7,6 +7,9 @@
 package CPAN::Metabase::Index::FlatFile;
 use Moose;
 use Moose::Util::TypeConstraints;
+use Fcntl ':flock';
+use IO::File ();
+use Carp ();
 
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
@@ -28,16 +31,58 @@ has 'index_file' => (
     required => 1, 
 );
 
-my @index_vars = qw/ dist_author dist_file type /;
-
 sub store {
     my ($self, $fact) = @_;
+    Carp::confess( "can't store a Fact without a GUID" ) unless $fact->guid;
+    
+    my $line =  join( q{ }, 
+        map { "$_ $fact->{$_}" } 
+        grep { $_ ne 'content' } 
+        sort keys %$fact
+    );
 
+    $line .= " timestamp " . time;
+        
+    my $fh = IO::File->new( $self->index_file, "a" )
+        or Carp::confess( "Couldn't append to '$self->{index_file}': $!" );
+    $fh->binmode(1);
+
+    flock $fh, LOCK_EX;
+    {   
+        seek $fh, 2, 0; # end
+        print {$fh} $line, "\n";
+    }
+    $fh->close;
 }
 
-sub locate {
-    my ($self, @search_spec) = @_;
+sub search {
+    my ($self, %spec) = @_;
+    
+    my $fh = IO::File->new( $self->index_file, "r" )
+        or Carp::confess( "Couldn't append to '$self->{index_file}': $!" );
+    $fh->binmode(1);
 
+    my @matches;
+    flock $fh, LOCK_SH;
+    {
+        while ( my $line = <$fh> ) {
+            my $parsed = { split q{ }, $line };
+            push @matches, $parsed->{guid} if _match( $parsed, \%spec );
+        }
+    }    
+    $fh->close;
+
+    return \@matches;
+}
+
+sub _match {
+    my ($parsed, $spec) = @_;
+    for my $k ( keys %$spec ) {
+        return unless  defined($parsed->{$k}) 
+                    && defined($spec->{$k}) 
+                    && $parsed->{$k} eq $spec->{$k};
+    }
+    return 1;
 }
 
 1;

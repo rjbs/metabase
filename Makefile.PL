@@ -11,8 +11,9 @@ requires('Path::Class'  => 0);
 requires('Object::Tiny' => 0);
 requires('Test::Exception' => 0);
 requires('Moose::Util::TypeConstraints' => 0);
+build_requires('MooseX::Singleton');
 
 tests_recursive;
-author_tests('xt');
+#author_tests('xt');
 
 WriteAll;
