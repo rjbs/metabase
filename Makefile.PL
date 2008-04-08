@@ -1,5 +1,6 @@
 require 5.006;
 use ExtUtils::MakeMaker;
+my @tests = qw {t/*.t t/*/*.t};
 WriteMakefile (
     'PL_FILES' => {},
     'INSTALLDIRS' => 'site',
@@ -15,5 +16,8 @@ WriteMakefile (
         'File::Temp' => 0,
         'File::Slurp' => 0,
         'Path::Class' => 0,
-    }
+    },
+    test         => {
+        TESTS => $^O eq 'MSWin32' ? "@{[map {glob} @tests]}" : "@tests" 
+    },
 );
