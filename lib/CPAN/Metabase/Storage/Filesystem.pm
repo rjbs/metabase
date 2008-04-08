@@ -63,6 +63,7 @@ sub store {
 # class isa CPAN::Metabase::Fact::Subclass
 sub extract {
     my ($self, $guid) = @_;
+    $guid = $guid->as_string if ref $guid;
     
     # read the fact
     my $fact_content = File::Slurp::read_file( 

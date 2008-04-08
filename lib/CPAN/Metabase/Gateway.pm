@@ -1,6 +1,8 @@
 package CPAN::Metabase::Gateway;
 use Moose;
 
+use CPAN::Metabase::Analyzer;
+use CPAN::Metabase::Storage;
 use Data::GUID;
 
 has analyzers => (
@@ -15,13 +17,6 @@ has storage => (
   isa      => 'CPAN::Metabase::Storage',
   required => 1,
 );
-
-# This is no good.  The analyzers won't be set because the TC on analyzers
-# can't pass if they weren't loaded. -- rjbs, 2008-04-06
-# sub BUILD {
-#   my ($self) = @_;
-#   eval "require $_; 1" or die for $self->analyzers;
-# }
 
 sub analyzer_for {
   my ($self, $request) = @_;
