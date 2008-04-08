@@ -5,8 +5,7 @@
 # copy of the License from http://dev.perl.org/licenses/
 
 package CPAN::Metabase::Index;
-use strict;
-use warnings;
+use Moose;
 
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345

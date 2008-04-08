@@ -5,11 +5,40 @@
 # copy of the License from http://dev.perl.org/licenses/
 
 package CPAN::Metabase::Index::FlatFile;
-use strict;
-use warnings;
+use Moose;
+use Moose::Util::TypeConstraints;
 
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
+
+extends 'CPAN::Metabase::Index';
+
+subtype 'File' 
+    => as 'Object' 
+        => where { $_->isa( "Path::Class::File" ) };
+
+coerce 'File' 
+    => from 'Str' 
+        => via { Path::Class::file($_) };
+
+has 'index_file' => (
+    is => 'ro', 
+    isa => 'File',
+    coerce => 1,
+    required => 1, 
+);
+
+my @index_vars = qw/ dist_author dist_file type /;
+
+sub store {
+    my ($self, $fact) = @_;
+
+}
+
+sub locate {
+    my ($self, @search_spec) = @_;
+
+}
 
 1;
 
