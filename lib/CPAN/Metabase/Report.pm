@@ -7,26 +7,8 @@ has guid => (
   handles => { guid_string => 'as_string' },
 );
 
-has type => (is => 'ro');
-has fact => (
-  is => 'ro',
-);
+has fact => (is => 'ro', isa => 'CPAN::Metabase::Fact', required => 1);
+has user => (is => 'ro', required => 1);
 
-has dist_author => (is => 'ro');
-has dist_name   => (is => 'ro');
-has summary     => (is => 'ro');
-
-sub as_string {
-  my ($self) = @_;
-  $self->{content};
-}
-
-sub metadata {
-  my ($self) = @_;
-
-  return {
-    map { $_ => $self->$_ } qw(dist_author dist_name type),
-  };
-}
-
+no Moose;
 1;

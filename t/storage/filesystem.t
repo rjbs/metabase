@@ -45,8 +45,8 @@ lives_ok {
 
 my $fact = CPAN::Metabase::TestFact->new( 
     dist_author => $dist_author, 
-    dist_file => $dist_file, 
-    content => {odor => 'sweet'}
+    dist_file   => $dist_file, 
+    content     => "I smell something fishy.",
 );
 
 isa_ok( $fact, 'CPAN::Metabase::TestFact' );
@@ -57,8 +57,8 @@ ok( my $copy = $storage->extract( "CPAN::Metabase::TestFact", $guid ),
     "got a fact from storage"
 );
 
-for my $p ( qw/odor type/ ) {
-    is( $copy->$p, $fact->$p, "second object has same $p" )
+for my $p ( qw/odor content/ ) {
+    is_deeply( $copy->$p, $fact->$p, "second object has same $p" )
 }
 
 

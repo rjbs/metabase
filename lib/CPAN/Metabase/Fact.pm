@@ -26,7 +26,7 @@ sub new {
         { type => 0, map { $_ => 1 } @valid_args } 
     );
     my $self = bless { %args, type => $class->type }, $class;
-    eval { $self->validate_content or die "\n" };
+    eval { $self->validate_content, 1 or die "\n" };
     if ($@) {
         Carp::confess( "$class object content invalid: $@" );
     }

@@ -18,14 +18,6 @@ sub analyze {
 
 sub fact_class { die 'no fact class supplied'; }
 
-sub fact_from_content {
-  my ($self, $content_ref) = @_;
-  
-  my $class = $self->fact_class;
-  eval "require $class; 1" or die;
-  $self->fact_class->from_string($content_ref);
-}
-
 sub produce_report {
   my ($self, $request) = @_;
 
@@ -36,15 +28,14 @@ sub produce_report {
   die "invalid keys in response from analyzer"
     if grep { /^[a-z]/ } keys %$analysis;
 
-  my $report = CPAN::Metabase::Report->new({
-    (map { $_ => $request->{$_} } qw(dist_name dist_author type guid)),
-    fact     => $self->fact_from_content(\$request->{content}),
-    metadata => {
-      %$analysis,
-      # user => $user,
-      type     => $request->{type},
-      analyzer => $self, # XXX: make this stringify betterly
-    },
+  my $class = $self->fact_class;
+  eval "require $class; 1" or die;
+  $self->fact_class->new({
+    dist_name   => $request->{dist_name},
+    dist_author => $request->{dist_author},
+    content     => $self->fact_class->content_from_string(
+      $request->{content_ref}
+    ),
   });
 }
   
