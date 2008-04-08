@@ -4,97 +4,69 @@
 # A copy of the License was distributed with this file or you may obtain a 
 # copy of the License from http://dev.perl.org/licenses/
 
-package CPAN::Metabase::Index::FlatFile;
+package CPAN::Metabase::Librarian;
 use Moose;
 use Moose::Util::TypeConstraints;
-use Fcntl ':flock';
-use IO::File ();
 use Carp ();
+use CPAN::Metabase::Storage;
+use CPAN::Metabase::Index;
 
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
 
-extends 'CPAN::Metabase::Index';
-
-subtype 'File' 
-    => as 'Object' 
-        => where { $_->isa( "Path::Class::File" ) };
-
-coerce 'File' 
-    => from 'Str' 
-        => via { Path::Class::file($_) };
-
-has 'index_file' => (
+has 'archive' => (
     is => 'ro', 
-    isa => 'File',
-    coerce => 1,
+#    isa => 'CPAN::Metabase::Storage[ClassName]',
     required => 1, 
 );
 
+has 'index' => (
+    is => 'ro', 
+#    isa => 'CPAN::Metabase::Index[ClassName]',
+    required => 1, 
+);
+
+# given fact, store it and return guid; 
 sub store {
     my ($self, $fact) = @_;
-    Carp::confess( "can't store a Fact without a GUID" ) unless $fact->guid;
-    
-    my $line =  join( q{ }, 
-        map { "$_ $fact->{$_}" } 
-        grep { $_ ne 'content' } 
-        sort keys %$fact
-    );
 
-    $line .= " timestamp " . time;
-        
-    my $fh = IO::File->new( $self->index_file, "a" )
-        or Carp::confess( "Couldn't append to '$self->{index_file}': $!" );
-    $fh->binmode(1);
-
-    flock $fh, LOCK_EX;
-    {   
-        seek $fh, 2, 0; # end
-        print {$fh} $line, "\n";
+    # can only store objects that have been marked submitted
+    unless ( $fact->is_submitted ) {
+        Carp::confess("Can't store a fact that isn't marked as submitted");
     }
-    $fh->close;
+
+    # don't store existing GUIDs
+    if ( $self->index->exists( $fact->guid ) ) {
+        Carp::confess("GUID conflicts with an existing object");
+    }
+
+    if ( $self->archive->store( $fact ) && $self->index->store( $fact ) ) {
+        return $fact->guid;
+    }
+    else {
+        Carp::confess("Error storing or indexing fact with guid: " . $fact->guid);
+    }
 }
 
 sub search {
     my ($self, %spec) = @_;
-    
-    my $fh = IO::File->new( $self->index_file, "r" )
-        or Carp::confess( "Couldn't append to '$self->{index_file}': $!" );
-    $fh->binmode(1);
-
-    my @matches;
-    flock $fh, LOCK_SH;
-    {
-        while ( my $line = <$fh> ) {
-            my $parsed = { split q{ }, $line };
-            push @matches, $parsed->{guid} if _match( $parsed, \%spec );
-        }
-    }    
-    $fh->close;
-
-    return \@matches;
+    return $self->index->search( %spec );
 }
 
-sub exists {
+sub extract {
     my ($self, $guid) = @_;
-    return scalar @{ $self->search( guid => $guid ) };
-}
-
-sub _match {
-    my ($parsed, $spec) = @_;
-    for my $k ( keys %$spec ) {
-        return unless  defined($parsed->{$k}) 
-                    && defined($spec->{$k}) 
-                    && $parsed->{$k} eq $spec->{$k};
-    }
-    return 1;
+    return $self->archive->extract( $guid );
 }
 
 1;
 
+__END__
+
+=pod
+
 =head1 NAME
 
-CPAN::Metabase::Index::FlatFile - CPAN::Metabase flat-file index
+CPAN::Metabase::Storage - Abstract base class for CPAN::Metabase storage
 
 =head1 SYNOPSIS
 

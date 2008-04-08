@@ -18,6 +18,20 @@ has test_gateway => (
   }
 );
 
+has test_fact => (
+  is   => 'ro',
+  isa  => 'CPAN::Metabase::Fact',
+  lazy => 1,
+  default => sub {
+    require CPAN::Metabase::Fact::TestFact;
+    CPAN::Metabase::Fact::TestFact->new( 
+        dist_author => 'JOHNDOE', 
+        dist_file   => 'Foo-Bar-1.23.tar.gz', 
+        content     => "I smell something fishy.",
+    );
+  },
+);
+
 has test_archive => (
   is   => 'ro',
   isa  => 'CPAN::Metabase::Archive::Filesystem',
@@ -38,16 +52,15 @@ has test_index => (
   },
 );
 
-has test_fact => (
+has test_librarian => (
   is   => 'ro',
-  isa  => 'CPAN::Metabase::Fact',
+  isa  => 'CPAN::Metabase::Librarian',
   lazy => 1,
   default => sub {
-    require CPAN::Metabase::Fact::TestFact;
-    CPAN::Metabase::Fact::TestFact->new( 
-        dist_author => 'JOHNDOE', 
-        dist_file   => 'Foo-Bar-1.23.tar.gz', 
-        content     => "I smell something fishy.",
+    require CPAN::Metabase::Librarian;
+    CPAN::Metabase::Librarian->new(
+        archive => Test::Metabase::Util->test_storage,
+        'index' => Test::Metabase::Util->test_index,
     );
   },
 );

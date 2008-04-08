@@ -51,6 +51,8 @@ my $fact = CPAN::Metabase::Fact::TestFact->new(
 
 isa_ok( $fact, 'CPAN::Metabase::Fact::TestFact' );
 
+$fact->mark_submitted(user_id => 'Larry');
+
 ok( my $guid = $archive->store( $fact ), "stored a fact" );
 
 is( $fact->guid, $guid, "GUID returned matched GUID in fact" );

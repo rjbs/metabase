@@ -11,6 +11,7 @@ use Path::Class ();
 use File::Slurp ();
 use Data::GUID ();
 use Carp ();
+use CPAN::Metabase::Fact;
 
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
@@ -38,24 +39,25 @@ has 'root_dir' => (
 sub store {
     my ($self, $fact) = @_;
 
-    # add GUID to fact
-    my $guid = Data::GUID->new;  
-    $fact->guid( $guid ) unless $fact->guid;
+    unless ( $fact->guid ) {
+        Carp::confess "Can't store: no GUID set for fact\n";
+    }
 
     # write the fact content
     File::Slurp::write_file( 
-        $self->_guid_path( $guid ), 
+        $self->_guid_path( $fact->guid ), 
         {binmode => ':raw'}, 
         $fact->content_as_string 
     );
     # write the fact meta info
     File::Slurp::write_file(
-        $self->_guid_path( $guid ) . ".meta",
-        {binmode => ':raw'}, 
+        $self->_guid_path( $fact->guid ) . ".meta",
+        {binmode => ':raw'},
+        "type " . $fact->type . "\n", # so we can reconstruct later
         map { "$_ $fact->{$_}\n" } grep { $_ ne 'content' } sort keys %$fact,
     );
 
-    return $guid;
+    return $fact->guid;
 }
 
 # given guid, retrieve it and return it
@@ -77,10 +79,9 @@ sub extract {
         binmode => ':raw',
     );
 
-    # reconstruct fact meta to find the class
+    # reconstruct fact meta and extract type to find the class
     my %fact_meta = map { chomp; split /\s/, $_, 2 } @fact_meta_lines;
-    my $class = $fact_meta{type};
-    $class =~ s{-}{::}g;
+    my $class = CPAN::Metabase::Fact->type_to_class( delete $fact_meta{type} );
 
     # recreate the class
     return $class->new(
