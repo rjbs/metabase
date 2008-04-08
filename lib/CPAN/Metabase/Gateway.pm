@@ -1,7 +1,7 @@
 package CPAN::Metabase::Gateway;
 use Moose;
 
-use CPAN::Metabase::Archive; # XXX: will be Librarian
+use CPAN::Metabase::Librarian;
 use Data::GUID;
 
 has fact_classes => (
@@ -11,9 +11,9 @@ has fact_classes => (
   required   => 1,
 );
 
-has archive => (
+has librarian => (
   is       => 'ro',
-  isa      => 'CPAN::Metabase::Archive', # XXX: will be Librarian
+  isa      => 'CPAN::Metabase::Librarian',
   required => 1,
 );
 
@@ -25,7 +25,7 @@ sub _validate_dist {
   1;
 }
 
-my %USER = map {; $_ => 1 } qw(rjbs dagolden);
+my %IS_USER = map {; $_ => 1 } qw(rjbs dagolden);
 
 sub handle {
   my ($self, $request) = @_;
@@ -35,20 +35,23 @@ sub handle {
   # that's just fine. -- rjbs, 2008-04-06
   $request ||= {};
 
-  die "unknown user" unless my $user = $USER{ $request->{user_id} };
+  die "unknown user" unless $IS_USER{ $request->{user_id} };
   die "unknown dist" unless $self->_validate_dist($request);
+
+  my $user_id = delete $request->{user_id};
+  my $type    = delete $request->{type};
 
   my $fact;
   FACT_CLASS: for my $fact_class ($self->fact_classes) {
     eval "require $fact_class; 1" or die;
-    next FACT_CLASS unless $fact_class->type eq $request->{type};
+    next FACT_CLASS unless $fact_class->type eq $type;
     $fact = eval { $fact_class->new($request) };
     die $@ unless $fact;
   }
 
-  $request->{guid} = Data::GUID->new;
+  $fact->mark_submitted(user_id => $user_id);
 
-  my $guid = $self->archive->store($fact);
+  my $guid = $self->librarian->store($fact);
 }
 
 1;
