@@ -17,7 +17,6 @@ WriteMakefile (
         'File::Slurp' => 0,
         'Path::Class' => 0,
         'Object::Tiny' => 0,
-    }
     },
     test         => {
         TESTS => $^O eq 'MSWin32' ? "@{[map {glob} @tests]}" : "@tests" 

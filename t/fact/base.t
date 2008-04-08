@@ -10,11 +10,13 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-plan tests => 8;
+plan tests => 9;
 
 require_ok( 'CPAN::Metabase::Fact' );
 
 #--------------------------------------------------------------------------#
+# fixtures
+#--------------------------------------------------------------------------#    
 
 my ($obj, $err);
 
@@ -30,12 +32,12 @@ for my $p ( qw/ dist_author dist_file content / ) {
 }
 
 #--------------------------------------------------------------------------#
-# fake object and test unimplemented
+# fake an object and test unimplemented
 #--------------------------------------------------------------------------#
 
 $obj = bless {}, 'CPAN::Metabase::Fact';
 
-for my $m ( qw/as_string from_string validate_content/ ) {
+for my $m ( qw/type as_string from_string validate_content/ ) {
     throws_ok { $obj->$m } qr/$m\(\) not implemented by CPAN::Metabase::Fact/;
 }
 

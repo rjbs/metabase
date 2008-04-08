@@ -49,7 +49,6 @@ sub type {
     my $self = shift;
     # normally called as a class function but just in case...
     my $class = ref $self ? ref($self) : $self;
-    print "class is $class\n";
     Carp::confess "type() not implemented by " . $class;
 }
 
