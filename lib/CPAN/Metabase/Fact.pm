@@ -41,16 +41,19 @@ sub guid {
     return $self->{guid};
 }
 
-#--------------------------------------------------------------------------#
-# fatal stubs
-#--------------------------------------------------------------------------#
+# default schema
+sub schema_version { 1 }
 
 sub type {
     my $self = shift;
-    # normally called as a class function but just in case...
     my $class = ref $self ? ref($self) : $self;
-    Carp::confess "type() not implemented by " . $class;
+    $class =~ s{::}{-}g;
+    return $class;
 }
+
+#--------------------------------------------------------------------------#
+# fatal stubs
+#--------------------------------------------------------------------------#
 
 sub as_string { 
     my $self = shift;

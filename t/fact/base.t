@@ -10,7 +10,10 @@ use warnings;
 use Test::More;
 use Test::Exception;
 
-plan tests => 9;
+use lib 't/lib';
+use CPAN::Metabase::TestFact;
+
+plan tests => 16;
 
 require_ok( 'CPAN::Metabase::Fact' );
 
@@ -32,13 +35,41 @@ for my $p ( qw/ dist_author dist_file content / ) {
 }
 
 #--------------------------------------------------------------------------#
-# fake an object and test unimplemented
+# fake an object and test methods
 #--------------------------------------------------------------------------#
 
 $obj = bless {}, 'CPAN::Metabase::Fact';
 
-for my $m ( qw/type as_string from_string validate_content/ ) {
+# schema version default
+can_ok( $obj, 'schema_version' );
+is( $obj->schema_version, 1, "schema_version() defaults to 1");
+
+# type is class munged from "::" to "-"
+can_ok( $obj, 'type' );
+is( $obj->type, "CPAN-Metabase-Fact", "type() is ok" );
+
+# unimplemented
+for my $m ( qw/as_string from_string validate_content/ ) {
     throws_ok { $obj->$m } qr/$m\(\) not implemented by CPAN::Metabase::Fact/;
 }
 
+#--------------------------------------------------------------------------#
+# new should take either hashref or list
+#--------------------------------------------------------------------------#
+
+my $args = {
+    dist_author => "JOHNDOE",
+    dist_file => "Foo-Bar-1.23.tar.gz",
+    content => { odor => 'smelly' },
+};
+
+lives_ok{ $obj = CPAN::Metabase::TestFact->new( $args ) } 
+    "new( <hashref> ) doesn't die";
+
+is( ref $obj, 'CPAN::Metabase::TestFact', "object created with correct type" );
+
+lives_ok{ $obj = CPAN::Metabase::TestFact->new( %$args ) } 
+    "new( <list> ) doesn't die";
+
+is( ref $obj, 'CPAN::Metabase::TestFact', "object created with correct type" );
 

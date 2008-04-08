@@ -11,8 +11,6 @@ sub odor {
     return $self->content->{odor};
 }
 
-sub type { return 'smelly_fact' }
-
 sub as_string {
   my ($self) = @_;
 
