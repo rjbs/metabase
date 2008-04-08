@@ -7,7 +7,43 @@
 use strict;
 use warnings;
 
-use Test::More tests => 1;
+use Test::More;
+
+use Test::Exception;
+use File::Temp ();
+use File::Path ();
+
+use lib 't/lib';
+use Test::Metabase::Util;
+
+plan tests => 13;
+
+#-------------------------------------------------------------------------#
 
 require_ok( 'CPAN::Metabase::Index::FlatFile' );
+
+ok( my $storage = Test::Metabase::Util->test_storage, 'created storage' );
+isa_ok( $storage, 'CPAN::Metabase::Storage::Filesystem' );
+
+ok( my $index = Test::Metabase::Util->test_index, 'created an index' );
+isa_ok( $index, 'CPAN::Metabase::Index::FlatFile' );
+
+ok( my $fact = Test::Metabase::Util->test_fact, "created a fact" );
+isa_ok( $fact, 'CPAN::Metabase::Fact::TestFact' );
+ok( my $guid = $storage->store( $fact ), "stored a fact" );
+
+ok( $index->store( $fact ), "indexed fact" );
+
+my $matches;
+$matches = $index->search( guid => $guid );
+is( scalar @$matches, 1, "found guid searching for guid" );
+
+$matches = $index->search( dist_author => $fact->dist_author );
+ok( scalar @$matches >= 1, "found guid searching for fact dist_author" );
+
+$matches = $index->search( dist_author => "asdljasljfa" );
+is( scalar @$matches, 0, "found no guids searching for bogus dist_author" );
+
+$matches = $index->search( bogus_key => "asdljasljfa" );
+is( scalar @$matches, 0, "found no guids searching on bogus key" );
 

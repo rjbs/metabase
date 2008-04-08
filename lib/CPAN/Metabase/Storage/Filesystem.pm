@@ -52,7 +52,7 @@ sub store {
     File::Slurp::write_file(
         $self->_guid_path( $guid ) . ".meta",
         {binmode => ':raw'}, 
-        map { "$_ $fact->{$_}\n" } grep { $_ ne 'content' } keys %$fact,
+        map { "$_ $fact->{$_}\n" } grep { $_ ne 'content' } sort keys %$fact,
     );
 
     return $guid;

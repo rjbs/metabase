@@ -22,7 +22,7 @@ my $dist_file = 'Foo-Bar-1.23.tar.gz';
 
 #--------------------------------------------------------------------------#
 
-plan tests => 9;
+plan tests => 10;
 
 require_ok( 'CPAN::Metabase::Storage::Filesystem' );
 
@@ -52,6 +52,8 @@ my $fact = CPAN::Metabase::Fact::TestFact->new(
 isa_ok( $fact, 'CPAN::Metabase::Fact::TestFact' );
 
 ok( my $guid = $storage->store( $fact ), "stored a fact" );
+
+is( $fact->guid, $guid, "GUID returned matched GUID in fact" );
 
 ok( my $copy = $storage->extract( $guid ),
     "got a fact from storage"
