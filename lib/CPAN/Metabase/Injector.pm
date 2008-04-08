@@ -23,7 +23,7 @@ sub inject_report {
     'meta',
     $self->_typename_for_path($report->type),
     $report->dist_author,
-    $report->dist_name
+    $report->dist_file
   );
 
   $dest_path->mkpath;
@@ -76,7 +76,7 @@ sub _record_injection {
     $report->guid,
     $injection_time,
     $report->type,
-    $report->dist_author, $report->dist_name;
+    $report->dist_author, $report->dist_file;
 }
 
 sub _activity_log {

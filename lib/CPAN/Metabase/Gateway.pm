@@ -30,6 +30,7 @@ sub analyzer_for {
 
   my $analyzer;
   CANDIDATE: for my $candidate ($self->analyzers) {
+    warn "checking $candidate for handling $request->{type}";
     if ($candidate->handles_type($request->{type})) {
       $analyzer = $candidate;
       last CANDIDATE;
