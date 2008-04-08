@@ -11,7 +11,7 @@ use Test::More;
 use Test::Exception;
 
 use lib 't/lib';
-use CPAN::Metabase::TestFact;
+use CPAN::Metabase::Fact::TestFact;
 
 plan tests => 16;
 
@@ -59,17 +59,17 @@ for my $m ( qw/content_as_string content_from_string validate_content/ ) {
 
 my $args = {
     dist_author => "JOHNDOE",
-    dist_file => "Foo-Bar-1.23.tar.gz",
-    content => { odor => 'smelly' },
+    dist_file   => "Foo-Bar-1.23.tar.gz",
+    content     => "Who am I?",
 };
 
-lives_ok{ $obj = CPAN::Metabase::TestFact->new( $args ) } 
+lives_ok{ $obj = CPAN::Metabase::Fact::TestFact->new( $args ) } 
     "new( <hashref> ) doesn't die";
 
-is( ref $obj, 'CPAN::Metabase::TestFact', "object created with correct type" );
+is( ref $obj, 'CPAN::Metabase::Fact::TestFact', "object created with correct type" );
 
-lives_ok{ $obj = CPAN::Metabase::TestFact->new( %$args ) } 
+lives_ok{ $obj = CPAN::Metabase::Fact::TestFact->new( %$args ) } 
     "new( <list> ) doesn't die";
 
-is( ref $obj, 'CPAN::Metabase::TestFact', "object created with correct type" );
+is( ref $obj, 'CPAN::Metabase::Fact::TestFact', "object created with correct type" );
 

@@ -13,7 +13,7 @@ use File::Temp ();
 use File::Path ();
 
 use lib 't/lib';
-use CPAN::Metabase::TestFact;
+use CPAN::Metabase::Fact::TestFact;
 
 #--------------------------------------------------------------------------#
 
@@ -43,13 +43,13 @@ lives_ok {
     $storage = CPAN::Metabase::Storage::Filesystem->new(root_dir => "$temp_root");
 } "created store at '$temp_root'";
 
-my $fact = CPAN::Metabase::TestFact->new( 
+my $fact = CPAN::Metabase::Fact::TestFact->new( 
     dist_author => $dist_author, 
     dist_file   => $dist_file, 
     content     => "I smell something fishy.",
 );
 
-isa_ok( $fact, 'CPAN::Metabase::TestFact' );
+isa_ok( $fact, 'CPAN::Metabase::Fact::TestFact' );
 
 ok( my $guid = $storage->store( $fact ), "stored a fact" );
 
@@ -57,7 +57,7 @@ ok( my $copy = $storage->extract( $guid ),
     "got a fact from storage"
 );
 
-for my $p ( qw/odor content/ ) {
+for my $p ( qw/type content/ ) {
     is_deeply( $copy->$p, $fact->$p, "second object has same $p" )
 }
 

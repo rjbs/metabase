@@ -1,12 +1,9 @@
-package CPAN::Metabase::TestFact;
+package CPAN::Metabase::Fact::TestFact;
 use base 'CPAN::Metabase::Fact';
 
 use MIME::Base64 ();
 use Data::Dumper ();
 use Carp ();
-
-# XXX: until merged from dagolden
-sub type { return 'CPAN-Metabase-TestFact' }
 
 sub validate_content {
   my ($self) = @_;
