@@ -38,9 +38,7 @@ sub produce_report {
   $self->fact_class->new({
     dist_file   => $request->{dist_file},
     dist_author => $request->{dist_author},
-    content     => $self->fact_class->content_from_string(
-      $request->{content_ref}
-    ),
+    content     => $self->fact_class->content_from_string($request->{content}),
   });
 }
   
