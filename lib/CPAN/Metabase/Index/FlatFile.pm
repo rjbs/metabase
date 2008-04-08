@@ -59,7 +59,7 @@ sub search {
     my ($self, %spec) = @_;
     
     my $fh = IO::File->new( $self->index_file, "r" )
-        or Carp::confess( "Couldn't append to '$self->{index_file}': $!" );
+        or Carp::confess( "Couldn't read from '$self->{index_file}': $!" );
     $fh->binmode(1);
 
     my @matches;
