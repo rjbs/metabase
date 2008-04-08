@@ -42,9 +42,17 @@ sub store {
     my $guid = Data::GUID->new;  
     $fact->guid( $guid ) unless $fact->guid;
 
-    # write the fact
+    # write the fact content
     File::Slurp::write_file( 
-        $self->_guid_path( $guid ), {binmode => ':raw'}, $fact->as_string 
+        $self->_guid_path( $guid ), 
+        {binmode => ':raw'}, 
+        $fact->content_as_string 
+    );
+    # write the fact meta info
+    File::Slurp::write_file(
+        $self->_guid_path( $guid ) . ".meta",
+        {binmode => ':raw'}, 
+        map { "$_ $fact->{$_}\n" } grep { $_ ne 'content' } keys %$fact,
     );
 
     return $guid;
@@ -54,16 +62,29 @@ sub store {
 # type is directory path
 # class isa CPAN::Metabase::Fact::Subclass
 sub extract {
-    my ($self, $class, $guid) = @_;
+    my ($self, $guid) = @_;
     
     # read the fact
-    my $fact_string = File::Slurp::read_file( 
+    my $fact_content = File::Slurp::read_file( 
         $self->_guid_path( $guid ),
         binmode => ':raw', 
     );
-    my $fact = $class->from_string( $fact_string );
 
-    return $fact;
+    # read the fact meta
+    my @fact_meta_lines = File::Slurp::read_file(
+        $self->_guid_path( $guid ) . ".meta",
+        binmode => ':raw',
+    );
+
+    # reconstruct fact meta to find the class
+    my %fact_meta = map { chomp; split /\s/, $_, 2 } @fact_meta_lines;
+    my $class = $fact_meta{type};
+    $class =~ s{-}{::}g;
+
+    # recreate the class
+    return $class->new(
+        %fact_meta, content => $class->content_from_string( $fact_content )
+    );
 }
 
 sub _guid_path {

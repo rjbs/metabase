@@ -49,7 +49,7 @@ can_ok( $obj, 'type' );
 is( $obj->type, "CPAN-Metabase-Fact", "type() is ok" );
 
 # unimplemented
-for my $m ( qw/as_string from_string validate_content/ ) {
+for my $m ( qw/content_as_string content_from_string validate_content/ ) {
     throws_ok { $obj->$m } qr/$m\(\) not implemented by CPAN::Metabase::Fact/;
 }
 

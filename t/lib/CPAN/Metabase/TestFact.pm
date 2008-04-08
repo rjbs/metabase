@@ -11,25 +11,25 @@ sub odor {
     return $self->content->{odor};
 }
 
-sub as_string {
+sub content_as_string {
   my ($self) = @_;
 
-  return MIME::Base64::encode_base64(Data::Dumper::Dumper($self));
+  return MIME::Base64::encode_base64(Data::Dumper::Dumper($self->content));
 }
 
-sub from_string { 
-  my ($class, $string) = @_;
+sub content_from_string { 
+  my ($self, $string) = @_;
 
   $string = $$string if ref $string;
 
   my $perl = MIME::Base64::decode_base64($string);
 
-  $class->new(eval $perl);
+  return(eval $perl);
 }
 
 sub validate_content {
-    my ($self) = @_;
-    my @keys = keys %{$self->content};
+    my ($self, $content) = @_;
+    my @keys = keys %$content;
     unless ( @keys == 1 && $keys[0] eq 'odor' ) {
         die "'odor' parameter required\n";
     }

@@ -53,7 +53,7 @@ isa_ok( $fact, 'CPAN::Metabase::TestFact' );
 
 ok( my $guid = $storage->store( $fact ), "stored a fact" );
 
-ok( my $copy = $storage->extract( "CPAN::Metabase::TestFact", $guid ),
+ok( my $copy = $storage->extract( $guid ),
     "got a fact from storage"
 );
 

@@ -26,7 +26,7 @@ sub new {
         { type => 0, map { $_ => 1 } @valid_args } 
     );
     my $self = bless { %args, type => $class->type }, $class;
-    eval { $self->validate_content or die "\n" };
+    eval { $self->validate_content( $self->content ) };
     if ($@) {
         Carp::confess( "$class object content invalid: $@" );
     }
@@ -55,18 +55,18 @@ sub type {
 # fatal stubs
 #--------------------------------------------------------------------------#
 
-sub as_string { 
+sub content_as_string { 
     my $self = shift;
-    Carp::confess "as_string() not implemented by " . ref $self;
+    Carp::confess "content_as_string() not implemented by " . ref $self;
 }
 
-sub from_string { 
+sub content_from_string { 
     my $self = shift;
-    Carp::confess "from_string() not implemented by " . ref $self;
+    Carp::confess "content_from_string() not implemented by " . ref $self;
 }
 
 sub validate_content {
-    my $self = shift;
+    my ($self, $content) = @_;
     Carp::confess "validate_content() not implemented by " . ref $self;
 }
 
