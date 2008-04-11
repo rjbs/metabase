@@ -2,6 +2,8 @@ require 5.006;
 use inc::Module::Install;
 all_from('lib/CPAN/Metabase.pm');
 
+requires('CPAN::Metabase::Fact' => 0);
+
 requires('Test::More'   => '0.47');
 requires('Data::GUID'   => 0);
 requires('Moose'        => 0);
@@ -14,6 +16,6 @@ requires('Moose::Util::TypeConstraints' => 0);
 build_requires('MooseX::Singleton');
 
 tests_recursive;
-#author_tests('xt');
+extra_tests;
 
 WriteAll;
