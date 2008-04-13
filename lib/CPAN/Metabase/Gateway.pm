@@ -49,9 +49,9 @@ sub handle {
     die $@ unless $fact;
   }
 
-  $fact->mark_submitted(user_id => $user_id);
+  # $fact->mark_submitted(user_id => $user_id);
 
-  my $guid = $self->librarian->store($fact);
+  my $guid = $self->librarian->store($fact, { user_id => $user_id });
 }
 
 1;

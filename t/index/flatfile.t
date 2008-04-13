@@ -31,7 +31,13 @@ isa_ok( $index, 'CPAN::Metabase::Index::FlatFile' );
 ok( my $fact = Test::Metabase::Util->test_fact, "created a fact" );
 isa_ok( $fact, 'CPAN::Metabase::Fact::TestFact' );
 
-$fact->mark_submitted(user_id => 'Larry');
+$fact->mark_submitted({
+  user_id => 'Larry',
+  guid    => Data::GUID->new,
+  dist_name    => 'Foo-Bar', 
+  dist_version => '1.23', 
+});
+
 ok( my $guid = $archive->store( $fact ), "stored a fact" );
 
 ok( $index->store( $fact ), "indexed fact" );
