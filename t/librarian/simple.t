@@ -27,14 +27,10 @@ ok( my $librarian = Test::Metabase::Util->test_librarian, 'created librarian' );
 ok( my $fact = Test::Metabase::Util->test_fact, "created a fact" );
 isa_ok( $fact, 'CPAN::Metabase::Fact::TestFact' );
 
-$fact->mark_submitted({
-  user_id => 'Larry',
-  guid    => Data::GUID->new,
-  dist_name    => 'Foo-Bar', 
-  dist_version => '1.23', 
-});
-
-ok( my $guid = $librarian->store( $fact ), "stored a fact" );
+ok(
+  my $guid = $librarian->store($fact, { user_id => 'Larry' }),
+  "stored a fact"
+);
 
 my $matches;
 $matches = $librarian->search( guid => $guid );

@@ -8,8 +8,10 @@ package CPAN::Metabase::Librarian;
 use Moose;
 use Moose::Util::TypeConstraints;
 use Carp ();
+use CPAN::DistnameInfo;
 use CPAN::Metabase::Archive;
 use CPAN::Metabase::Index;
+use Data::GUID ();
 
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
@@ -28,14 +30,28 @@ has 'index' => (
 
 # given fact, store it and return guid; 
 sub store {
-    my ($self, $fact) = @_;
+    my ($self, $fact, $arg) = @_;
 
-    # can only store objects that have been marked submitted
-    unless ( $fact->is_submitted ) {
-        Carp::confess("Can't store a fact that isn't marked as submitted");
+    # can only store objects that have not yet been marked submitted
+    if ( $fact->is_submitted ) {
+        Carp::confess("Can't store a fact that is already marked as submitted");
     }
 
-    # don't store existing GUIDs
+    Carp::confess("no user_id provided for fact") unless $arg->{user_id};
+
+    my $d = CPAN::DistnameInfo->new(
+      uc($fact->dist_author) . '/' . $fact->dist_file
+    );
+
+    $fact->mark_submitted({
+      guid    => Data::GUID->new,
+      user_id => $arg->{user_id},
+      dist_name    => $d->dist,
+      dist_version => $d->version,
+    });
+
+    # Don't store existing GUIDs; this should never happen, since we're just
+    # generating a new one, but... hey, can't be too safe, right?
     if ( $self->index->exists( $fact->guid ) ) {
         Carp::confess("GUID conflicts with an existing object");
     }
