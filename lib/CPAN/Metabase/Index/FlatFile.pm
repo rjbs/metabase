@@ -45,7 +45,7 @@ sub store {
         
     my $fh = IO::File->new( $self->index_file, "a+" )
         or Carp::confess( "Couldn't append to '$self->{index_file}': $!" );
-    $fh->binmode(1);
+    $fh->binmode(':raw');
 
     flock $fh, LOCK_EX;
     {   
@@ -60,7 +60,7 @@ sub search {
     
     my $fh = IO::File->new( $self->index_file, "r" )
         or Carp::confess( "Couldn't read from '$self->{index_file}': $!" );
-    $fh->binmode(1);
+    $fh->binmode(':raw');
 
     my @matches;
     flock $fh, LOCK_SH;
