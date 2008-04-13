@@ -3,8 +3,14 @@ use MooseX::Singleton;
 
 use lib 'lib';
 
-my $temp_root = 'eg/store';
-File::Path::mkpath( $temp_root );
+use File::Temp;
+use Path::Class;
+
+# This is ridiculous. -- rjbs, 2008-04-13
+my $temp_dir  = File::Temp::tempdir(CLEANUP => 1);
+my $store_dir = Path::Class::dir($temp_dir)->subdir('store');
+$store_dir->mkpath;
+close $store_dir->file('metabase.index')->openw;
 
 has test_gateway => (
   is   => 'ro',
@@ -38,7 +44,7 @@ has test_archive => (
   lazy => 1,
   default => sub {
     require CPAN::Metabase::Archive::Filesystem;
-    CPAN::Metabase::Archive::Filesystem->new(root_dir => "eg/store");
+    CPAN::Metabase::Archive::Filesystem->new(root_dir => "$temp_dir/store");
   },
 );
 
@@ -48,7 +54,7 @@ has test_index => (
   lazy => 1,
   default => sub {
     require CPAN::Metabase::Index::FlatFile;
-    CPAN::Metabase::Index::FlatFile->new(index_file => "eg/store/metabase.index");
+    CPAN::Metabase::Index::FlatFile->new(index_file => "$temp_dir/store/metabase.index");
   },
 );
 

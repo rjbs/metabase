@@ -16,7 +16,7 @@ use File::Path ();
 use lib 't/lib';
 use Test::Metabase::Util;
 
-plan tests => 9;
+plan tests => 10;
 
 #-------------------------------------------------------------------------#
 
@@ -43,3 +43,4 @@ ok( my $new_fact = $librarian->extract( $matches->[0] ), "extracted object from 
 
 is( $new_fact->content, $fact->content, "fact content matches" );
 
+is( $new_fact->dist_name, 'Foo-Bar', "dist name was indexed as expected" );
