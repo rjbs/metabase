@@ -36,9 +36,10 @@ sub store {
     Carp::confess( "can't store a Fact without a GUID" ) unless $fact->guid;
     
     my $line =  join( q{ }, 
-        map { "$_ $fact->{$_}" } 
+        type => $fact->type,
+        (map { "$_ $fact->{$_}" } 
         grep { $_ ne 'content' } 
-        sort keys %$fact
+        sort keys %$fact)
     );
 
     $line .= " timestamp " . time;
