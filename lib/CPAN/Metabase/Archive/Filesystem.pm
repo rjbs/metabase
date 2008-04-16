@@ -7,11 +7,12 @@
 package CPAN::Metabase::Archive::Filesystem;
 use Moose;
 use Moose::Util::TypeConstraints;
-use Path::Class ();
-use File::Slurp ();
-use Data::GUID ();
-use Carp ();
+
 use CPAN::Metabase::Fact;
+use Carp ();
+use Data::GUID ();
+use File::Slurp ();
+use Path::Class ();
 
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
@@ -53,8 +54,11 @@ sub store {
     File::Slurp::write_file(
         $self->_guid_path( $fact->guid ) . ".meta",
         {binmode => ':raw'},
-        "type " . $fact->type . "\n", # so we can reconstruct later
-        map { "$_ $fact->{$_}\n" } grep { $_ ne 'content' } sort keys %$fact,
+        JSON::XS->new->encode({
+          type => $fact->type, # so we can reconstruct later
+          guid => $fact->guid->as_string,
+          map {; $_ => $fact->{$_} } grep { $_ ne 'content' and $_ ne 'guid' } sort keys %$fact,
+        }),
     );
 
     return $fact->guid;
@@ -74,18 +78,20 @@ sub extract {
     );
 
     # read the fact meta
-    my @fact_meta_lines = File::Slurp::read_file(
+    my $fact_meta = JSON::XS->new->decode(
+      File::Slurp::read_file(
         $self->_guid_path( $guid ) . ".meta",
         binmode => ':raw',
+      ),
     );
 
     # reconstruct fact meta and extract type to find the class
-    my %fact_meta = map { chomp; split /\s/, $_, 2 } @fact_meta_lines;
-    my $class = CPAN::Metabase::Fact->type_to_class( delete $fact_meta{type} );
+    my $class = CPAN::Metabase::Fact->type_to_class(delete $fact_meta->{type});
 
     # recreate the class
     return $class->new(
-        %fact_meta, content => $class->content_from_string( $fact_content )
+        %$fact_meta,
+        content => $class->content_from_string( $fact_content ),
     );
 }
 

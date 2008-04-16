@@ -30,12 +30,11 @@ my %IS_USER = map {; $_ => 1 } qw(rjbs dagolden);
 sub handle {
   my ($self, $request) = @_;
 
-  # XXX Yeah, uh, in the future this won't be a hashref. -- rjbs, 2008-04-06
-  # ... or will it?  If this is being passed in by a Catalyst controller,
-  # that's just fine. -- rjbs, 2008-04-06
   $request ||= {};
 
-  die "unknown user" unless $IS_USER{ $request->{user_id} };
+  use Data::Dumper;
+  local $SIG{__WARN__} = sub { warn "@_: " . Dumper($request); };
+  die "unknown user: $request->{user_id}" unless $IS_USER{$request->{user_id}};
   die "unknown dist" unless $self->_validate_dist($request);
 
   my $user_id = delete $request->{user_id};

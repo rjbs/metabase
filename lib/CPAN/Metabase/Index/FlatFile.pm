@@ -7,9 +7,11 @@
 package CPAN::Metabase::Index::FlatFile;
 use Moose;
 use Moose::Util::TypeConstraints;
+
+use Carp ();
 use Fcntl ':flock';
 use IO::File ();
-use Carp ();
+use JSON::XS;
 
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
@@ -35,14 +37,12 @@ sub store {
     my ($self, $fact) = @_;
     Carp::confess( "can't store a Fact without a GUID" ) unless $fact->guid;
     
-    my $line =  join( q{ }, 
-      (
-        type => $fact->type,
-        (map { "$_ $fact->{$_}" } grep { $_ ne 'content' } sort keys %$fact)
-      )
-    );
-
-    $line .= " timestamp " . time;
+    my $line = JSON::XS->new->encode({
+      type      => $fact->type,
+      timestamp => time,
+      guid      => $fact->guid->as_string,
+      map {; $_ => $fact->{$_} } grep { $_ ne 'content' and $_ ne 'guid' } sort keys %$fact,
+    });
         
     my $fh = IO::File->new( $self->index_file, "a+" )
         or Carp::confess( "Couldn't append to '$self->{index_file}': $!" );
@@ -67,7 +67,7 @@ sub search {
     flock $fh, LOCK_SH;
     {
         while ( my $line = <$fh> ) {
-            my $parsed = { split q{ }, $line };
+            my $parsed = JSON::XS->new->decode($line);
             push @matches, $parsed->{guid} if _match( $parsed, \%spec );
         }
     }    
