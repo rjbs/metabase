@@ -56,7 +56,7 @@ sub store {
         Carp::confess("GUID conflicts with an existing object");
     }
 
-    if ( $self->archive->store( $fact ) && $self->index->store( $fact ) ) {
+    if ( $self->archive->store( $fact ) && $self->index->add( $fact ) ) {
         return $fact->guid;
     }
     else {

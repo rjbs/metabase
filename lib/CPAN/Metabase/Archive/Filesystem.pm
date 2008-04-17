@@ -12,12 +12,13 @@ use CPAN::Metabase::Fact;
 use Carp ();
 use Data::GUID ();
 use File::Slurp ();
+use JSON::XS ();
 use Path::Class ();
 
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
 
-extends 'CPAN::Metabase::Archive';
+with 'CPAN::Metabase::Archive';
 
 subtype 'ExistingDir' 
     => as 'Object' 

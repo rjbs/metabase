@@ -40,7 +40,7 @@ $fact->mark_submitted({
 
 ok( my $guid = $archive->store( $fact ), "stored a fact" );
 
-ok( $index->store( $fact ), "indexed fact" );
+ok( $index->add( $fact ), "indexed fact" );
 
 my $matches;
 $matches = $index->search( guid => $guid );

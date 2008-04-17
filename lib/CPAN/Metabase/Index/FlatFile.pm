@@ -16,7 +16,7 @@ use JSON::XS;
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
 
-extends 'CPAN::Metabase::Index';
+with 'CPAN::Metabase::Index';
 
 subtype 'File' 
     => as 'Object' 
@@ -33,9 +33,9 @@ has 'index_file' => (
     required => 1, 
 );
 
-sub store {
+sub add {
     my ($self, $fact) = @_;
-    Carp::confess( "can't store a Fact without a GUID" ) unless $fact->guid;
+    Carp::confess( "can't index a Fact without a GUID" ) unless $fact->guid;
     
     my $line = JSON::XS->new->encode({
       type      => $fact->type,
