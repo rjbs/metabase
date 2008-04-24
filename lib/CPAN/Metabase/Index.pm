@@ -13,6 +13,11 @@ $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
 requires 'add';
 requires 'search';
 
+sub exists {
+    my ($self, $guid) = @_;
+    return scalar @{ $self->search( guid => $guid ) };
+}
+
 1;
 
 __END__

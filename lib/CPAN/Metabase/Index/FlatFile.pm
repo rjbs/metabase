@@ -77,11 +77,6 @@ sub search {
     return \@matches;
 }
 
-sub exists {
-    my ($self, $guid) = @_;
-    return scalar @{ $self->search( guid => $guid ) };
-}
-
 # XXX needs to support parsed meta with an array ref -- DG 04/24/08
 sub _match {
     my ($parsed, $spec) = @_;
