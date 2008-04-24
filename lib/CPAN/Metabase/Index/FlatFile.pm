@@ -36,12 +36,13 @@ has 'index_file' => (
 sub add {
     my ($self, $fact) = @_;
     Carp::confess( "can't index a Fact without a GUID" ) unless $fact->guid;
+    Carp::confess( "can't index a Fact without index_meta" ) unless $fact->index_meta;
     
-    my $line = JSON::XS->new->encode({
+    my $line = JSON::XS->new->encode({ 
       type      => $fact->type,
-      timestamp => time,
       guid      => $fact->guid->as_string,
-      map {; $_ => $fact->{$_} } grep { $_ ne 'content' and $_ ne 'guid' } sort keys %$fact,
+      ( $fact->content_meta ? %{$fact->content_meta} : () ), 
+      ( $fact->index_meta ? %{$fact->index_meta} : () ), 
     });
         
     my $fh = IO::File->new( $self->index_file, "a+" )
@@ -81,10 +82,11 @@ sub exists {
     return scalar @{ $self->search( guid => $guid ) };
 }
 
+# XXX needs to support parsed meta with an array ref -- DG 04/24/08
 sub _match {
     my ($parsed, $spec) = @_;
     for my $k ( keys %$spec ) {
-        return unless  defined($parsed->{$k}) 
+        return unless defined($parsed->{$k}) 
                     && defined($spec->{$k}) 
                     && $parsed->{$k} eq $spec->{$k};
     }

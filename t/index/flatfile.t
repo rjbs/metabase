@@ -31,11 +31,13 @@ isa_ok( $index, 'CPAN::Metabase::Index::FlatFile' );
 ok( my $fact = Test::Metabase::Util->test_fact, "created a fact" );
 isa_ok( $fact, 'CPAN::Metabase::Fact::TestFact' );
 
-$fact->mark_submitted({
-  user_id => 'Larry',
-  guid    => Data::GUID->new,
-  dist_name    => 'Foo-Bar', 
-  dist_version => '1.23', 
+$fact->guid( Data::GUID->new );
+$fact->index_meta( {
+  user_id       => 'Larry',
+  dist_name     => 'Foo-Bar', 
+  dist_author   => 'JOHNDOE',
+  dist_version  => '1.23',
+  timestamp     => time,
 });
 
 ok( my $guid = $archive->store( $fact ), "stored a fact" );
@@ -46,7 +48,7 @@ my $matches;
 $matches = $index->search( guid => $guid );
 is( scalar @$matches, 1, "found guid searching for guid" );
 
-$matches = $index->search( dist_author => $fact->dist_author );
+$matches = $index->search( dist_author => 'JOHNDOE' );
 ok( scalar @$matches >= 1, "found guid searching for fact dist_author" );
 
 $matches = $index->search( type => $fact->type );

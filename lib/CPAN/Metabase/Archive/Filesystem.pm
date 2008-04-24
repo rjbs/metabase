@@ -45,21 +45,11 @@ sub store {
         Carp::confess "Can't store: no GUID set for fact\n";
     }
 
-    # write the fact content
+    # freeze and write the fact
     File::Slurp::write_file( 
         $self->_guid_path( $fact->guid ), 
         {binmode => ':raw'}, 
-        $fact->content_as_string 
-    );
-    # write the fact meta info
-    File::Slurp::write_file(
-        $self->_guid_path( $fact->guid ) . ".meta",
-        {binmode => ':raw'},
-        JSON::XS->new->encode({
-          type => $fact->type, # so we can reconstruct later
-          guid => $fact->guid->as_string,
-          map {; $_ => $fact->{$_} } grep { $_ ne 'content' and $_ ne 'guid' } sort keys %$fact,
-        }),
+        $fact->freeze,
     );
 
     return $fact->guid;
@@ -78,22 +68,7 @@ sub extract {
         binmode => ':raw', 
     );
 
-    # read the fact meta
-    my $fact_meta = JSON::XS->new->decode(
-      File::Slurp::read_file(
-        $self->_guid_path( $guid ) . ".meta",
-        binmode => ':raw',
-      ),
-    );
-
-    # reconstruct fact meta and extract type to find the class
-    my $class = CPAN::Metabase::Fact->type_to_class(delete $fact_meta->{type});
-
-    # recreate the class
-    return $class->new(
-        %$fact_meta,
-        content => $class->content_from_string( $fact_content ),
-    );
+    return CPAN::Metabase::Fact->thaw( $fact_content );
 }
 
 sub _guid_path {

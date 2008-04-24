@@ -31,8 +31,7 @@ has test_fact => (
   default => sub {
     require CPAN::Metabase::Fact::TestFact;
     CPAN::Metabase::Fact::TestFact->new( 
-        dist_author => 'JOHNDOE', 
-        dist_file   => 'Foo-Bar-1.23.tar.gz', 
+        id => 'JOHNDOE/Foo-Bar-1.23.tar.gz', 
         content     => "I smell something fishy.",
     );
   },

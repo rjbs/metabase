@@ -39,14 +39,15 @@ sub store {
 
     Carp::confess("no user_id provided for fact") unless $arg->{user_id};
 
-    my $d = CPAN::DistnameInfo->new(
-      uc($fact->dist_author) . '/' . $fact->dist_file
-    );
+    my $id = $fact->id;
+    my $initials = substr($id,0,1) . '/' . substr($id,0,2);
+    my $d = CPAN::DistnameInfo->new( $initials . "/" . $fact->id );
 
-    $fact->mark_submitted({
-      guid    => Data::GUID->new,
+    $fact->guid( Data::GUID->new ),
+    $fact->index_meta({
       user_id => $arg->{user_id},
       dist_name    => $d->dist,
+      dist_author  => $d->cpanid,
       dist_version => $d->version,
     });
 
