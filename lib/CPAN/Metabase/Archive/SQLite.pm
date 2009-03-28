@@ -16,6 +16,7 @@ use JSON::XS    ();
 use Path::Class ();
 use DBI         ();
 use DBD::SQLite ();
+use Compress::Zlib qw(compress uncompress);
 
 our $VERSION = '0.01';
 $VERSION = eval $VERSION;    # convert '1.23_45' to 1.2345
@@ -29,14 +30,20 @@ has 'filename' => (
     required => 1,
 );
 
+has 'compressed' => (
+    is      => 'rw',
+    isa     => 'Bool',
+    default => 1,
+);
+
 has 'dbh' => (
     is      => 'ro',
     isa     => 'DBI::db',
     default => sub {
         my $self     = shift;
         my $filename = $self->filename;
-        my $exists = -f $filename;
-        my $dbh    = DBI->connect(
+        my $exists   = -f $filename;
+        my $dbh      = DBI->connect(
             "dbi:SQLite:dbname=$filename",
             "", "",
             {   RaiseError => 1,
@@ -73,14 +80,19 @@ sub store {
     }
 
     my $content = $fact->content_as_string;
-    my $meta    = JSON::XS->new->encode(
+    my $json    = JSON::XS->new->encode(
         {   map { ; $_ => $fact->{$_} }
                 grep { $_ ne 'content' and $_ ne 'guid' } sort keys %$fact,
         }
     );
 
+    if ( $self->compressed ) {
+        $json    = compress($json);
+        $content = compress($content);
+    }
+
     my $sth = $dbh->prepare('INSERT INTO archive VALUES (?, ?, ?, ?)');
-    $sth->execute( $guid, $type, $meta, $content );
+    $sth->execute( $guid, $type, $json, $content );
 
     return $guid;
 }
@@ -97,8 +109,13 @@ sub extract {
     my $sth = $dbh->prepare(
         'SELECT type, meta, content FROM archive WHERE guid = ?');
     $sth->execute($guid);
-    $sth->bind_columns( \my $type, \my $json, \my $content );
+    $sth->bind_columns( \my $type, \my $json, \my $content, );
     $sth->fetch;
+
+    if ( $self->compressed ) {
+        $json    = uncompress($json);
+        $content = uncompress($content);
+    }
 
     my $meta = JSON::XS->new->decode($json);
 
@@ -107,7 +124,7 @@ sub extract {
 
     # recreate the class
     return $class->new( %$meta,
-        content => $class->content_from_string($content), );
+        content => $class->content_from_string($content) );
 }
 
 1;
