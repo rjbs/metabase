@@ -40,11 +40,11 @@ has test_fact => (
 
 has test_archive => (
   is   => 'ro',
-  isa  => 'CPAN::Metabase::Archive::Filesystem',
+  isa  => 'CPAN::Metabase::Archive::SQLite',
   lazy => 1,
   default => sub {
-    require CPAN::Metabase::Archive::Filesystem;
-    CPAN::Metabase::Archive::Filesystem->new(root_dir => "$temp_dir/store");
+    require CPAN::Metabase::Archive::SQLite;
+    CPAN::Metabase::Archive::SQLite->new(filename => "$temp_dir/store.db");
   },
 );
 

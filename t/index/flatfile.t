@@ -23,7 +23,7 @@ plan tests => 14;
 require_ok( 'CPAN::Metabase::Index::FlatFile' );
 
 ok( my $archive = Test::Metabase::Util->test_archive, 'created archive' );
-isa_ok( $archive, 'CPAN::Metabase::Archive::Filesystem' );
+isa_ok( $archive, 'CPAN::Metabase::Archive::SQLite' );
 
 ok( my $index = Test::Metabase::Util->test_index, 'created an index' );
 isa_ok( $index, 'CPAN::Metabase::Index::FlatFile' );
