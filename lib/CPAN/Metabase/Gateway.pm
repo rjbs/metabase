@@ -30,7 +30,7 @@ my %IS_USER = map {; $_ => 1 } qw(rjbs dagolden);
 sub handle {
   my ($self, $request) = @_;
 
-  $request ||= {};
+  $request = { %{ $request || {} } };
 
   use Data::Dumper;
   local $SIG{__WARN__} = sub { warn "@_: " . Dumper($request); };
