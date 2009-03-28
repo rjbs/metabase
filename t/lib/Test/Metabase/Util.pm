@@ -44,7 +44,7 @@ has test_archive => (
   lazy => 1,
   default => sub {
     require CPAN::Metabase::Archive::SQLite;
-    CPAN::Metabase::Archive::SQLite->new(filename => "$temp_dir/store.db");
+    CPAN::Metabase::Archive::SQLite->new(filename => "$temp_dir/store.db", compressed => 0);
   },
 );
 
