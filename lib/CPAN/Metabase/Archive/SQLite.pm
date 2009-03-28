@@ -79,7 +79,7 @@ sub store {
         Carp::confess "Can't store: no GUID set for fact\n";
     }
 
-    my $content = $fact->content_as_string;
+    my $content = $fact->content_as_bytes;
     my $json    = JSON::XS->new->encode(
         {   map { ; $_ => $fact->{$_} }
                 grep { $_ ne 'content' and $_ ne 'guid' } sort keys %$fact,
