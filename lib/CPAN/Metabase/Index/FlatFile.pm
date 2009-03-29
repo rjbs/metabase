@@ -36,17 +36,32 @@ has 'index_file' => (
 sub add {
     my ($self, $fact) = @_;
     Carp::confess( "can't index a Fact without a GUID" ) unless $fact->guid;
-    Carp::confess( "can't index a Fact without index_meta" ) unless $fact->index_meta;
+
+    my %metadata = (
+      'core.type'           => [ Str => $fact->type            ],
+      'core.schema_version' => [ Num => $fact->schema_version  ],
+      'core.guid'           => [ Str => $fact->guid            ],
+      'core.created_at'     => [ Num => $fact->created_at      ],
+    );
+
+    for my $type (qw(content resource)) {
+      my $method = "$type\_metadata";
+      my $data   = $fact->$method;
+
+      for my $key (keys %$data) {
+        # I'm just starting with a strict-ish set.  We can tighten or loosen
+        # parts of this later. -- rjbs, 2009-03-28
+        die "invalid metadata key" unless $key =~ /\A[-_a-z0-9.]+\z/;
+        $metadata{ "$type.$key" } = $data->{$key};
+      }
+    }
     
-    my $line = JSON::XS->new->encode({ 
-      type      => $fact->type,
-      guid      => $fact->guid->as_string,
-      ( $fact->content_meta ? %{$fact->content_meta} : () ), 
-      ( $fact->index_meta ? %{$fact->index_meta} : () ), 
-    });
-        
-    my $fh = IO::File->new( $self->index_file, "a+" )
-        or Carp::confess( "Couldn't append to '$self->{index_file}': $!" );
+    my $line = JSON::XS->new->encode(\%metadata);
+
+    my $filename = $self->index_file;
+
+    my $fh = IO::File->new( $filename, "a+" )
+        or Carp::confess( "Couldn't append to '$filename': $!" );
     $fh->binmode(':raw');
 
     flock $fh, LOCK_EX;
@@ -54,14 +69,17 @@ sub add {
         seek $fh, 2, 0; # end
         print {$fh} $line, "\n";
     }
+
     $fh->close;
 }
 
 sub search {
     my ($self, %spec) = @_;
+
+    my $filename = $self->index_file;
     
-    my $fh = IO::File->new( $self->index_file, "r" )
-        or Carp::confess( "Couldn't read from '$self->{index_file}': $!" );
+    my $fh = IO::File->new( $filename, "r" )
+        or Carp::confess( "Couldn't read from '$filename': $!" );
     $fh->binmode(':raw');
 
     my @matches;
@@ -69,7 +87,7 @@ sub search {
     {
         while ( my $line = <$fh> ) {
             my $parsed = JSON::XS->new->decode($line);
-            push @matches, $parsed->{guid} if _match( $parsed, \%spec );
+            push @matches, $parsed->{'core.guid'}[1] if _match($parsed, \%spec);
         }
     }    
     $fh->close;
@@ -77,13 +95,17 @@ sub search {
     return \@matches;
 }
 
-# XXX needs to support parsed meta with an array ref -- DG 04/24/08
+sub exists {
+    my ($self, $guid) = @_;
+    return scalar @{ $self->search( 'core.guid' => $guid ) };
+}
+
 sub _match {
     my ($parsed, $spec) = @_;
     for my $k ( keys %$spec ) {
         return unless defined($parsed->{$k}) 
                     && defined($spec->{$k}) 
-                    && $parsed->{$k} eq $spec->{$k};
+                    && $parsed->{$k}[1] eq $spec->{$k};
     }
     return 1;
 }

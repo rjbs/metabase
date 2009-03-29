@@ -49,7 +49,13 @@ sub store {
     File::Slurp::write_file( 
         $self->_guid_path( $fact->guid ), 
         {binmode => ':raw'}, 
-        $fact->freeze,
+        $fact->content_as_bytes
+    );
+    # write the fact meta info
+    File::Slurp::write_file(
+        $self->_guid_path( $fact->guid ) . ".meta",
+        {binmode => ':raw'},
+        JSON::XS->new->encode($fact->core_metadata),
     );
 
     return $fact->guid;
@@ -60,7 +66,6 @@ sub store {
 # class isa CPAN::Metabase::Fact::Subclass
 sub extract {
     my ($self, $guid) = @_;
-    $guid = $guid->as_string if ref $guid;
     
     # read the fact
     my $fact_content = File::Slurp::read_file( 
@@ -68,7 +73,26 @@ sub extract {
         binmode => ':raw', 
     );
 
-    return CPAN::Metabase::Fact->thaw( $fact_content );
+    # read the fact meta
+    my $fact_meta = JSON::XS->new->decode(
+      File::Slurp::read_file(
+        $self->_guid_path( $guid ) . ".meta",
+        binmode => ':raw',
+      ),
+    );
+
+    for my $key (keys %$fact_meta) {
+      $fact_meta->{$key} = $fact_meta->{$key}[1];
+    }
+
+    # reconstruct fact meta and extract type to find the class
+    my $class = CPAN::Metabase::Fact->type_to_class($fact_meta->{type});
+
+    # recreate the class
+    return $class->new(
+        %$fact_meta,
+        content => $class->content_from_bytes( $fact_content ),
+    );
 }
 
 sub _guid_path {

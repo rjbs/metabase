@@ -33,14 +33,20 @@ ok(
 );
 
 my $matches;
-$matches = $librarian->search( guid => $guid );
+TODO: {
+  local $TODO = 'resource analysis not implemented';
+  $matches = $librarian->search( 'resource.author' => 'JOHNDOE' );
+  ok( scalar @$matches >= 1, "found guid searching for fact dist_author" );
+}
+
+$matches = $librarian->search( 'core.guid' => $guid );
 is( scalar @$matches, 1, "found guid searching for guid" );
 
-$matches = $librarian->search( dist_author => 'JOHNDOE' );
-ok( scalar @$matches >= 1, "found guid searching for fact dist_author" );
-
-ok( my $new_fact = $librarian->extract( $matches->[0] ), "extracted object from guid from search");
+ok(
+  my $new_fact = $librarian->extract( $matches->[0] ),
+  "extracted object from guid from search"
+);
 
 is( $new_fact->content, $fact->content, "fact content matches" );
 
-is( $new_fact->index_meta->{dist_name}, 'Foo-Bar', "dist name was indexed as expected" );
+is( $new_fact->resource, $fact->resource, "dist name was indexed as expected" );

@@ -17,7 +17,7 @@ has librarian => (
   required => 1,
 );
 
-sub _validate_dist {
+sub _validate_resource {
   my ($self, $request) = @_;
 
   # XXX Well... yeah, eventually we'll want to reject reports for dists that
@@ -30,15 +30,16 @@ my %IS_USER = map {; $_ => 1 } qw(rjbs dagolden);
 sub handle {
   my ($self, $request) = @_;
 
-  $request ||= {};
+  $request = { %{ $request || {} } };
 
   use Data::Dumper;
   local $SIG{__WARN__} = sub { warn "@_: " . Dumper($request); };
-  die "unknown user: $request->{user_id}" unless $IS_USER{$request->{user_id}};
-  die "unknown dist" unless $self->_validate_dist($request);
 
-  my $user_id = delete $request->{user_id};
-  my $type    = delete $request->{type};
+  my $user = $request->{request}{user_id};
+  die "unknown user: $user" unless $IS_USER{ $user_id };
+  die "unknown dist" unless $self->_validate_resource($request);
+
+  my $type = delete $request->{struct}{content_metadata}{type}[1];
 
   my $fact;
   FACT_CLASS: for my $fact_class ($self->fact_classes) {

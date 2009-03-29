@@ -31,19 +31,19 @@ has test_fact => (
   default => sub {
     require CPAN::Metabase::Fact::TestFact;
     CPAN::Metabase::Fact::TestFact->new( 
-        id => 'JOHNDOE/Foo-Bar-1.23.tar.gz', 
-        content     => "I smell something fishy.",
+      resource => 'JOHNDOE/Foo-Bar-1.23.tar.gz', 
+      content  => "I smell something fishy.",
     );
   },
 );
 
 has test_archive => (
   is   => 'ro',
-  isa  => 'CPAN::Metabase::Archive::Filesystem',
+  isa  => 'CPAN::Metabase::Archive::SQLite',
   lazy => 1,
   default => sub {
-    require CPAN::Metabase::Archive::Filesystem;
-    CPAN::Metabase::Archive::Filesystem->new(root_dir => "$temp_dir/store");
+    require CPAN::Metabase::Archive::SQLite;
+    CPAN::Metabase::Archive::SQLite->new(filename => "$temp_dir/store.db", compressed => 0);
   },
 );
 
