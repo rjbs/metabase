@@ -43,7 +43,7 @@ lives_ok {
 } "created store at '$temp_root'";
 
 my $fact = CPAN::Metabase::Fact::TestFact->new( 
-    resource => "$dist_author/$dist_file",
+    resource => $dist_id,
     content  => "I smell something fishy.",
 );
 
