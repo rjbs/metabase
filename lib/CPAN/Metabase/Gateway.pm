@@ -26,6 +26,10 @@ sub _validate_resource {
 }
 
 my %IS_USER = map {; $_ => 1 } qw(rjbs dagolden);
+sub _validate_user {
+  my $req = $_[1]; 
+  return $IS_USER{ $req->{metadata}{core}{user_id}[1] };
+}
 
 sub handle {
   my ($self, $request) = @_;
@@ -36,7 +40,7 @@ sub handle {
   local $SIG{__WARN__} = sub { warn "@_: " . Dumper($request); };
 
   my $user = $request->{request}{user_id};
-  die "unknown user: $user" unless $IS_USER{ $user_id };
+  die "unknown user" unless $self->_validate_user($request);
   die "unknown dist" unless $self->_validate_resource($request);
 
   my $type = delete $request->{struct}{content_metadata}{type}[1];
@@ -49,9 +53,7 @@ sub handle {
     die $@ unless $fact;
   }
 
-  # $fact->mark_submitted(user_id => $user_id);
-
-  my $guid = $self->librarian->store($fact, { user_id => $user_id });
+  my $guid = $self->librarian->store($fact);
 }
 
 1;
