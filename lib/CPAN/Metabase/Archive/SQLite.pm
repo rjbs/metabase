@@ -80,11 +80,7 @@ sub store {
     }
 
     my $content = $fact->content_as_bytes;
-    my $json    = JSON::XS->new->encode(
-        {   map { ; $_ => $fact->{$_} }
-                grep { $_ ne 'content' and $_ ne 'guid' } sort keys %$fact,
-        }
-    );
+    my $json    = JSON::XS->new->encode($fact->core_metadata);
 
     if ( $self->compressed ) {
         $json    = compress($json);
@@ -104,8 +100,6 @@ sub extract {
     my ( $self, $guid ) = @_;
     my $dbh = $self->dbh;
 
-    $guid = $guid->as_string if ref $guid;
-
     my $sth = $dbh->prepare(
         'SELECT type, meta, content FROM archive WHERE guid = ?');
     $sth->execute($guid);
@@ -123,8 +117,10 @@ sub extract {
     my $class = CPAN::Metabase::Fact->type_to_class($type);
 
     # recreate the class
-    return $class->new( %$meta,
-        content => $class->content_from_string($content) );
+    return $class->new(
+        (map { $_ => $meta->{$_}[1] } keys %$meta),
+        content => $class->content_from_string($content)
+    );
 }
 
 1;

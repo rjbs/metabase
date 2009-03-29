@@ -44,19 +44,11 @@ lives_ok {
 } "created store at '$temp_root'";
 
 my $fact = CPAN::Metabase::Fact::TestFact->new( 
-    dist_author => $dist_author, 
-    dist_file   => $dist_file, 
-    content     => "I smell something fishy.",
+    resource => "$dist_author/$dist_file",
+    content  => "I smell something fishy.",
 );
 
 isa_ok( $fact, 'CPAN::Metabase::Fact::TestFact' );
-
-$fact->mark_submitted({
-  user_id => 'Larry',
-  guid    => Data::GUID->new,
-  dist_name    => 'Foo-Bar', 
-  dist_version => '1.23', 
-});
 
 ok( my $guid = $archive->store( $fact ), "stored a fact" );
 

@@ -32,23 +32,11 @@ has 'index' => (
 sub store {
     my ($self, $fact, $arg) = @_;
 
-    # can only store objects that have not yet been marked submitted
-    if ( $fact->is_submitted ) {
-        Carp::confess("Can't store a fact that is already marked as submitted");
-    }
-
     Carp::confess("no user_id provided for fact") unless $arg->{user_id};
 
-    my $d = CPAN::DistnameInfo->new(
-      uc($fact->dist_author) . '/' . $fact->dist_file
-    );
+    my $d = CPAN::DistnameInfo->new($fact->resource);
 
-    $fact->mark_submitted({
-      guid    => Data::GUID->new,
-      user_id => $arg->{user_id},
-      dist_name    => $d->dist,
-      dist_version => $d->version,
-    });
+    $fact->guid(Data::GUID->new);
 
     # Don't store existing GUIDs; this should never happen, since we're just
     # generating a new one, but... hey, can't be too safe, right?
@@ -58,8 +46,7 @@ sub store {
 
     if ( $self->archive->store( $fact ) && $self->index->add( $fact ) ) {
         return $fact->guid;
-    }
-    else {
+    } else {
         Carp::confess("Error storing or indexing fact with guid: " . $fact->guid);
     }
 }
