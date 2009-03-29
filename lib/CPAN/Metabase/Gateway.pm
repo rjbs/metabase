@@ -32,24 +32,25 @@ sub _validate_user {
 }
 
 sub handle {
-  my ($self, $request) = @_;
+  my ($self, $struct) = @_;
 
-  $request = { %{ $request || {} } };
+  $struct = { %{ $struct || {} } };
 
   use Data::Dumper;
-  local $SIG{__WARN__} = sub { warn "@_: " . Dumper($request); };
+  local $SIG{__WARN__} = sub { warn "@_: " . Dumper($struct); };
 
-  my $user = $request->{request}{user_id};
-  die "unknown user" unless $self->_validate_user($request);
-  die "unknown dist" unless $self->_validate_resource($request);
+  die "unknown user" unless $self->_validate_user($struct);
+  die "unknown dist" unless $self->_validate_resource($struct);
+  die "submissions must not include resource or content metadata"
+    if $struct->{metadata}{content} or $struct->{metadata}{resource;}
 
-  my $type = delete $request->{struct}{content_metadata}{type}[1];
+  my $type = $struct->{metadata}{content}{type}[1];
 
   my $fact;
   FACT_CLASS: for my $fact_class ($self->fact_classes) {
     eval "require $fact_class; 1" or die;
     next FACT_CLASS unless $fact_class->type eq $type;
-    $fact = eval { $fact_class->new($request) };
+    $fact = eval { $fact_class->from_struct($request) };
     die $@ unless $fact;
   }
 
