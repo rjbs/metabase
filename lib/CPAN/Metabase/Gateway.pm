@@ -42,7 +42,7 @@ sub handle {
   die "unknown user" unless $self->_validate_user($struct);
   die "unknown dist" unless $self->_validate_resource($struct);
   die "submissions must not include resource or content metadata"
-    if $struct->{metadata}{content} or $struct->{metadata}{resource;}
+    if $struct->{metadata}{content} or $struct->{metadata}{resource};
 
   my $type = $struct->{metadata}{content}{type}[1];
 
