@@ -44,7 +44,7 @@ sub handle {
   die "submissions must not include resource or content metadata"
     if $struct->{metadata}{content} or $struct->{metadata}{resource};
 
-  my $type = $struct->{metadata}{content}{type}[1];
+  my $type = $struct->{metadata}{core}{type}[1];
 
   my $fact;
   FACT_CLASS: for my $fact_class ($self->fact_classes) {
