@@ -30,13 +30,9 @@ has 'index' => (
 
 # given fact, store it and return guid; 
 sub store {
-    my ($self, $fact, $arg) = @_;
-
-    Carp::confess("no user_id provided for fact") unless $arg->{user_id};
+    my ($self, $fact) = @_;
 
     my $d = CPAN::DistnameInfo->new($fact->resource);
-
-    $fact->guid(Data::GUID->new);
 
     # Don't store existing GUIDs; this should never happen, since we're just
     # generating a new one, but... hey, can't be too safe, right?

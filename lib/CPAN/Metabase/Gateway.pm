@@ -26,26 +26,31 @@ sub _validate_resource {
 }
 
 my %IS_USER = map {; $_ => 1 } qw(rjbs dagolden);
+sub _validate_user {
+  my $req = $_[1]; 
+  return $IS_USER{ $req->{metadata}{core}{user_id}[1] };
+}
 
 sub handle {
-  my ($self, $request) = @_;
+  my ($self, $struct) = @_;
 
-  $request = { %{ $request || {} } };
+  $struct = { %{ $struct || {} } };
 
   use Data::Dumper;
-  local $SIG{__WARN__} = sub { warn "@_: " . Dumper($request); };
+  local $SIG{__WARN__} = sub { warn "@_: " . Dumper($struct); };
 
-  my $user = $request->{request}{user_id};
-  die "unknown user: $user" unless $IS_USER{ $user_id };
-  die "unknown dist" unless $self->_validate_resource($request);
+  die "unknown user" unless $self->_validate_user($struct);
+  die "unknown dist" unless $self->_validate_resource($struct);
+  die "submissions must not include resource or content metadata"
+    if $struct->{metadata}{content} or $struct->{metadata}{resource};
 
-  my $type = delete $request->{struct}{content_metadata}{type}[1];
+  my $type = $struct->{metadata}{core}{type}[1];
 
   my $fact;
   FACT_CLASS: for my $fact_class ($self->fact_classes) {
     eval "require $fact_class; 1" or die;
     next FACT_CLASS unless $fact_class->type eq $type;
-    $fact = eval { $fact_class->new($request) };
+    $fact = eval { $fact_class->from_struct($struct) };
     die $@ unless $fact;
   }
 
