@@ -51,7 +51,12 @@ sub handle {
 
   # $fact->mark_submitted(user_id => $user_id);
 
-  my $guid = $self->librarian->store($fact, { user_id => $user_id });
+  return $self->enqueue( $fact, {user_id => $user_id} );
+}
+
+sub enqueue {
+  my ($self, $credential) = @_;
+  return $self->librarian->store($fact, $credential);
 }
 
 1;
