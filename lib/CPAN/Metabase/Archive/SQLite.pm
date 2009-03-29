@@ -119,7 +119,7 @@ sub extract {
     # recreate the class
     return $class->new(
         (map { $_ => $meta->{$_}[1] } keys %$meta),
-        content => $class->content_from_string($content)
+        content => $class->content_from_bytes($content)
     );
 }
 
