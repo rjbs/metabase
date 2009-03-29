@@ -50,7 +50,7 @@ sub handle {
   FACT_CLASS: for my $fact_class ($self->fact_classes) {
     eval "require $fact_class; 1" or die;
     next FACT_CLASS unless $fact_class->type eq $type;
-    $fact = eval { $fact_class->from_struct($request) };
+    $fact = eval { $fact_class->from_struct($struct) };
     die $@ unless $fact;
   }
 
