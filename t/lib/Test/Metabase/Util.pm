@@ -1,5 +1,5 @@
 package Test::Metabase::Util;
-use MooseX::Singleton;
+use Moose;
 
 use lib 'lib';
 
@@ -43,7 +43,10 @@ has test_archive => (
   lazy => 1,
   default => sub {
     require CPAN::Metabase::Archive::SQLite;
-    CPAN::Metabase::Archive::SQLite->new(filename => "$temp_dir/store.db", compressed => 0);
+    CPAN::Metabase::Archive::SQLite->new(
+      filename   => "$temp_dir/store.db",
+      compressed => 0,
+    );
   },
 );
 
@@ -53,7 +56,9 @@ has test_index => (
   lazy => 1,
   default => sub {
     require CPAN::Metabase::Index::FlatFile;
-    CPAN::Metabase::Index::FlatFile->new(index_file => "$temp_dir/store/metabase.index");
+    CPAN::Metabase::Index::FlatFile->new(
+      index_file => "$temp_dir/store/metabase.index",
+    );
   },
 );
 
@@ -64,10 +69,11 @@ has test_librarian => (
   default => sub {
     require CPAN::Metabase::Librarian;
     CPAN::Metabase::Librarian->new(
-        archive => Test::Metabase::Util->test_archive,
-        'index' => Test::Metabase::Util->test_index,
+        archive => $_[0]->test_archive,
+        'index' => $_[0]->test_index,
     );
   },
 );
 
+no Moose;
 1;

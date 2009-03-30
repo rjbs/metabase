@@ -15,8 +15,6 @@ requires('Moose::Util::TypeConstraints' => 0);
 requires('DBI' => 0);
 requires('DBD::SQLite' => 0);
 
-test_requires('MooseX::Singleton');
-
 tests_recursive;
 extra_tests;
 

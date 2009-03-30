@@ -15,6 +15,7 @@ use File::Path ();
 
 use lib 't/lib';
 use Test::Metabase::Util;
+my $TEST = Test::Metabase::Util->new;
 
 plan tests => 10;
 
@@ -22,9 +23,9 @@ plan tests => 10;
 
 require_ok( 'CPAN::Metabase::Librarian' );
 
-ok( my $librarian = Test::Metabase::Util->test_librarian, 'created librarian' );
+ok( my $librarian = $TEST->test_librarian, 'created librarian' );
 
-ok( my $fact = Test::Metabase::Util->test_fact, "created a fact" );
+ok( my $fact = $TEST->test_fact, "created a fact" );
 isa_ok( $fact, 'CPAN::Metabase::Fact::TestFact' );
 
 ok(

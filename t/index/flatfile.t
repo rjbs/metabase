@@ -15,6 +15,7 @@ use File::Path ();
 
 use lib 't/lib';
 use Test::Metabase::Util;
+my $TEST = Test::Metabase::Util->new;
 
 plan tests => 14;
 
@@ -22,13 +23,13 @@ plan tests => 14;
 
 require_ok( 'CPAN::Metabase::Index::FlatFile' );
 
-ok( my $archive = Test::Metabase::Util->test_archive, 'created archive' );
+ok( my $archive = $TEST->test_archive, 'created archive' );
 isa_ok( $archive, 'CPAN::Metabase::Archive::SQLite' );
 
-ok( my $index = Test::Metabase::Util->test_index, 'created an index' );
+ok( my $index = $TEST->test_index, 'created an index' );
 isa_ok( $index, 'CPAN::Metabase::Index::FlatFile' );
 
-ok( my $fact = Test::Metabase::Util->test_fact, "created a fact" );
+ok( my $fact = $TEST->test_fact, "created a fact" );
 isa_ok( $fact, 'CPAN::Metabase::Fact::TestFact' );
 
 ok( my $guid = $archive->store( $fact ), "stored a fact" );
