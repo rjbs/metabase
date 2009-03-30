@@ -17,6 +17,12 @@ has librarian => (
   required => 1,
 );
 
+# has secret_librarian => (
+#   is       => 'ro',
+#   isa      => 'CPAN::Metabase::Librarian',
+#   required => 1,
+# );
+
 sub _validate_resource {
   my ($self, $request) = @_;
 
@@ -26,12 +32,28 @@ sub _validate_resource {
 }
 
 my %IS_USER = map {; $_ => 1 } qw(74B9A2EA-1D1A-11DE-BE21-DD62421C7A0A);
-sub _validate_user {
+sub __user_profile {
   my $user = $_[1]; 
   return $IS_USER{ $user->{metadata}{core}{guid}[1] };
 }
 
-sub handle {
+sub _validate_fact_struct {
+  my ($self, $struct) = @_;
+
+  die "no resource provided" unless $struct->{metadata}{core}{resource};
+
+  die "submissions must not include resource or content metadata"
+    if $struct->{metadata}{content} or $struct->{metadata}{resource};
+}
+
+sub _check_permissions {
+  my ($self, $profile, $action, $fact) = @_;
+
+  # The devil may care, but we don't. -- rjbs, 2009-03-30
+  return 1;
+}
+
+sub handle_submission {
   my ($self, $struct) = @_;
 
   my $fact_struct = $struct->{fact};
@@ -40,12 +62,9 @@ sub handle {
   use Data::Dumper;
   local $SIG{__WARN__} = sub { warn "@_: " . Dumper($struct); };
 
-  die "unknown user" unless $self->_validate_user($user_struct);
-  die "unknown dist" unless $self->_validate_resource($struct);
-  die "submissions must not include resource or content metadata"
-    if $fact_struct->{metadata}{content} or $fact_struct->{metadata}{resource};
+  die "unknown user" unless my $profile = $self->__user_profile($user_struct);
 
-  # check combination of user and fact -- rjbs, 2009-03-30
+  $self->_validate_fact_struct($fact_struct);
 
   my $type = $fact_struct->{metadata}{core}{type}[1];
 
@@ -57,13 +76,14 @@ sub handle {
     die $@ unless $fact;
   }
 
-  # XXX: should be a profile fact -- rjbs, 2009-03-30
-  return $self->enqueue( $fact, $user_struct );
+  $self->_check_permissions($profile => submit => $fact);
+
+  return $self->enqueue($fact, $profile);
 }
 
 sub enqueue {
-  my ($self, $fact, $credential) = @_;
-  return $self->librarian->store($fact, $credential);
+  my ($self, $fact, $profile) = @_;
+  return $self->librarian->store($fact, $profile);
 }
 
 1;
