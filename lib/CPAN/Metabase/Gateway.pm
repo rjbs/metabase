@@ -31,10 +31,22 @@ sub _validate_resource {
   1;
 }
 
-my %IS_USER = map {; $_ => 1 } qw(74B9A2EA-1D1A-11DE-BE21-DD62421C7A0A);
-sub __user_profile {
-  my $user = $_[1]; 
-  return $IS_USER{ $user->{metadata}{core}{guid}[1] };
+sub __submitter_profile {
+  my ($self, $profile_struct) = @_;
+
+  my $profile_guid = $profile_struct->{metadata}{core}{guid}[1];
+  my $profile_fact = eval {
+    $self->secret_librarian->extract($profile_guid);
+  };
+
+  return unless $profile_fact;
+
+  my $given  = $profile_struct->{metadata}{core}{secret}[1];
+  my $secret = $profile_fact->core_metadata->{secret}[1];
+
+  return unless defined $given and defined $secret and $given eq $secret;
+
+  return $profile_fact;
 }
 
 sub _validate_fact_struct {
@@ -56,13 +68,14 @@ sub _check_permissions {
 sub handle_submission {
   my ($self, $struct) = @_;
 
-  my $fact_struct = $struct->{fact};
-  my $user_struct = $struct->{submitter};
+  my $fact_struct    = $struct->{fact};
+  my $profile_struct = $struct->{submitter};
 
   use Data::Dumper;
   local $SIG{__WARN__} = sub { warn "@_: " . Dumper($struct); };
 
-  die "unknown user" unless my $profile = $self->__user_profile($user_struct);
+  die "unknown submitter profile"
+    unless my $profile = $self->__submitter_profile($profile_struct);
 
   $self->_validate_fact_struct($fact_struct);
 
