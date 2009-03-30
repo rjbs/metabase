@@ -27,8 +27,8 @@ sub _validate_resource {
 
 my %IS_USER = map {; $_ => 1 } qw(rjbs dagolden);
 sub _validate_user {
-  my $req = $_[1]; 
-  return $IS_USER{ $req->{metadata}{core}{user_id}[1] };
+  my $user = $_[1]; 
+  return $IS_USER{ $user };
 }
 
 sub handle {
@@ -38,8 +38,9 @@ sub handle {
 
   use Data::Dumper;
   local $SIG{__WARN__} = sub { warn "@_: " . Dumper($struct); };
+  my $user = { user_id => $struct->{metadata}{core}{user_id}[1] };
 
-  die "unknown user" unless $self->_validate_user($struct);
+  die "unknown user" unless $self->_validate_user($user);
   die "unknown dist" unless $self->_validate_resource($struct);
   die "submissions must not include resource or content metadata"
     if $struct->{metadata}{content} or $struct->{metadata}{resource};
@@ -56,11 +57,11 @@ sub handle {
 
   # $fact->mark_submitted(user_id => $user_id);
 
-  return $self->enqueue( $fact, {user_id => $user_id} );
+  return $self->enqueue( $fact, $user );
 }
 
 sub enqueue {
-  my ($self, $credential) = @_;
+  my ($self, $fact, $credential) = @_;
   return $self->librarian->store($fact, $credential);
 }
 
