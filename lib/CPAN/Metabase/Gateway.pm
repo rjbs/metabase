@@ -4,6 +4,8 @@ use Moose;
 use CPAN::Metabase::Librarian;
 use Data::GUID;
 
+use CPAN::Metabase::User::Profile;
+
 has fact_classes => (
   is  => 'ro',
   isa => 'ArrayRef[Str]',
@@ -33,18 +35,32 @@ sub _validate_resource {
 
 sub __submitter_profile {
   my ($self, $profile_struct) = @_;
+  # I hate nearly every variable name in this scope. -- rjbs, 2009-03-31
 
   my $profile_guid = $profile_struct->{metadata}{core}{guid}[1];
   my $profile_fact = eval {
     $self->secret_librarian->extract($profile_guid);
   };
 
-  return unless $profile_fact;
+  my $given_fact = eval {
+    CPAN::Metabase::User::Profile->from_struct($profile_struct);
+  };
 
-  my $given  = $profile_struct->{metadata}{core}{secret}[1];
-  my $secret = $profile_fact->core_metadata->{secret}[1];
+  return unless $profile_fact and $given_fact;
 
-  return unless defined $given and defined $secret and $given eq $secret;
+  my ($profile_secret_fact) = grep { $_->isa('CPAN::Metabase::User::Secret') }
+                              $profile_fact->facts;
+
+  my ($given_secret_fact)   = grep { $_->isa('CPAN::Metabase::User::Secret') }
+                              $given_fact->facts;
+
+  my $profile_secret = $profile_secret_fact->content;
+  my $given_secret   = $given_secret_fact->content;
+
+  return
+    unless defined $profile_secret
+    and    defined $given_secret
+    and    $profile_secret eq $given_secret;
 
   return $profile_fact;
 }
@@ -71,10 +87,10 @@ sub handle_submission {
   my $fact_struct    = $struct->{fact};
   my $profile_struct = $struct->{submitter};
 
-  use Data::Dumper;
-  local $SIG{__WARN__} = sub { warn "@_: " . Dumper($struct); };
+  # use Data::Dumper;
+  # local $SIG{__WARN__} = sub { warn "@_: " . Dumper($struct); };
 
-  die "unknown submitter profile"
+  die "reason: unknown submitter profile\n"
     unless my $profile = $self->__submitter_profile($profile_struct);
 
   $self->_validate_fact_struct($fact_struct);
