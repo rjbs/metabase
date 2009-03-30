@@ -25,37 +25,35 @@ sub _validate_resource {
   1;
 }
 
-my %IS_USER = map {; $_ => 1 } qw(rjbs dagolden);
+my %IS_USER = map {; $_ => 1 } qw(74B9A2EA-1D1A-11DE-BE21-DD62421C7A0A);
 sub _validate_user {
   my $user = $_[1]; 
-  return $IS_USER{ $user };
+  return $IS_USER{ $user->{metadata}{core}{guid}[1] };
 }
 
 sub handle {
   my ($self, $struct) = @_;
 
-  $struct = { %{ $struct || {} } };
+  my $fact_struct = $struct->{fact};
+  my $user_struct = $struct->{submitter};
 
   use Data::Dumper;
   local $SIG{__WARN__} = sub { warn "@_: " . Dumper($struct); };
-  my $user = { user_id => $struct->{metadata}{core}{user_id}[1] };
 
-  die "unknown user" unless $self->_validate_user($user);
+  die "unknown user" unless $self->_validate_user($user_struct);
   die "unknown dist" unless $self->_validate_resource($struct);
   die "submissions must not include resource or content metadata"
-    if $struct->{metadata}{content} or $struct->{metadata}{resource};
+    if $fact_struct->{metadata}{content} or $fact_struct->{metadata}{resource};
 
-  my $type = $struct->{metadata}{core}{type}[1];
+  my $type = $fact_struct->{metadata}{core}{type}[1];
 
   my $fact;
   FACT_CLASS: for my $fact_class ($self->fact_classes) {
     eval "require $fact_class; 1" or die;
     next FACT_CLASS unless $fact_class->type eq $type;
-    $fact = eval { $fact_class->from_struct($struct) };
+    $fact = eval { $fact_class->from_struct($fact_struct) };
     die $@ unless $fact;
   }
-
-  # $fact->mark_submitted(user_id => $user_id);
 
   return $self->enqueue( $fact, $user );
 }
