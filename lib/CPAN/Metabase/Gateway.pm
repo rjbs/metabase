@@ -17,11 +17,11 @@ has librarian => (
   required => 1,
 );
 
-# has secret_librarian => (
-#   is       => 'ro',
-#   isa      => 'CPAN::Metabase::Librarian',
-#   required => 1,
-# );
+has secret_librarian => (
+  is       => 'ro',
+  isa      => 'CPAN::Metabase::Librarian',
+  required => 1,
+);
 
 sub _validate_resource {
   my ($self, $request) = @_;
