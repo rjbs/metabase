@@ -45,6 +45,8 @@ sub handle {
   die "submissions must not include resource or content metadata"
     if $fact_struct->{metadata}{content} or $fact_struct->{metadata}{resource};
 
+  # check combination of user and fact -- rjbs, 2009-03-30
+
   my $type = $fact_struct->{metadata}{core}{type}[1];
 
   my $fact;
@@ -55,7 +57,8 @@ sub handle {
     die $@ unless $fact;
   }
 
-  return $self->enqueue( $fact, $user );
+  # XXX: should be a profile fact -- rjbs, 2009-03-30
+  return $self->enqueue( $fact, $user_struct );
 }
 
 sub enqueue {
