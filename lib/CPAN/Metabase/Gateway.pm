@@ -4,13 +4,25 @@ use Moose;
 use CPAN::Metabase::Librarian;
 use Data::GUID;
 
+use CPAN::Metabase::Fact;
 use CPAN::Metabase::User::Profile;
+
+# XXX life becomes a lot easier if we say that fact classes MUST have 1-to-1 
+# relationship with a .pm file. -- dagolden, 2009-03-31
 
 has fact_classes => (
   is  => 'ro',
   isa => 'ArrayRef[Str]',
   auto_deref => 1,
   required   => 1,
+);
+
+has approved_types => (
+  is          =>  'ro',
+  isa         =>  'ArrayRef[Str]',
+  auto_deref  => 1,
+  lazy        => 1,
+  builder     => '_build_approved_types',
 );
 
 has librarian => (
@@ -24,6 +36,19 @@ has secret_librarian => (
   isa      => 'CPAN::Metabase::Librarian',
   required => 1,
 );
+
+# recurse report classes -- less to specify to new()
+sub _build_approved_types {
+  my ($self) = @_;
+  my @queue = $self->fact_classes;
+  my @approved;
+  while ( my $class = shift @queue ) {
+    push @approved, $class;
+    # XXX $class->can('fact_classes') ?? -- dagolden, 2009-03-31
+    push @queue, $class->fact_classes if $class->isa('CPAN::Metabase::Report');
+  }
+  return [ map { $_->type } @approved ];
+}
 
 sub _validate_resource {
   my ($self, $request) = @_;
@@ -63,15 +88,6 @@ sub __submitter_profile {
     and    $profile_secret eq $given_secret;
 
   return $profile_fact;
-}
-
-sub _validate_fact_class {
-  my ($self, $type) = @_;
-  my $class = CPAN::Metabase::Fact->class_from_type($type);
-  die "'$class' is not an approved fact class"
-    unless grep { $class eq $_ } $self->fact_classes;
-
-  return $class;
 }
 
 sub _validate_fact_struct {
@@ -116,7 +132,10 @@ sub handle_submission {
 
   my $type = $fact_struct->{metadata}{core}{type}[1];
 
-  my $class = $self->_validate_fact_class($type);
+  die "'$type' is not an approved fact type"
+    unless grep { $type eq $_ } $self->approved_types;
+
+  my $class = CPAN::Metabase::Fact->class_from_type($type);
 
   my $fact = eval { $class->from_struct($struct) }
     or die "Unable to create a '$class' object: $@";
