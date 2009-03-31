@@ -4,6 +4,15 @@
 # A copy of the License was distributed with this file or you may obtain a 
 # copy of the License from http://dev.perl.org/licenses/
 
-- Write some code
-- Write some tests
-- Replace boilerplate docs with real documentation
+- 1-to-1 relation between fact classes and .pm files?  If so, we need to fix our
+  test facts elsewhere (C::M::Fact at least)
+
+- Where should fact classes be loaded?  Anywhere that facts are deserialized,
+  we need the class for the type to be loaded. Who deserializes? gateway does it,
+  archives do it, even report does it for facts it contains
+
+- We validate submissions at the gateway, but we don't validate things coming out
+  directly from the librarian.  Should we?  Per last point, someone using librarian
+  or archive might need them to load classes for facts.  Should they be restricted to
+  a defined list?
+

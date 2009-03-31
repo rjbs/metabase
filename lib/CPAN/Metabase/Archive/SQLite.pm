@@ -117,6 +117,7 @@ sub extract {
     my $class = CPAN::Metabase::Fact->class_from_type($type);
 
     # recreate the class
+    # XXX should this be from_struct rather than new? -- dagolden, 2009-03-31
     return $class->new(
         (map { $_ => $meta->{$_}[1] } keys %$meta),
         content => $class->content_from_bytes($content)
