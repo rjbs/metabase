@@ -65,10 +65,29 @@ sub __submitter_profile {
   return $profile_fact;
 }
 
+sub _validate_fact_class {
+  my ($self, $type) = @_;
+  my $class = CPAN::Metabase::Fact->class_from_type($type);
+  die "'$class' is not an approved fact class"
+    unless grep { $class eq $_ } $self->fact_classes;
+
+  return $class;
+}
+
 sub _validate_fact_struct {
   my ($self, $struct) = @_;
 
-  die "no resource provided" unless $struct->{metadata}{core}{resource};
+  die "no content provided" unless defined $struct->{content};
+
+  for my $key ( qw/resource type schema_version guid creator/ ) {
+    my $meta = $struct->{metadata}{core}{$key};
+    die "no '$key' provided in core metadata"
+      unless defined $meta;
+    die "invalid '$key' provided in core metadata"
+      unless ref $meta eq 'ARRAY';
+    # XXX really should check meta validity: [ Str => 'abc' ], but lets wait
+    # until we decide on sugar for metadata types -- dagolden, 2009-03-31
+  }
 
   die "submissions must not include resource or content metadata"
     if $struct->{metadata}{content} or $struct->{metadata}{resource};
@@ -97,13 +116,10 @@ sub handle_submission {
 
   my $type = $fact_struct->{metadata}{core}{type}[1];
 
-  my $fact;
-  FACT_CLASS: for my $fact_class ($self->fact_classes) {
-    eval "require $fact_class; 1" or die;
-    next FACT_CLASS unless $fact_class->type eq $type;
-    $fact = eval { $fact_class->from_struct($fact_struct) };
-    die $@ unless $fact;
-  }
+  my $class = $self->_validate_fact_class($type);
+
+  my $fact = eval { $class->from_struct($struct) }
+    or die "Unable to create a '$class' object: $@";
 
   $self->_check_permissions($profile => submit => $fact);
 
