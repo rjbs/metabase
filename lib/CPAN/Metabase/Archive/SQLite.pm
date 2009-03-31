@@ -114,7 +114,7 @@ sub extract {
     my $meta = JSON::XS->new->decode($json);
 
     # reconstruct fact meta and extract type to find the class
-    my $class = CPAN::Metabase::Fact->type_to_class($type);
+    my $class = CPAN::Metabase::Fact->class_from_type($type);
 
     # recreate the class
     return $class->new(

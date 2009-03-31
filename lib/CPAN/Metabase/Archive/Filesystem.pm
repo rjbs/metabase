@@ -86,7 +86,7 @@ sub extract {
     }
 
     # reconstruct fact meta and extract type to find the class
-    my $class = CPAN::Metabase::Fact->type_to_class($fact_meta->{type});
+    my $class = CPAN::Metabase::Fact->class_from_type($fact_meta->{type});
 
     # recreate the class
     return $class->new(
