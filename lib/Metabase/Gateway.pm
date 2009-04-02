@@ -137,7 +137,7 @@ sub handle_submission {
 
   my $class = Metabase::Fact->class_from_type($type);
 
-  my $fact = eval { $class->from_struct($struct) }
+  my $fact = eval { $class->from_struct($fact_struct) }
     or die "Unable to create a '$class' object: $@";
 
   $self->_check_permissions($profile => submit => $fact);
