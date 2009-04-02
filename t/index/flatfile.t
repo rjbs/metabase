@@ -21,16 +21,16 @@ plan tests => 14;
 
 #-------------------------------------------------------------------------#
 
-require_ok( 'CPAN::Metabase::Index::FlatFile' );
+require_ok( 'Metabase::Index::FlatFile' );
 
 ok( my $archive = $TEST->test_archive, 'created archive' );
-isa_ok( $archive, 'CPAN::Metabase::Archive::SQLite' );
+isa_ok( $archive, 'Metabase::Archive::SQLite' );
 
 ok( my $index = $TEST->test_index, 'created an index' );
-isa_ok( $index, 'CPAN::Metabase::Index::FlatFile' );
+isa_ok( $index, 'Metabase::Index::FlatFile' );
 
 ok( my $fact = $TEST->test_fact, "created a fact" );
-isa_ok( $fact, 'CPAN::Metabase::Fact::TestFact' );
+isa_ok( $fact, 'Metabase::Fact::TestFact' );
 
 ok( my $guid = $archive->store( $fact ), "stored a fact" );
 

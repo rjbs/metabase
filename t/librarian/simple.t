@@ -21,12 +21,12 @@ plan tests => 10;
 
 #-------------------------------------------------------------------------#
 
-require_ok( 'CPAN::Metabase::Librarian' );
+require_ok( 'Metabase::Librarian' );
 
 ok( my $librarian = $TEST->test_librarian, 'created librarian' );
 
 ok( my $fact = $TEST->test_fact, "created a fact" );
-isa_ok( $fact, 'CPAN::Metabase::Fact::TestFact' );
+isa_ok( $fact, 'Metabase::Fact::TestFact' );
 
 ok(
   my $guid = $librarian->store($fact, { user_id => 'Larry' }),

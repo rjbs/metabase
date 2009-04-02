@@ -1,11 +1,11 @@
-package CPAN::Metabase::Gateway;
+package Metabase::Gateway;
 use Moose;
 
-use CPAN::Metabase::Librarian;
+use Metabase::Librarian;
 use Data::GUID;
 
-use CPAN::Metabase::Fact;
-use CPAN::Metabase::User::Profile;
+use Metabase::Fact;
+use Metabase::User::Profile;
 
 # XXX life becomes a lot easier if we say that fact classes MUST have 1-to-1 
 # relationship with a .pm file. -- dagolden, 2009-03-31
@@ -27,13 +27,13 @@ has approved_types => (
 
 has librarian => (
   is       => 'ro',
-  isa      => 'CPAN::Metabase::Librarian',
+  isa      => 'Metabase::Librarian',
   required => 1,
 );
 
 has secret_librarian => (
   is       => 'ro',
-  isa      => 'CPAN::Metabase::Librarian',
+  isa      => 'Metabase::Librarian',
   required => 1,
 );
 
@@ -45,7 +45,7 @@ sub _build_approved_types {
   while ( my $class = shift @queue ) {
     push @approved, $class;
     # XXX $class->can('fact_classes') ?? -- dagolden, 2009-03-31
-    push @queue, $class->fact_classes if $class->isa('CPAN::Metabase::Report');
+    push @queue, $class->fact_classes if $class->isa('Metabase::Report');
   }
   return [ map { $_->type } @approved ];
 }
@@ -68,15 +68,15 @@ sub __submitter_profile {
   };
 
   my $given_fact = eval {
-    CPAN::Metabase::User::Profile->from_struct($profile_struct);
+    Metabase::User::Profile->from_struct($profile_struct);
   };
 
   return unless $profile_fact and $given_fact;
 
-  my ($profile_secret_fact) = grep { $_->isa('CPAN::Metabase::User::Secret') }
+  my ($profile_secret_fact) = grep { $_->isa('Metabase::User::Secret') }
                               $profile_fact->facts;
 
-  my ($given_secret_fact)   = grep { $_->isa('CPAN::Metabase::User::Secret') }
+  my ($given_secret_fact)   = grep { $_->isa('Metabase::User::Secret') }
                               $given_fact->facts;
 
   my $profile_secret = $profile_secret_fact->content;
@@ -135,7 +135,7 @@ sub handle_submission {
   die "'$type' is not an approved fact type"
     unless grep { $type eq $_ } $self->approved_types;
 
-  my $class = CPAN::Metabase::Fact->class_from_type($type);
+  my $class = Metabase::Fact->class_from_type($type);
 
   my $fact = eval { $class->from_struct($struct) }
     or die "Unable to create a '$class' object: $@";

@@ -13,7 +13,7 @@ use File::Temp ();
 use File::Path ();
 
 use lib 't/lib';
-use CPAN::Metabase::Fact::TestFact;
+use Metabase::Fact::TestFact;
 
 #--------------------------------------------------------------------------#
 
@@ -23,13 +23,13 @@ my $dist_id = 'UNKNOWN/Foo-Bar-1.23.tar.gz';
 
 plan tests => 10;
 
-require_ok( 'CPAN::Metabase::Archive::Filesystem' );
+require_ok( 'Metabase::Archive::Filesystem' );
 
 # die on missing or non-existing directory
 my $re_bad_root_dir = qr/\QAttribute (root_dir)\E/;
-throws_ok { CPAN::Metabase::Archive::Filesystem->new() } $re_bad_root_dir;
+throws_ok { Metabase::Archive::Filesystem->new() } $re_bad_root_dir;
 throws_ok { 
-    CPAN::Metabase::Archive::Filesystem->new(root_dir => 'doesntexist') 
+    Metabase::Archive::Filesystem->new(root_dir => 'doesntexist') 
 } $re_bad_root_dir;
 
 # store into a temp directory
@@ -39,15 +39,15 @@ File::Path::mkpath( $temp_root );
 
 my $archive;
 lives_ok { 
-    $archive = CPAN::Metabase::Archive::Filesystem->new(root_dir => "$temp_root");
+    $archive = Metabase::Archive::Filesystem->new(root_dir => "$temp_root");
 } "created store at '$temp_root'";
 
-my $fact = CPAN::Metabase::Fact::TestFact->new( 
+my $fact = Metabase::Fact::TestFact->new( 
     resource => $dist_id,
     content  => "I smell something fishy.",
 );
 
-isa_ok( $fact, 'CPAN::Metabase::Fact::TestFact' );
+isa_ok( $fact, 'Metabase::Fact::TestFact' );
 
 ok( my $guid = $archive->store( $fact ), "stored a fact" );
 

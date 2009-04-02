@@ -9,5 +9,5 @@ use warnings;
 
 use Test::More tests => 1;
 
-require_ok( 'CPAN::Metabase::Index' );
+require_ok( 'Metabase::Index' );
 

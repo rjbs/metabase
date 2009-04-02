@@ -4,7 +4,7 @@
 # A copy of the License was distributed with this file or you may obtain a 
 # copy of the License from http://dev.perl.org/licenses/
 
-package CPAN::Metabase::Index::FlatFile;
+package Metabase::Index::FlatFile;
 use Moose;
 use Moose::Util::TypeConstraints;
 
@@ -16,7 +16,7 @@ use JSON::XS;
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
 
-with 'CPAN::Metabase::Index';
+with 'Metabase::Index';
 
 subtype 'File' 
     => as 'Object' 
@@ -114,7 +114,7 @@ sub _match {
 
 =head1 NAME
 
-CPAN::Metabase::Index::FlatFile - CPAN::Metabase flat-file index
+Metabase::Index::FlatFile - Metabase flat-file index
 
 =head1 SYNOPSIS
 

@@ -14,23 +14,23 @@ close $store_dir->file('metabase.index')->openw;
 
 has test_gateway => (
   is   => 'ro',
-  isa  => 'CPAN::Metabase::Gateway',
+  isa  => 'Metabase::Gateway',
   lazy => 1,
   default => sub {
-    require CPAN::Metabase::Analyzer::Test;
-    my $gateway = CPAN::Metabase::Gateway->new({
-      fact_classes => [ 'CPAN::Metabase::Fact::TestFact' ],
+    require Metabase::Analyzer::Test;
+    my $gateway = Metabase::Gateway->new({
+      fact_classes => [ 'Metabase::Fact::TestFact' ],
     });
   }
 );
 
 has test_fact => (
   is   => 'ro',
-  isa  => 'CPAN::Metabase::Fact',
+  isa  => 'Metabase::Fact',
   lazy => 1,
   default => sub {
-    require CPAN::Metabase::Fact::TestFact;
-    CPAN::Metabase::Fact::TestFact->new( 
+    require Metabase::Fact::TestFact;
+    Metabase::Fact::TestFact->new( 
       resource => 'JOHNDOE/Foo-Bar-1.23.tar.gz', 
       content  => "I smell something fishy.",
     );
@@ -39,11 +39,11 @@ has test_fact => (
 
 has test_archive => (
   is   => 'ro',
-  isa  => 'CPAN::Metabase::Archive::SQLite',
+  isa  => 'Metabase::Archive::SQLite',
   lazy => 1,
   default => sub {
-    require CPAN::Metabase::Archive::SQLite;
-    CPAN::Metabase::Archive::SQLite->new(
+    require Metabase::Archive::SQLite;
+    Metabase::Archive::SQLite->new(
       filename   => "$temp_dir/store.db",
       compressed => 0,
     );
@@ -52,11 +52,11 @@ has test_archive => (
 
 has test_index => (
   is   => 'ro',
-  isa  => 'CPAN::Metabase::Index::FlatFile',
+  isa  => 'Metabase::Index::FlatFile',
   lazy => 1,
   default => sub {
-    require CPAN::Metabase::Index::FlatFile;
-    CPAN::Metabase::Index::FlatFile->new(
+    require Metabase::Index::FlatFile;
+    Metabase::Index::FlatFile->new(
       index_file => "$temp_dir/store/metabase.index",
     );
   },
@@ -64,11 +64,11 @@ has test_index => (
 
 has test_librarian => (
   is   => 'ro',
-  isa  => 'CPAN::Metabase::Librarian',
+  isa  => 'Metabase::Librarian',
   lazy => 1,
   default => sub {
-    require CPAN::Metabase::Librarian;
-    CPAN::Metabase::Librarian->new(
+    require Metabase::Librarian;
+    Metabase::Librarian->new(
         archive => $_[0]->test_archive,
         'index' => $_[0]->test_index,
     );

@@ -4,7 +4,7 @@
 # A copy of the License was distributed with this file or you may obtain a 
 # copy of the License from http://dev.perl.org/licenses/
 
-package CPAN::Metabase::Index;
+package Metabase::Index;
 use Moose::Role;
 
 our $VERSION = '0.01';
@@ -26,7 +26,7 @@ __END__
 
 =head1 NAME
 
-CPAN::Metabase::Index - Abstract base class for CPAN::Metabase indexing
+Metabase::Index - Abstract base class for Metabase indexing
 
 =head1 SYNOPSIS
 

@@ -4,13 +4,13 @@
 # A copy of the License was distributed with this file or you may obtain a 
 # copy of the License from http://dev.perl.org/licenses/
 
-package CPAN::Metabase::Librarian;
+package Metabase::Librarian;
 use Moose;
 use Moose::Util::TypeConstraints;
 use Carp ();
 use CPAN::DistnameInfo;
-use CPAN::Metabase::Archive;
-use CPAN::Metabase::Index;
+use Metabase::Archive;
+use Metabase::Index;
 use Data::GUID ();
 
 our $VERSION = '0.01';
@@ -18,13 +18,13 @@ $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
 
 has 'archive' => (
     is => 'ro', 
-    isa => 'CPAN::Metabase::Archive',
+    isa => 'Metabase::Archive',
     required => 1, 
 );
 
 has 'index' => (
     is => 'ro', 
-    isa => 'CPAN::Metabase::Index',
+    isa => 'Metabase::Index',
     required => 1, 
 );
 
@@ -32,6 +32,8 @@ has 'index' => (
 sub store {
     my ($self, $fact) = @_;
 
+    # XXX: This needs to be made a per-resource-type analyzer. -- rjbs,
+    # 2009-04-02
     my $d = CPAN::DistnameInfo->new($fact->resource);
 
     # Don't store existing GUIDs; this should never happen, since we're just
@@ -65,7 +67,7 @@ __END__
 
 =head1 NAME
 
-CPAN::Metabase::Librarian - no human would stack books this way
+Metabase::Librarian - no human would stack books this way
 
 =head1 SYNOPSIS
 

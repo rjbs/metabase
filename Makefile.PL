@@ -1,8 +1,8 @@
 require 5.006;
 use inc::Module::Install;
-all_from('lib/CPAN/Metabase.pm');
+all_from('lib/Metabase.pm');
 
-requires('CPAN::Metabase::Fact' => 0);
+requires('Metabase::Fact' => 0);
 
 requires('Test::More'   => '0.47');
 requires('Data::GUID'   => 0);

@@ -4,7 +4,7 @@
 # A copy of the License was distributed with this file or you may obtain a 
 # copy of the License from http://dev.perl.org/licenses/
 
-package CPAN::Metabase;
+package Metabase;
 use 5.006;
 use strict;
 use warnings;
@@ -14,7 +14,7 @@ $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
 
 =head1 NAME
 
-CPAN::Metabase - a database for metadata about CPAN distributions
+Metabase - a database for metadata about CPAN distributions
 
 =head1 DESCRIPTION
 
@@ -23,13 +23,13 @@ It can be used to store, retrieve, and search this information, which can be of
 arbitrary and mixed types.
 
 The metabase was built as a means of storing reports from the CPAN Testers.
-When CPAN::Metabase was initially developed, CPAN Testers reports were sent by
+When Metabase was initially developed, CPAN Testers reports were sent by
 individual testers to a single email server, which then forwarded them to a
 USENET group, which was considered the authoritative store.  This presented
 problems: some testers couldn't send email, the system wasn't very searchable
 or mirrorable, and the data inside the system was entirely unstructured.
 
-CPAN::Metabase aims to avoid all of those problems by being transport-neutral,
+Metabase aims to avoid all of those problems by being transport-neutral,
 searchable and mirrorable by design, and geared toward storing structured data.
 Simplicity is another design goal: while it has several moving parts, they're
 all simple and designed to be replaceable and extensible, rather than to be a

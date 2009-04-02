@@ -1,4 +1,4 @@
-The Indexer part of CPAN::Metabase will be a Solr server. Solr is a web
+The Indexer part of Metabase will be a Solr server. Solr is a web
 interface to Lucene. It is powerful and flexible and meets our needs
 very well.
 

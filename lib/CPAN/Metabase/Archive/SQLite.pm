@@ -4,12 +4,12 @@
 # A copy of the License was distributed with this file or you may obtain a
 # copy of the License from http://dev.perl.org/licenses/
 
-package CPAN::Metabase::Archive::SQLite;
+package Metabase::Archive::SQLite;
 use Moose;
 use Moose::Util::TypeConstraints;
 use MooseX::Types::Path::Class;
 
-use CPAN::Metabase::Fact;
+use Metabase::Fact;
 use Carp        ();
 use Data::GUID  ();
 use JSON::XS    ();
@@ -21,7 +21,7 @@ use Compress::Zlib qw(compress uncompress);
 our $VERSION = '0.01';
 $VERSION = eval $VERSION;    # convert '1.23_45' to 1.2345
 
-with 'CPAN::Metabase::Archive';
+with 'Metabase::Archive';
 
 has 'filename' => (
     is       => 'ro',
@@ -95,7 +95,7 @@ sub store {
 
 # given guid, retrieve it and return it
 # type is directory path
-# class isa CPAN::Metabase::Fact::Subclass
+# class isa Metabase::Fact::Subclass
 sub extract {
     my ( $self, $guid ) = @_;
     my $dbh = $self->dbh;
@@ -114,7 +114,7 @@ sub extract {
     my $meta = JSON::XS->new->decode($json);
 
     # reconstruct fact meta and extract type to find the class
-    my $class = CPAN::Metabase::Fact->class_from_type($type);
+    my $class = Metabase::Fact->class_from_type($type);
 
     # recreate the class
     # XXX should this be from_struct rather than new? -- dagolden, 2009-03-31
@@ -132,7 +132,7 @@ __END__
 
 =head1 NAME
 
-CPAN::Metabase::Archive::SQLite - CPAN::Metabase SQLite-based storage
+Metabase::Archive::SQLite - Metabase SQLite-based storage
 
 =head1 SYNOPSIS
 
