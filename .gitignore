@@ -11,3 +11,4 @@ META.yml
 MANIFEST
 !MANIFEST.SKIP
 inc
+/.mylib
