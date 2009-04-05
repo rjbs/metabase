@@ -59,6 +59,11 @@ sub extract {
     return $self->archive->extract( $guid );
 }
 
+sub exists {
+    my ($self, $guid) = @_;
+    return $self->index->exists( $guid );
+}
+
 1;
 
 __END__
