@@ -20,7 +20,9 @@ with 'Metabase::Index';
 
 subtype 'File' 
     => as 'Object' 
-        => where { $_->isa( "Path::Class::File" ) };
+        => where { $_->isa( "Path::Class::File" ) && ( (-f && -w) || ! -e ) }
+        => message { 'must be a writeable file or must not exist' };
+    
 
 coerce 'File' 
     => from 'Str' 
@@ -46,7 +48,7 @@ sub add {
 
     for my $type (qw(content resource)) {
       my $method = "$type\_metadata";
-      my $data   = $fact->$method;
+      my $data   = $fact->$method || {};
 
       for my $key (keys %$data) {
         # I'm just starting with a strict-ish set.  We can tighten or loosen
@@ -78,6 +80,8 @@ sub search {
 
     my $filename = $self->index_file;
     
+    return [] unless -f $filename;
+
     my $fh = IO::File->new( $filename, "r" )
         or Carp::confess( "Couldn't read from '$filename': $!" );
     $fh->binmode(':raw');
