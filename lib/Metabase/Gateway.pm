@@ -25,6 +25,12 @@ has approved_types => (
   builder     => '_build_approved_types',
 );
 
+has autocreate_profile => (
+  is          => 'ro',
+  isa         => 'Bool',
+  default     => 0,
+);
+
 has librarian => (
   is       => 'ro',
   isa      => 'Metabase::Librarian',
@@ -63,15 +69,22 @@ sub __submitter_profile {
   # I hate nearly every variable name in this scope. -- rjbs, 2009-03-31
 
   my $profile_guid = $profile_struct->{metadata}{core}{guid}[1];
-  my $profile_fact = eval {
-    $self->secret_librarian->extract($profile_guid);
-  };
-
   my $given_fact = eval {
     Metabase::User::Profile->from_struct($profile_struct);
   };
 
-  return unless $profile_fact and $given_fact;
+  die "invalid submitter profile" unless $given_fact; # bad profile provided
+
+  my $profile_fact = eval {
+    $self->secret_librarian->extract($profile_guid);
+  };
+
+  # if not found, maybe autocreate it
+  if ( ! $profile_fact ) {
+    die "unknown submitter profile" unless $self->autocreate_profile;
+    $self->secret_librarian->store( $given_fact ); # XXX check fail -- dagolden, 2009-04-05
+    return $given_fact;
+  }
 
   my ($profile_secret_fact) = grep { $_->isa('Metabase::User::Secret') }
                               $profile_fact->facts;
@@ -82,7 +95,7 @@ sub __submitter_profile {
   my $profile_secret = $profile_secret_fact->content;
   my $given_secret   = $given_secret_fact->content;
 
-  return
+  die "submitter could not be authenticated"
     unless defined $profile_secret
     and    defined $given_secret
     and    $profile_secret eq $given_secret;
@@ -125,8 +138,8 @@ sub handle_submission {
   # use Data::Dumper;
   # local $SIG{__WARN__} = sub { warn "@_: " . Dumper($struct); };
 
-  die "reason: unknown submitter profile\n"
-    unless my $profile = $self->__submitter_profile($profile_struct);
+  my $profile = eval { $self->__submitter_profile($profile_struct) };
+  die "reason: $@" unless $profile;
 
   $self->_validate_fact_struct($fact_struct);
 
