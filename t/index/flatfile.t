@@ -17,7 +17,7 @@ use lib 't/lib';
 use Test::Metabase::Util;
 my $TEST = Test::Metabase::Util->new;
 
-plan tests => 14;
+plan tests => 16;
 
 #-------------------------------------------------------------------------#
 
@@ -33,6 +33,10 @@ ok( my $fact = $TEST->test_fact, "created a fact" );
 isa_ok( $fact, 'Metabase::Fact::TestFact' );
 
 ok( my $guid = $archive->store( $fact ), "stored a fact" );
+
+my $fact2 = $archive->extract($guid);
+ok ( $fact2->guid, "extracted a fact " );
+is ( $fact2->guid, $fact->guid, "extracted a fact with the same guid" );
 
 ok( $index->add( $fact ), "indexed fact" );
 
