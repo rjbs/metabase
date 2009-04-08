@@ -17,6 +17,7 @@ use Path::Class ();
 use DBI         ();
 use DBD::SQLite ();
 use Compress::Zlib qw(compress uncompress);
+use Metabase::Archive::Schema;
 
 our $VERSION = '0.01';
 $VERSION = eval $VERSION;    # convert '1.23_45' to 1.2345
@@ -36,33 +37,23 @@ has 'compressed' => (
     default => 1,
 );
 
-has 'dbh' => (
+has 'schema' => (
     is      => 'ro',
-    isa     => 'DBI::db',
+    isa     => 'Metabase::Archive::Schema',
+    lazy    => 1,
     default => sub {
         my $self     = shift;
         my $filename = $self->filename;
         my $exists   = -f $filename;
-        my $dbh      = DBI->connect(
-            "dbi:SQLite:dbname=$filename",
+        my $schema   = Metabase::Archive::Schema->connect(
+            "dbi:SQLite:$filename",
             "", "",
             {   RaiseError => 1,
                 AutoCommit => 1,
-            }
+            },
         );
-
-        unless ($exists) {
-            $dbh->do('PRAGMA auto_vacuum = 1');
-            $dbh->do( '
-CREATE TABLE archive (
-  guid varchar NOT NULL,
-  type varchar NOT NULL,
-  meta varchar NOT NULL,
-  content blob NOT NULL,
-  PRIMARY KEY (guid)
-)' );
-        }
-        return $dbh;
+        $schema->deploy unless $exists;
+        return $schema;
     },
 );
 
@@ -71,24 +62,29 @@ CREATE TABLE archive (
 # here assign only if no GUID already
 sub store {
     my ( $self, $fact ) = @_;
-    my $dbh  = $self->dbh;
-    my $guid = $fact->guid;
-    my $type = $fact->type;
+    my $schema = $self->schema;
+    my $guid   = $fact->guid;
+    my $type   = $fact->type;
 
     unless ($guid) {
         Carp::confess "Can't store: no GUID set for fact\n";
     }
 
     my $content = $fact->content_as_bytes;
-    my $json    = JSON::XS->new->encode($fact->core_metadata);
+    my $json    = JSON::XS->new->encode( $fact->core_metadata );
 
     if ( $self->compressed ) {
         $json    = compress($json);
         $content = compress($content);
     }
 
-    my $sth = $dbh->prepare('INSERT INTO archive VALUES (?, ?, ?, ?)');
-    $sth->execute( $guid, $type, $json, $content );
+    $schema->resultset('Fact')->create(
+        {   guid    => $guid,
+            type    => $type,
+            meta    => $json,
+            content => $content,
+        }
+    );
 
     return $guid;
 }
@@ -98,13 +94,14 @@ sub store {
 # class isa Metabase::Fact::Subclass
 sub extract {
     my ( $self, $guid ) = @_;
-    my $dbh = $self->dbh;
+    my $schema = $self->schema;
 
-    my $sth = $dbh->prepare(
-        'SELECT type, meta, content FROM archive WHERE guid = ?');
-    $sth->execute($guid);
-    $sth->bind_columns( \my $type, \my $json, \my $content, );
-    $sth->fetch;
+    my $fact = $schema->resultset('Fact')->find($guid);
+    return undef unless $fact;
+
+    my $type    = $fact->type;
+    my $json    = $fact->meta;
+    my $content = $fact->content;
 
     if ( $self->compressed ) {
         $json    = uncompress($json);
@@ -119,7 +116,7 @@ sub extract {
     # recreate the class
     # XXX should this be from_struct rather than new? -- dagolden, 2009-03-31
     return $class->new(
-        (map { $_ => $meta->{$_}[1] } keys %$meta),
+        ( map { $_ => $meta->{$_}[1] } keys %$meta ),
         content => $class->content_from_bytes($content)
     );
 }
