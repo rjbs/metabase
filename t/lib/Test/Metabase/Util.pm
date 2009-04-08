@@ -52,12 +52,11 @@ has test_archive => (
 
 has test_index => (
   is   => 'ro',
-  isa  => 'Metabase::Index::FlatFile',
+  isa  => 'Metabase::Index::Solr',
   lazy => 1,
   default => sub {
-    require Metabase::Index::FlatFile;
-    Metabase::Index::FlatFile->new(
-      index_file => "$temp_dir/store/metabase.index",
+    require Metabase::Index::Solr;
+    Metabase::Index::Solr->new(
     );
   },
 );

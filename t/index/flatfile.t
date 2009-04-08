@@ -27,7 +27,7 @@ ok( my $archive = $TEST->test_archive, 'created archive' );
 isa_ok( $archive, 'Metabase::Archive::SQLite' );
 
 ok( my $index = $TEST->test_index, 'created an index' );
-isa_ok( $index, 'Metabase::Index::FlatFile' );
+isa_ok( $index, 'Metabase::Index::Solr' );
 
 ok( my $fact = $TEST->test_fact, "created a fact" );
 isa_ok( $fact, 'Metabase::Fact::TestFact' );
