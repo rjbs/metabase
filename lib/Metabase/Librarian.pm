@@ -32,9 +32,10 @@ has 'index' => (
 sub store {
     my ($self, $fact) = @_;
 
-    # XXX: This needs to be made a per-resource-type analyzer. -- rjbs,
-    # 2009-04-02
-    my $d = CPAN::DistnameInfo->new($fact->resource);
+    # Facts must be assigned GUID at source
+    unless ( $fact->guid ) {
+        Carp::confess "Can't store: no GUID set for fact\n";
+    }
 
     # Don't store existing GUIDs; this should never happen, since we're just
     # generating a new one, but... hey, can't be too safe, right?
@@ -42,7 +43,9 @@ sub store {
         Carp::confess("GUID conflicts with an existing object");
     }
 
-    if ( $self->archive->store( $fact ) && $self->index->add( $fact ) ) {
+    my $fact_struct = $fact->as_struct;
+    if ( $self->archive->store( $fact_struct ) 
+      && $self->index  ->add  ( $fact ) ) {
         return $fact->guid;
     } else {
         Carp::confess("Error storing or indexing fact with guid: " . $fact->guid);
@@ -56,7 +59,14 @@ sub search {
 
 sub extract {
     my ($self, $guid) = @_;
-    return $self->archive->extract( $guid );
+    my $fact_struct = $self->archive->extract( $guid );
+
+    # reconstruct fact meta and extract type to find the class
+    my $class = Metabase::Fact->class_from_type(
+      $fact_struct->{metadata}{core}{type}[1]
+    );
+
+    return $class->from_struct( $fact_struct );
 }
 
 sub exists {

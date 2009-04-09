@@ -39,26 +39,21 @@ has 'root_dir' => (
 # XXX can we store a fact with a GUID already?  Replaces?  Or error?
 # here assign only if no GUID already
 sub store {
-    my ($self, $fact) = @_;
+    my ($self, $fact_struct) = @_;
 
-    unless ( $fact->guid ) {
+    my $guid = $fact_struct->{metadata}{core}{guid}[1];
+    unless ( $guid ) {
         Carp::confess "Can't store: no GUID set for fact\n";
     }
 
     # freeze and write the fact
     File::Slurp::write_file( 
-        $self->_guid_path( $fact->guid ), 
+        $self->_guid_path( $guid ), 
         {binmode => ':raw'}, 
-        $fact->content_as_bytes
-    );
-    # write the fact meta info
-    File::Slurp::write_file(
-        $self->_guid_path( $fact->guid ) . ".meta",
-        {binmode => ':raw'},
-        JSON::XS->new->encode($fact->core_metadata),
+        JSON::XS->new->encode($fact_struct),
     );
 
-    return $fact->guid;
+    return $guid;
 }
 
 # given guid, retrieve it and return it
@@ -68,32 +63,14 @@ sub extract {
     my ($self, $guid) = @_;
     
     # read the fact
-    my $fact_content = File::Slurp::read_file( 
-        $self->_guid_path( $guid ),
-        binmode => ':raw', 
-    );
-
-    # read the fact meta
-    my $fact_meta = JSON::XS->new->decode(
+    my $fact_struct = JSON::XS->new->decode(
       File::Slurp::read_file(
-        $self->_guid_path( $guid ) . ".meta",
+        $self->_guid_path( $guid ),
         binmode => ':raw',
       ),
     );
 
-    for my $key (keys %$fact_meta) {
-      $fact_meta->{$key} = $fact_meta->{$key}[1];
-    }
-
-    # reconstruct fact meta and extract type to find the class
-    my $class = Metabase::Fact->class_from_type($fact_meta->{type});
-
-    # recreate the class
-    # XXX should this be from_struct rather than new? -- dagolden, 2009-03-31
-    return $class->new(
-        %$fact_meta,
-        content => $class->content_from_bytes( $fact_content ),
-    );
+    return $fact_struct;
 }
 
 sub _guid_path {
