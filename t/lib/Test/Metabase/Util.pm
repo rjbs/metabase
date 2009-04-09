@@ -39,14 +39,17 @@ has test_fact => (
 
 has test_report => (
   is   => 'ro',
-  isa  => 'Metabase::Fact',
+  isa  => 'Metabase::Report',
   lazy => 1,
   default => sub {
-    require Test::Metabase::StringFact;
-    Test::Metabase::StringFact->new( 
-      resource => 'JOHNDOE/Foo-Bar-1.23.tar.gz', 
-      content  => "I smell something fishy.",
+    require Test::Metabase::Report;
+    my $report = Test::Metabase::Report->open(
+      resource => 'JOHNDOE/Foo-Bar-1.23.tar.gz'
     );
+    $report->add( 'Test::Metabase::StringFact' => "I smell something fishy.");
+    $report->add( 'Test::Metabase::StringFact' => "Fish is brain food.");
+    $report->close;
+    return $report
   },
 );
 

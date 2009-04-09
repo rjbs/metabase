@@ -8,7 +8,7 @@ __PACKAGE__->load_fact_classes;
 
 sub report_spec {
   return {
-    Test::Metabase::Fact => "1+",  # zero or more
+    'Test::Metabase::StringFact' => "1+",  # zero or more
   }
 }
 
