@@ -30,7 +30,7 @@ ok( my $index = $TEST->test_index, 'created an index' );
 isa_ok( $index, 'Metabase::Index::FlatFile' );
 
 ok( my $fact = $TEST->test_fact, "created a fact" );
-isa_ok( $fact, 'Metabase::Fact::TestFact' );
+isa_ok( $fact, 'Test::Metabase::StringFact' );
 
 ok( my $guid = $archive->store( $fact ), "stored a fact" );
 

@@ -13,7 +13,7 @@ use File::Temp ();
 use File::Path ();
 
 use lib 't/lib';
-use Metabase::Fact::TestFact;
+use Test::Metabase::StringFact;
 
 #--------------------------------------------------------------------------#
 
@@ -42,12 +42,12 @@ lives_ok {
     $archive = Metabase::Archive::Filesystem->new(root_dir => "$temp_root");
 } "created store at '$temp_root'";
 
-my $fact = Metabase::Fact::TestFact->new( 
+my $fact = Test::Metabase::StringFact->new( 
     resource => $dist_id,
     content  => "I smell something fishy.",
 );
 
-isa_ok( $fact, 'Metabase::Fact::TestFact' );
+isa_ok( $fact, 'Test::Metabase::StringFact' );
 
 ok( my $guid = $archive->store( $fact ), "stored a fact" );
 

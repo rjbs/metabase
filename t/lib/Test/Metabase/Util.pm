@@ -19,7 +19,7 @@ has test_gateway => (
   default => sub {
     require Metabase::Analyzer::Test;
     my $gateway = Metabase::Gateway->new({
-      fact_classes => [ 'Metabase::Fact::TestFact' ],
+      fact_classes => [ 'Test::Metabase::StringFact' ],
     });
   }
 );
@@ -29,8 +29,21 @@ has test_fact => (
   isa  => 'Metabase::Fact',
   lazy => 1,
   default => sub {
-    require Metabase::Fact::TestFact;
-    Metabase::Fact::TestFact->new( 
+    require Test::Metabase::StringFact;
+    Test::Metabase::StringFact->new( 
+      resource => 'JOHNDOE/Foo-Bar-1.23.tar.gz', 
+      content  => "I smell something fishy.",
+    );
+  },
+);
+
+has test_report => (
+  is   => 'ro',
+  isa  => 'Metabase::Fact',
+  lazy => 1,
+  default => sub {
+    require Test::Metabase::StringFact;
+    Test::Metabase::StringFact->new( 
       resource => 'JOHNDOE/Foo-Bar-1.23.tar.gz', 
       content  => "I smell something fishy.",
     );

@@ -26,7 +26,7 @@ require_ok( 'Metabase::Librarian' );
 ok( my $librarian = $TEST->test_librarian, 'created librarian' );
 
 ok( my $fact = $TEST->test_fact, "created a fact" );
-isa_ok( $fact, 'Metabase::Fact::TestFact' );
+isa_ok( $fact, 'Test::Metabase::StringFact' );
 
 ok(
   my $guid = $librarian->store($fact, { user_id => 'Larry' }),
