@@ -17,7 +17,7 @@ use lib 't/lib';
 use Test::Metabase::Util;
 my $TEST = Test::Metabase::Util->new;
 
-plan tests => 8;
+plan tests => 12;
 
 #-------------------------------------------------------------------------#
 
@@ -33,24 +33,20 @@ ok(
   "stored a report"
 );
 
-TODO:{
-  local $TODO = "reports should store individual facts";
-  for my $f ( $report, $report->facts ) {
-    ok( $librarian->exists( $f->guid ), "$f was stored" );
-  }
+for my $f ( $report, $report->facts ) {
+  ok( $librarian->exists( $f->guid ), "$f was stored" );
 }
 
+my $matches;
 
-#my $matches;
+$matches = $librarian->search( 'core.guid' => $guid );
+is( scalar @$matches, 1, "found guid searching for guid" );
 
-#$matches = $librarian->search( 'core.guid' => $guid );
-#is( scalar @$matches, 1, "found guid searching for guid" );
-#
-#ok(
-#  my $new_fact = $librarian->extract( $matches->[0] ),
-#  "extracted object from guid from search"
-#);
-#
-#is( $new_fact->content, $fact->content, "fact content matches" );
-#
-#is( $new_fact->resource, $fact->resource, "dist name was indexed as expected" );
+ok(
+  my $new_fact = $librarian->extract( $matches->[0] ),
+  "extracted object from guid from search"
+);
+
+is( $new_fact->content_as_bytes, $report->content_as_bytes, "fact content matches" );
+
+is( $new_fact->resource, $report->resource, "dist name was indexed as expected" );

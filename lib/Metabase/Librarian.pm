@@ -12,6 +12,7 @@ use CPAN::DistnameInfo;
 use Metabase::Archive;
 use Metabase::Index;
 use Data::GUID ();
+use JSON::XS ();
 
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
@@ -50,10 +51,9 @@ sub store {
     if ( $fact->isa('Metabase::Report') ) {
       my @fact_guids;
       for my $f ( $fact->facts ) {
-        # XXX no error checking if store() fails -- dagolden, 2009-04-09
         push @fact_guids, $self->store( $f );
       }
-      $fact_struct->{content} = \@fact_guids;
+      $fact_struct->{content} = JSON::XS->new->encode(\@fact_guids);
     }
 
     if ( $self->archive->store( $fact_struct ) 
@@ -81,14 +81,18 @@ sub extract {
     
     if ($class->isa('Metabase::Report')) {
       my @facts;
-      for my $g ( @{$fact_struct->{content}} ) {
+      my $content = JSON::XS->new->decode( $fact_struct->{content} );
+      for my $g ( @$content ) {
         # XXX no error checking if extract() fails -- dagolden, 2009-04-09
         push @facts, $self->extract( $g ); 
       }
+      my $core = $fact_struct->{metadata}{core};
+      my %args = map { $_, $core->{$_}[1] } keys %$core;
       $fact = $class->new( 
-        %{$fact_struct->{metadata}{core}},
+        %args,
         content => \@facts
       );
+      $fact->close;
     }
     else {
       $fact = $class->from_struct( $fact_struct );
