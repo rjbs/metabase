@@ -44,6 +44,18 @@ sub store {
     }
 
     my $fact_struct = $fact->as_struct;
+
+    # for Reports, store facts and replace content with GUID's
+    # XXX nasty tight coupling with as_struct() -- dagolden, 2009-04-09
+    if ( $fact->isa('Metabase::Report') ) {
+      my @fact_guids;
+      for my $f ( $fact->facts ) {
+        # XXX no error checking if store() fails -- dagolden, 2009-04-09
+        push @fact_guids, $self->store( $f );
+      }
+      $fact_struct->{content} = \@fact_guids;
+    }
+
     if ( $self->archive->store( $fact_struct ) 
       && $self->index  ->add  ( $fact ) ) {
         return $fact->guid;
@@ -59,14 +71,29 @@ sub search {
 
 sub extract {
     my ($self, $guid) = @_;
+    my $fact;
     my $fact_struct = $self->archive->extract( $guid );
 
     # reconstruct fact meta and extract type to find the class
     my $class = Metabase::Fact->class_from_type(
       $fact_struct->{metadata}{core}{type}[1]
     );
-
-    return $class->from_struct( $fact_struct );
+    
+    if ($class->isa('Metabase::Report')) {
+      my @facts;
+      for my $g ( @{$fact_struct->{content}} ) {
+        # XXX no error checking if extract() fails -- dagolden, 2009-04-09
+        push @facts, $self->extract( $g ); 
+      }
+      $fact = $class->new( 
+        %{$fact_struct->{metadata}{core}},
+        content => \@facts
+      );
+    }
+    else {
+      $fact = $class->from_struct( $fact_struct );
+    }
+    return $fact;
 }
 
 sub exists {
