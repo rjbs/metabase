@@ -1,0 +1,29 @@
+README.hacking -- notes for contributors
+----------------------------------------
+
+CODING STYLE
+
+Not all old code has been cleaned up, but going forward, please follow these
+conventions:
+
+* 2-space indentation with spaces, not tabs
+
+DEPENDENCIES DURING DEVELOPMENT (AKA USING MYLIB)
+
+It can be annoying to manage dependencies during development when testing
+metabase distributions as they often depend on other metabase distributions
+also under development.  
+
+There are a few options
+(1) set PERL5LIB to include all metabase project files
+(2) continually install all metabase project files while developing
+(3) use "-Mylib" and the .mylib file
+
+For (3), install the "ylib" module from CPAN.  Then, when you invoke "perl
+-Mylib", all directories listed in the .mylib file will be added to @INC.  For
+Makefile.PL, you'll need to make sure that -Mylib is used by perl as invoked
+in the Makefile:
+
+  $ perl -Mylib Makefile.PL PERL="`which perl` -Mylib"
+
+
