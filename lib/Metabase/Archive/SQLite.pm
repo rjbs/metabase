@@ -61,17 +61,17 @@ has 'schema' => (
 # XXX can we store a fact with a GUID already?  Replaces?  Or error?
 # here assign only if no GUID already
 sub store {
-    my ( $self, $fact ) = @_;
-    my $schema = $self->schema;
-    my $guid   = $fact->guid;
-    my $type   = $fact->type;
+    my ( $self, $fact_struct ) = @_;
+    my $dbh  = $self->dbh;
+    my $guid = $fact_struct->{metadata}{core}{guid}[1];
+    my $type = $fact_struct->{metadata}{core}{type}[1];
 
     unless ($guid) {
         Carp::confess "Can't store: no GUID set for fact\n";
     }
 
-    my $content = $fact->content_as_bytes;
-    my $json    = JSON::XS->new->encode( $fact->core_metadata );
+    my $content = $fact_struct->{content};
+    my $json    = JSON::XS->new->encode($fact_struct->{metadata}{core});
 
     if ( $self->compressed ) {
         $json    = compress($json);
@@ -113,12 +113,12 @@ sub extract {
     # reconstruct fact meta and extract type to find the class
     my $class = Metabase::Fact->class_from_type($type);
 
-    # recreate the class
-    # XXX should this be from_struct rather than new? -- dagolden, 2009-03-31
-    return $class->new(
-        ( map { $_ => $meta->{$_}[1] } keys %$meta ),
-        content => $class->content_from_bytes($content)
-    );
+    return { 
+      content => $content, 
+      metadata => {
+        core => $meta
+      },
+    };
 }
 
 1;

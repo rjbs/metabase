@@ -12,6 +12,7 @@ use CPAN::DistnameInfo;
 use Metabase::Archive;
 use Metabase::Index;
 use Data::GUID ();
+use JSON::XS ();
 
 our $VERSION = '0.01';
 $VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
@@ -32,9 +33,10 @@ has 'index' => (
 sub store {
     my ($self, $fact) = @_;
 
-    # XXX: This needs to be made a per-resource-type analyzer. -- rjbs,
-    # 2009-04-02
-    my $d = CPAN::DistnameInfo->new($fact->resource);
+    # Facts must be assigned GUID at source
+    unless ( $fact->guid ) {
+        Carp::confess "Can't store: no GUID set for fact\n";
+    }
 
     # Don't store existing GUIDs; this should never happen, since we're just
     # generating a new one, but... hey, can't be too safe, right?
@@ -42,7 +44,20 @@ sub store {
         Carp::confess("GUID conflicts with an existing object");
     }
 
-    if ( $self->archive->store( $fact ) && $self->index->add( $fact ) ) {
+    my $fact_struct = $fact->as_struct;
+
+    # for Reports, store facts and replace content with GUID's
+    # XXX nasty tight coupling with as_struct() -- dagolden, 2009-04-09
+    if ( $fact->isa('Metabase::Report') ) {
+      my @fact_guids;
+      for my $f ( $fact->facts ) {
+        push @fact_guids, $self->store( $f );
+      }
+      $fact_struct->{content} = JSON::XS->new->encode(\@fact_guids);
+    }
+
+    if ( $self->archive->store( $fact_struct ) 
+      && $self->index  ->add  ( $fact ) ) {
         return $fact->guid;
     } else {
         Carp::confess("Error storing or indexing fact with guid: " . $fact->guid);
@@ -56,7 +71,33 @@ sub search {
 
 sub extract {
     my ($self, $guid) = @_;
-    return $self->archive->extract( $guid );
+    my $fact;
+    my $fact_struct = $self->archive->extract( $guid );
+
+    # reconstruct fact meta and extract type to find the class
+    my $class = Metabase::Fact->class_from_type(
+      $fact_struct->{metadata}{core}{type}[1]
+    );
+    
+    if ($class->isa('Metabase::Report')) {
+      my @facts;
+      my $content = JSON::XS->new->decode( $fact_struct->{content} );
+      for my $g ( @$content ) {
+        # XXX no error checking if extract() fails -- dagolden, 2009-04-09
+        push @facts, $self->extract( $g ); 
+      }
+      my $core = $fact_struct->{metadata}{core};
+      my %args = map { $_, $core->{$_}[1] } keys %$core;
+      $fact = $class->new( 
+        %args,
+        content => \@facts
+      );
+      $fact->close;
+    }
+    else {
+      $fact = $class->from_struct( $fact_struct );
+    }
+    return $fact;
 }
 
 sub exists {

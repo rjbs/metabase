@@ -17,7 +17,7 @@ use lib 't/lib';
 use Test::Metabase::Util;
 my $TEST = Test::Metabase::Util->new;
 
-plan tests => 10;
+plan tests => 12;
 
 #-------------------------------------------------------------------------#
 
@@ -25,20 +25,19 @@ require_ok( 'Metabase::Librarian' );
 
 ok( my $librarian = $TEST->test_librarian, 'created librarian' );
 
-ok( my $fact = $TEST->test_fact, "created a fact" );
-isa_ok( $fact, 'Test::Metabase::StringFact' );
+ok( my $report = $TEST->test_report, "created a report" );
+isa_ok( $report, 'Test::Metabase::Report' );
 
 ok(
-  my $guid = $librarian->store($fact, { user_id => 'Larry' }),
-  "stored a fact"
+  my $guid = $librarian->store($report, { user_id => 'Larry' }),
+  "stored a report"
 );
 
-my $matches;
-TODO: {
-  local $TODO = 'resource analysis not implemented';
-  $matches = $librarian->search( 'resource.author' => 'JOHNDOE' );
-  ok( scalar @$matches >= 1, "found guid searching for fact dist_author" );
+for my $f ( $report, $report->facts ) {
+  ok( $librarian->exists( $f->guid ), "$f was stored" );
 }
+
+my $matches;
 
 $matches = $librarian->search( 'core.guid' => $guid );
 is( scalar @$matches, 1, "found guid searching for guid" );
@@ -48,6 +47,6 @@ ok(
   "extracted object from guid from search"
 );
 
-is( $new_fact->content, $fact->content, "fact content matches" );
+is( $new_fact->content_as_bytes, $report->content_as_bytes, "fact content matches" );
 
-is( $new_fact->resource, $fact->resource, "dist name was indexed as expected" );
+is( $new_fact->resource, $report->resource, "dist name was indexed as expected" );
