@@ -62,7 +62,6 @@ has 'schema' => (
 # here assign only if no GUID already
 sub store {
     my ( $self, $fact_struct ) = @_;
-    my $dbh  = $self->dbh;
     my $guid = $fact_struct->{metadata}{core}{guid}[1];
     my $type = $fact_struct->{metadata}{core}{type}[1];
 
@@ -78,7 +77,7 @@ sub store {
         $content = compress($content);
     }
 
-    $schema->resultset('Fact')->create(
+    $self->schema->resultset('Fact')->create(
         {   guid    => $guid,
             type    => $type,
             meta    => $json,
