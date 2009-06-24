@@ -36,9 +36,9 @@ sub add {
           # parts of this later. -- rjbs, 2009-03-28
             die "invalid metadata key" unless $key =~ /\A[-_a-z0-9.]+\z/;
             my ( $type, $value ) = @{ $data->{$key} };
-            if ( $type eq 'Str' ) {
+            if ( $type eq '//str' ) {
                 $metadata{"$category.$key\_s"} = $value;
-            } elsif ( $type eq 'Num' ) {
+            } elsif ( $type eq '//num' ) {
                 $metadata{"$category.$key\_i"} = $value;
             } else {
                 confess "Unknown type $type";
