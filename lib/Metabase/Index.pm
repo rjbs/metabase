@@ -26,24 +26,48 @@ __END__
 
 =head1 NAME
 
-Metabase::Index - Abstract base class for Metabase indexing
+Metabase::Index - Interface for Metabase indexing
 
 =head1 SYNOPSIS
+
+  package Metabase::Index::Bar;
+  use Metabase::Fact;
+  use Moose;
+  with 'Metabase::Index';
+  
+  # define Moose attributes
+  
+  sub add {
+    my ( $self, $fact ) = @_;
+    # index a fact
+  }
+
+  sub search {
+    my ( $self, %spec ) = @_;
+    # conduct search 
+    return \@matches;
+  }
 
 
 =head1 DESCRIPTION
 
-Description...
+This describes the interface for indexing and searching facts.  Implementations
+must provide the C<add> and C<search> methods.
 
 =head1 USAGE
 
-Usage...
+=head2 C<exists>
+
+  if ( $index->exists( $guid ) ) { do_stuff() }
+
+This interface provides an C<exists> method that calls C<search()> and 
+returns a boolean value.
 
 =head1 BUGS
 
 Please report any bugs or feature using the CPAN Request Tracker.  
 Bugs can be submitted through the web interface at 
-L<http://rt.cpan.org/Dist/Display.html?Queue=CPAN-Metabase>
+L<http://rt.cpan.org/Dist/Display.html?Queue=Metabase>
 
 When submitting a bug or request, please include a test-file or a patch to an
 existing test-file that illustrates the bug or desired feature.
@@ -64,8 +88,8 @@ Ricardo J. B. Signes (RJBS)
 
 =head1 COPYRIGHT AND LICENSE
 
- Portions copyright (c) 2008 by David A. Golden
- Portions copyright (c) 2008 by Ricardo J. B. Signes
+ Portions Copyright (c) 2008 by David A. Golden
+ Portions Copyright (c) 2008 by Ricardo J. B. Signes
 
 Licensed under terms of Perl itself (the "License").
 You may not use this file except in compliance with the License.

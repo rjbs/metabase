@@ -135,7 +135,7 @@ Usage...
 
 Please report any bugs or feature using the CPAN Request Tracker.  
 Bugs can be submitted through the web interface at 
-L<http://rt.cpan.org/Dist/Display.html?Queue=CPAN-Metabase>
+L<http://rt.cpan.org/Dist/Display.html?Queue=Metabase>
 
 When submitting a bug or request, please include a test-file or a patch to an
 existing test-file that illustrates the bug or desired feature.
@@ -156,8 +156,8 @@ Ricardo J. B. Signes (RJBS)
 
 =head1 COPYRIGHT AND LICENSE
 
- Portions copyright (c) 2008 by David A. Golden
- Portions copyright (c) 2008 by Ricardo J. B. Signes
+ Portions Copyright (c) 2008 by David A. Golden
+ Portions Copyright (c) 2008 by Ricardo J. B. Signes
 
 Licensed under terms of Perl itself (the "License").
 You may not use this file except in compliance with the License.

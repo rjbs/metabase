@@ -23,6 +23,7 @@ has approved_types => (
   auto_deref  => 1,
   lazy        => 1,
   builder     => '_build_approved_types',
+  init_arg    => undef,
 );
 
 has autocreate_profile => (
@@ -164,3 +165,129 @@ sub enqueue {
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Metabase::Gateway - Manage Metabase fact submission
+
+=head1 SYNOPSIS
+
+  my $mg = Metabase::Gateway->new( 
+    fact_classes      => \@valid_fact_classes,
+    librarian         => $librarian,
+    secret_librarian  => $secret_librarian,
+  );
+
+  $mg->handle_submission( $fact_struct );
+
+=head1 DESCRIPTION
+
+The Metabase::Librarian class provides a front-end interface to user-defined
+Metabase storage and indexing objects.
+
+=head1 USAGE
+
+=head2 C<new>
+
+  my $mg = Metabase::Gateway->new( 
+    fact_classes      => \@valid_fact_classes,
+    librarian         => $librarian,
+    secret_librarian  => $secret_librarian,
+  );
+
+Gateway constructor.  Takes three required attributes C<fact_classes>,
+C<librarian> and C<secret_librarian>.  See below for details.
+
+=head1 ATTRIBUTES
+
+=head2 C<approved_types>
+
+Returns a list of approved fact types.  Automatically generated; cannot be
+initialized.  Used for validating submitted facts.
+
+=head2 C<autocreate_profile>
+
+A boolean option.  If true, if a submission is from an unknown user profile,
+the profile will be added to the Metabase.  If false, an exception will be thrown.
+Default is false.
+
+=head2 C<fact_classes>
+
+Array reference containing a list of valid L<Metabase::Fact> subclasses. Only facts
+from these classes may be added to the Metabase. Required.
+
+=head2 C<librarian>
+
+A librarian object to manage fact data. Required.
+
+=head2 C<secret_librarian>
+
+A librarian object to manage user profile data.  This is generally kept in a separate
+data store to isolate user profile facts from public, searchable facts. Required.
+
+=head1 METHODS
+
+=head2 C<enqueue>
+
+  $mg->enqueue( $fact, $profile );
+
+Add a fact from a user (identified by a profile) to the Metabase the gateway is
+managing.  Used internally by handle_submission.
+
+=head2 C<handle_submission>
+
+  $mg->handle_submission({
+    fact      => $fact_struct,
+    submitter => $profile_struct
+  });
+
+Extract a fact and profile from a deserialized data structure and add it to the
+Metabase. The fact and profile structs are generated from the C<as_struct> method.
+
+=head1 BUGS   
+
+Please report any bugs or feature using the CPAN Request Tracker.  
+Bugs can be submitted through the web interface at 
+L<http://rt.cpan.org/Dist/Display.html?Queue=Metabase>
+
+When submitting a bug or request, please include a test-file or a patch to an
+existing test-file that illustrates the bug or desired feature.
+
+=head1 AUTHOR
+
+=over 
+
+=item *
+
+David A. Golden (DAGOLDEN)
+
+=item *
+
+Ricardo J. B. Signes (RJBS)
+
+=back
+
+I<...no human would stack books this way...>
+
+=head1 COPYRIGHT AND LICENSE
+
+ Portions copyright (c) 2008-2009 by David A. Golden
+ Portions copyright (c) 2008-2009 by Ricardo J. B. Signes
+
+Licensed under terms of Perl itself (the "License").
+You may not use this file except in compliance with the License.
+A copy of the License was distributed with this file or you may obtain a 
+copy of the License from http://dev.perl.org/licenses/
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=cut
+

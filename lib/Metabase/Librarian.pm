@@ -1,4 +1,4 @@
-# Copyright (c) 2008 by Ricardo Signes. All rights reserved.
+# Copyright (c) 2008-2009 by Ricardo Signes and David Golden. All rights reserved.
 # Licensed under terms of Perl itself (the "License").
 # You may not use this file except in compliance with the License.
 # A copy of the License was distributed with this file or you may obtain a 
@@ -113,24 +113,67 @@ __END__
 
 =head1 NAME
 
-Metabase::Librarian - no human would stack books this way
+Metabase::Librarian - front-end interface to Metabase storage
 
 =head1 SYNOPSIS
+
+  my $ml = Metabase::Librarian->new( 
+    archive => $archive,
+    index => $index,
+  );
 
 
 =head1 DESCRIPTION
 
-Description...
+The Metabase::Librarian class provides a front-end interface to user-defined
+Metabase storage and indexing objects.
 
 =head1 USAGE
 
-Usage...
+=head2 C<new>
+
+  my $ml = Metabase::Librarian->new( 
+    archive => $archive,
+    index => $index,
+  );
+
+Librarian constructor.  Takes two required arguments
+
+=over
+
+=item *
+
+C<archive> -- a Metabase::Archive subclass
+
+=item *
+
+C<index> -- a Metabase::Index subclass
+
+=back
+
+=head2 C<store>
+
+  $ml->store( $fact );
+
+=head2 C<search>
+
+  $ml->search( %spec );
+
+See L<Metabase::Index> for spec details.
+
+=head2 C<extract>
+
+  $fact = $ml->extract( $guid );
+
+=head2 C<exists>
+
+  if ( $ml->exists( $guid ) ) { do_stuff() }
 
 =head1 BUGS
 
 Please report any bugs or feature using the CPAN Request Tracker.  
 Bugs can be submitted through the web interface at 
-L<http://rt.cpan.org/Dist/Display.html?Queue=CPAN-Metabase>
+L<http://rt.cpan.org/Dist/Display.html?Queue=Metabase>
 
 When submitting a bug or request, please include a test-file or a patch to an
 existing test-file that illustrates the bug or desired feature.
@@ -149,10 +192,12 @@ Ricardo J. B. Signes (RJBS)
 
 =back
 
+I<...no human would stack books this way...>
+
 =head1 COPYRIGHT AND LICENSE
 
- Portions copyright (c) 2008 by David A. Golden
- Portions copyright (c) 2008 by Ricardo J. B. Signes
+ Portions copyright (c) 2008-2009 by David A. Golden
+ Portions copyright (c) 2008-2009 by Ricardo J. B. Signes
 
 Licensed under terms of Perl itself (the "License").
 You may not use this file except in compliance with the License.
