@@ -19,6 +19,7 @@ requires('Moose::Util::TypeConstraints' => 0);
 requires('MooseX::Types::Path::Class' => 0);
 requires('SQL::Translator' => 0.09003);
 
+auto_manifest;
 tests_recursive;
 extra_tests;
 

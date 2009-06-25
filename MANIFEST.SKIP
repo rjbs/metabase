@@ -37,3 +37,4 @@
 
 # Private developer files
 ^\.mylib
+^Metabase-.*
