@@ -14,7 +14,7 @@ use Metabase::Index;
 use Data::GUID ();
 use JSON::XS ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.001';
 $VERSION = eval $VERSION;
 
 has 'archive' => (
