@@ -12,10 +12,11 @@ requires('File::Temp'   => 0);
 requires('File::Slurp'  => 0);
 requires('Path::Class'  => 0);
 requires('Test::Exception' => 0);
+requires('DBI'          => 0);
+requires('DBD::SQLite'  => 0);
+requires('DBIx::Class'  => 0);
 requires('Moose::Util::TypeConstraints' => 0);
 requires('MooseX::Types::Path::Class' => 0);
-requires('DBI' => 0);
-requires('DBD::SQLite' => 0);
 
 tests_recursive;
 extra_tests;

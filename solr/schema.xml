@@ -33,8 +33,10 @@
        When using MoreLikeThis, fields used for similarity should be stored for 
        best performance.
    -->
-   <field name="guid" type="string" indexed="true" stored="true" required="true" />
-   <field name="type" type="string" indexed="true" stored="false" required="true" />
+   <field name="core.guid_s" type="string" indexed="true" stored="true" required="true" />
+   <field name="core.type_s" type="string" indexed="true" stored="false" required="true" />
+   <field name="core.schema_version_i" type="sint" indexed="true" stored="false" required="true" />
+   <field name="core.created_at_i" type="sint" indexed="true" stored="false" required="true" />
 <!--
    <field name="timestamp" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
 -->
@@ -49,9 +51,9 @@
    <dynamicField name="*_dt" type="date"    indexed="true"  stored="false"/>
  </fields>
 
- <uniqueKey>guid</uniqueKey>
+ <uniqueKey>core.guid_s</uniqueKey>
 
- <defaultSearchField>guid</defaultSearchField>
+ <defaultSearchField>core.guid_s</defaultSearchField>
 
  <solrQueryParser defaultOperator="AND"/>
 
