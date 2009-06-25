@@ -28,7 +28,7 @@ for my $mod ( @modules ) {
       $mod,
       {
         pod_from       => $doc,
-        coverage_class => 'Pod::Coverage::CountParents',
+        coverage_class => 'Pod::Coverage::TrustPod',
       },
     );
 }

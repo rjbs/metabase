@@ -116,6 +116,8 @@ sub _match {
 
 1;
 
+=for Pod::Coverage::TrustPod add search exists
+
 =head1 NAME
 
 Metabase::Index::FlatFile - Metabase flat-file index

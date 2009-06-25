@@ -87,6 +87,8 @@ sub exists {
 
 __END__
 
+=for Pod::Coverage::TrustPod add search exists
+
 =head1 NAME
 
 Metabase::Index::Solr - Metabase Solr index

@@ -126,6 +126,8 @@ __END__
 
 =pod
 
+=for Pod::Coverage::TrustPod store extract
+
 =head1 NAME
 
 Metabase::Archive::SQLite - Metabase storage using SQLite
