@@ -182,12 +182,16 @@ Metabase::Gateway - Manage Metabase fact submission
     secret_librarian  => $secret_librarian,
   );
 
-  $mg->handle_submission( $fact_struct );
+  $mg->handle_submission({
+    fact      => $fact_struct,
+    submitter => $profile_struct
+  });
 
 =head1 DESCRIPTION
 
-The Metabase::Librarian class provides a front-end interface to user-defined
-Metabase storage and indexing objects.
+The Metabase::Gateway class manages submissions to the Metabase.  It
+provides fact and submitter validation or authorization before storing
+new facts in a Metabase.
 
 =head1 USAGE
 
@@ -270,8 +274,6 @@ David A. Golden (DAGOLDEN)
 Ricardo J. B. Signes (RJBS)
 
 =back
-
-I<...no human would stack books this way...>
 
 =head1 COPYRIGHT AND LICENSE
 

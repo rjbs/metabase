@@ -128,17 +128,26 @@ __END__
 
 =head1 NAME
 
-Metabase::Archive::SQLite - Metabase SQLite-based storage
+Metabase::Archive::SQLite - Metabase storage using SQLite
 
 =head1 SYNOPSIS
 
+  require Metabase::Archive::SQLite;
+
+  $archive = Metabase::Archive::SQLite->new(
+    filename => $sqlite_file,
+  ); 
+
 =head1 DESCRIPTION
 
-Description...
+Store facts in a SQLite database.
 
 =head1 USAGE
 
-Usage...
+See L<Metabase::Archive> and L<Metabase::Librarian>.
+
+TODO: document optional C<compressed> option (default 1) and
+C<schema> option (sensible default provided).
 
 =head1 BUGS
 
@@ -153,25 +162,15 @@ existing test-file that illustrates the bug or desired feature.
 
 =over 
 
-=item * 
-
-Leon Brocard  (ACME)
-
 =item *
 
-David A. Golden (DAGOLDEN)
-
-=item *
-
-Ricardo J. B. Signes (RJBS)
+Leon Brocard (ACME)
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
- Portions Copyright (c) 2008 by David A. Golden
- Portions Copyright (c) 2008 by Ricardo J. B. Signes
- Portions Copyright (c) 2008 by Leon Brocard
+ Portions Copyright (c) 2008-2009 by Leon Brocard
 
 Licensed under terms of Perl itself (the "License").
 You may not use this file except in compliance with the License.

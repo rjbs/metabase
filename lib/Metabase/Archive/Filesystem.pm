@@ -94,18 +94,24 @@ __END__
 
 =head1 NAME
 
-Metabase::Archive::Filesystem - Metabase file-based storage
+Metabase::Archive::Filesystem - Metabase filesystem-based storage
 
 =head1 SYNOPSIS
 
+  require Metabase::Archive::Filesystem;
+
+  $archive = Metabase::Archive::Filesystem->new(
+    root_dir => $storage_directory
+  ); 
 
 =head1 DESCRIPTION
 
-Description...
+Store facts as files in the filesystem, hashed into a directory tree by GUID to
+manage the number of files in any particular directory.
 
 =head1 USAGE
 
-Usage...
+See L<Metabase::Archive> and L<Metabase::Librarian>.
 
 =head1 BUGS
 
@@ -132,8 +138,8 @@ Ricardo J. B. Signes (RJBS)
 
 =head1 COPYRIGHT AND LICENSE
 
- Portions Copyright (c) 2008 by David A. Golden
- Portions Copyright (c) 2008 by Ricardo J. B. Signes
+ Portions Copyright (c) 2008-2009 by David A. Golden
+ Portions Copyright (c) 2008-2009 by Ricardo J. B. Signes
 
 Licensed under terms of Perl itself (the "License").
 You may not use this file except in compliance with the License.

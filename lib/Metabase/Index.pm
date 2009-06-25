@@ -88,8 +88,8 @@ Ricardo J. B. Signes (RJBS)
 
 =head1 COPYRIGHT AND LICENSE
 
- Portions Copyright (c) 2008 by David A. Golden
- Portions Copyright (c) 2008 by Ricardo J. B. Signes
+ Portions Copyright (c) 2008-2009 by David A. Golden
+ Portions Copyright (c) 2008-2009 by Ricardo J. B. Signes
 
 Licensed under terms of Perl itself (the "License").
 You may not use this file except in compliance with the License.

@@ -87,13 +87,19 @@ L<Metabase::Archive::SQLite>
 
 L<Metabase::Index::FlatFile>
 
+=item *
+
+L<Metabase::Index::Solr>
+
 =back
 
 Facts stored with in a Metabase are defined as subclasses of L<Metabase::Fact>.
 L<Metabase::Report> is a subclass that relates multiple facts.
 
-L<Metabase::Web> provides the web API for storing, searching and retrieving facts.
-L<Metabase::Client::Simple> is the client library to access a Metabase::Web server.
+L<Metabase::Web> provides the web API for storing, searching and retrieving
+facts.  L<Metabase::Client::Simple> is the client library to submit facts to a
+Metabase::Web server.  A future Metabase::Client class will provide submit and
+search capabilities.
 
 =head1 BUGS
 

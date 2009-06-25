@@ -122,14 +122,19 @@ Metabase::Index::FlatFile - Metabase flat-file index
 
 =head1 SYNOPSIS
 
+    require Metabase::Index::FlatFile;
+
+    my $index = Metabase::Index::FlatFile->new(
+      index_file => "$temp_dir/store/metabase.index",
+    );
 
 =head1 DESCRIPTION
 
-Description...
+Flat-file Metabase index.
 
 =head1 USAGE
 
-Usage...
+See L<Metabase::Index> and L<Metabase::Librarian>.
 
 =head1 BUGS
 
@@ -156,8 +161,8 @@ Ricardo J. B. Signes (RJBS)
 
 =head1 COPYRIGHT AND LICENSE
 
- Portions Copyright (c) 2008 by David A. Golden
- Portions Copyright (c) 2008 by Ricardo J. B. Signes
+ Portions Copyright (c) 2008-2009 by David A. Golden
+ Portions Copyright (c) 2008-2009 by Ricardo J. B. Signes
 
 Licensed under terms of Perl itself (the "License").
 You may not use this file except in compliance with the License.
