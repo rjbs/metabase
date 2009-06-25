@@ -20,7 +20,7 @@ use Compress::Zlib qw(compress uncompress);
 use Metabase::Archive::Schema;
 
 our $VERSION = '0.01';
-$VERSION = eval $VERSION;    # convert '1.23_45' to 1.2345
+$VERSION = eval $VERSION;
 
 with 'Metabase::Archive';
 

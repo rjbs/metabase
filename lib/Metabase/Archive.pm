@@ -8,7 +8,7 @@ package Metabase::Archive;
 use Moose::Role;
 
 our $VERSION = '0.01';
-$VERSION = eval $VERSION; # convert '1.23_45' to 1.2345
+$VERSION = eval $VERSION;
 
 requires 'store';    # store( $fact_struct ) -- die or return $guid
 requires 'extract';  # extract( $guid ) -- die or return $fact_struct
