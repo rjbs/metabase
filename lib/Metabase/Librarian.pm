@@ -72,6 +72,7 @@ sub search {
 sub extract {
     my ($self, $guid) = @_;
     my $fact;
+
     my $fact_struct = $self->archive->extract( $guid );
 
     # reconstruct fact meta and extract type to find the class
@@ -79,6 +80,10 @@ sub extract {
       $fact_struct->{metadata}{core}{type}[1]
     );
     
+    # XXX: The problem here is that what we get out of the librarian isn't
+    # exactly what we put in, it seems.  We need to improve the specification
+    # for what goes in/out and then test it more thoroughly.  *Clearly* the
+    # following block is a wretched hack. -- rjbs, 2009-06-24
     if ($class->isa('Metabase::Report')) {
       my @facts;
       my $content = JSON::XS->new->decode( $fact_struct->{content} );
@@ -87,11 +92,14 @@ sub extract {
         push @facts, $self->extract( $g ); 
       }
       my $core = $fact_struct->{metadata}{core};
-      my %args = map { $_, $core->{$_}[1] } keys %$core;
-      $fact = $class->new( 
-        %args,
-        content => \@facts
-      );
+
+      my $bogus_content = [ map { $_->as_struct } @facts ];
+      my $bogus_string  = JSON->new->encode( $bogus_content );
+
+      $fact = $class->from_struct({
+        metadata => { core => $fact_struct->{metadata}{core} },
+        content  => \$bogus_string,
+      });
       $fact->close;
     }
     else {
