@@ -24,6 +24,12 @@ for my $mod ( @modules ) {
     my $doc = "lib/$mod";
     $doc =~ s{::}{/}g;
     $doc = -f "$doc\.pod" ? "$doc\.pod" : "$doc\.pm" ;
-    pod_coverage_ok( $mod, { pod_from => $doc } );
+    pod_coverage_ok(
+      $mod,
+      {
+        pod_from       => $doc,
+        coverage_class => 'Pod::Coverage::CountParents',
+      },
+    );
 }
 
