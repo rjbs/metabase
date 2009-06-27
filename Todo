@@ -1,34 +1,3 @@
-# Copyright (c) 2008 by Ricardo Signes. All rights reserved.
-# Licensed under terms of Perl itself (the "License").
-# You may not use this file except in compliance with the License.
-# A copy of the License was distributed with this file or you may obtain a 
-# copy of the License from http://dev.perl.org/licenses/
-
-#--------------------------------------------------------------------------#
-# Consolidated "todo" and design discussion for the metabase project
-#--------------------------------------------------------------------------#
-
-# Todo list
-
-- make reports keep facts in a "facts" attribute with guids in "content" so
-  that we don't have to mangle "content" as much during serialization;
-  that requires metabase-client to send all facts in a report separately
-  from serialized content
-
-- Make sure all subclasses and test classes take scalar or scalar ref
-  for content_as/from_bytes
-
-- document a standard for whether to die/croak/confess when facts fail
-  validation
-
-- rename "validate_content" to just "validate"
-
-- create validator classes with utility routines?
-  sub validate { 
-    my $self = shift;
-    $self->validate_with( 'SUPER' );  # Metabase::Validator::SUPER
-    $self->validate_with( 'HoH' );    # Metabase::Validator::HoH
-  }
 
 # Design discussion
 
