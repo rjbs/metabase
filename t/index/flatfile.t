@@ -24,10 +24,10 @@ plan tests => 16;
 require_ok( 'Metabase::Index::FlatFile' );
 
 ok( my $archive = $TEST->test_archive, 'created archive' );
-isa_ok( $archive, 'Metabase::Archive::SQLite' );
+isa_ok( $archive, 'Metabase::Archive::S3' );
 
 ok( my $index = $TEST->test_index, 'created an index' );
-isa_ok( $index, 'Metabase::Index::FlatFile' );
+isa_ok( $index, 'Metabase::Index::SimpleDB' );
 
 ok( my $fact = $TEST->test_fact, "created a fact" );
 isa_ok( $fact, 'Test::Metabase::StringFact' );
