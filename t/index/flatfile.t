@@ -8,6 +8,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Moose;
 
 use Test::Exception;
 use File::Temp ();
@@ -24,10 +25,10 @@ plan tests => 16;
 require_ok( 'Metabase::Index::FlatFile' );
 
 ok( my $archive = $TEST->test_archive, 'created archive' );
-isa_ok( $archive, 'Metabase::Archive::S3' );
+does_ok( $archive, 'Metabase::Archive' );
 
 ok( my $index = $TEST->test_index, 'created an index' );
-isa_ok( $index, 'Metabase::Index::SimpleDB' );
+does_ok( $index, 'Metabase::Index' );
 
 ok( my $fact = $TEST->test_fact, "created a fact" );
 isa_ok( $fact, 'Test::Metabase::StringFact' );

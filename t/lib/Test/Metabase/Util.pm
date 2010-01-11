@@ -52,37 +52,61 @@ has test_report => (
     },
 );
 
+has test_archive_class => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 1,
+    default  => 'Metabase::Archive::SQLite',
+);
+
+has test_archive_args => (
+    is       => 'ro',
+    isa      => 'ArrayRef',
+    required => 1,
+    default  => sub { [filename => "$temp_dir/store.db", compressed => 0] },
+);
+
 has test_archive => (
     is      => 'ro',
-    isa     => 'Metabase::Archive::S3',
+    does    => 'Metabase::Archive',
     lazy    => 1,
-    default => sub {
-        require Metabase::Archive::S3;
-        Metabase::Archive::S3->new(
-            aws_access_key_id => 'XXX',
-            aws_secret_access_key =>
-                'YYY',
-            bucket     => 'acme',
-            prefix     => 'metabase/',
-            compressed => 0,
-        );
-    },
+    builder => '_build_test_archive',
+);
+
+sub _build_test_archive {
+    my ($self) = @_;
+    my $archive_class = $self->test_archive_class;
+    Class::MOP::load_class($archive_class);
+    return $archive_class->new(@{ $self->test_archive_args });
+}
+
+has test_index_class => (
+    is       => 'ro',
+    isa      => 'Str',
+    required => 1,
+    default  => 'Metabase::Index::FlatFile',
+);
+
+has test_index_args => (
+    is       => 'ro',
+    isa      => 'ArrayRef',
+    required => 1,
+    default  => sub { [index_file => "$temp_dir/store/metabase.index"] },
 );
 
 has test_index => (
     is      => 'ro',
-    isa     => 'Metabase::Index::SimpleDB',
+    does    => 'Metabase::Index',
     lazy    => 1,
-    default => sub {
-        require Metabase::Index::SimpleDB;
-        Metabase::Index::SimpleDB->new(
-            aws_access_key_id => 'XXX',
-            aws_secret_access_key =>
-                'YYY',
-            domain => 'metabase',
-        );
-    },
+    builder => '_build_test_index',
 );
+
+sub _build_test_index {
+    my ($self) = @_;
+    my $index_class = $self->test_index_class;
+    Class::MOP::load_class($index_class);
+    return $index_class->new(@{ $self->test_index_args });
+}
 
 has test_librarian => (
     is      => 'ro',
