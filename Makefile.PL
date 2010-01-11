@@ -17,6 +17,8 @@ requires('DBD::SQLite'  => 0);
 requires('DBIx::Class'  => 0);
 requires('Moose::Util::TypeConstraints' => 0);
 requires('MooseX::Types::Path::Class' => 0);
+requires('Net::Amazon::S3' => 0);
+requires('SimpleDB::Class::HTTP' => 0);
 requires('SQL::Translator' => 0.09003);
 
 auto_manifest;
