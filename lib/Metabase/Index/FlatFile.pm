@@ -11,7 +11,7 @@ use Moose::Util::TypeConstraints;
 use Carp ();
 use Fcntl ':flock';
 use IO::File ();
-use JSON::XS;
+use JSON 2 ();
 
 our $VERSION = '0.001';
 $VERSION = eval $VERSION;
@@ -58,7 +58,7 @@ sub add {
       }
     }
     
-    my $line = JSON::XS->new->encode(\%metadata);
+    my $line = JSON->new->encode(\%metadata);
 
     my $filename = $self->index_file;
 
@@ -90,7 +90,7 @@ sub search {
     flock $fh, LOCK_SH;
     {
         while ( my $line = <$fh> ) {
-            my $parsed = JSON::XS->new->decode($line);
+            my $parsed = JSON->new->decode($line);
             push @matches, $parsed->{'core.guid'}[1] if _match($parsed, \%spec);
         }
     }    

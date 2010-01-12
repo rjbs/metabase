@@ -12,7 +12,7 @@ use CPAN::DistnameInfo;
 use Metabase::Archive;
 use Metabase::Index;
 use Data::GUID ();
-use JSON::XS ();
+use JSON 2 ();
 
 our $VERSION = '0.001';
 $VERSION = eval $VERSION;
@@ -53,7 +53,7 @@ sub store {
       for my $f ( $fact->facts ) {
         push @fact_guids, $self->store( $f );
       }
-      $fact_struct->{content} = JSON::XS->new->encode(\@fact_guids);
+      $fact_struct->{content} = JSON->new->encode(\@fact_guids);
     }
 
     if ( $self->archive->store( $fact_struct ) 
@@ -86,7 +86,7 @@ sub extract {
     # following block is a wretched hack. -- rjbs, 2009-06-24
     if ($class->isa('Metabase::Report')) {
       my @facts;
-      my $content = JSON::XS->new->decode( $fact_struct->{content} );
+      my $content = JSON->new->decode( $fact_struct->{content} );
       for my $g ( @$content ) {
         # XXX no error checking if extract() fails -- dagolden, 2009-04-09
         push @facts, $self->extract( $g ); 

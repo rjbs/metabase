@@ -12,7 +12,7 @@ use Metabase::Fact;
 use Carp ();
 use Data::GUID ();
 use File::Slurp ();
-use JSON::XS ();
+use JSON 2 ();
 use Path::Class ();
 
 our $VERSION = '0.001';
@@ -50,7 +50,7 @@ sub store {
     File::Slurp::write_file( 
         $self->_guid_path( $guid ), 
         {binmode => ':raw'}, 
-        JSON::XS->new->encode($fact_struct),
+        JSON->new->encode($fact_struct),
     );
 
     return $guid;
@@ -63,7 +63,7 @@ sub extract {
     my ($self, $guid) = @_;
     
     # read the fact
-    my $fact_struct = JSON::XS->new->decode(
+    my $fact_struct = JSON->new->decode(
       File::Slurp::read_file(
         $self->_guid_path( $guid ),
         binmode => ':raw',
