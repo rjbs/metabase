@@ -15,7 +15,7 @@ requires 'search';
 
 sub exists {
     my ($self, $guid) = @_;
-    return scalar @{ $self->search( guid => $guid ) };
+    return scalar @{ $self->search( 'core.guid' => $guid ) };
 }
 
 1;
@@ -74,6 +74,13 @@ of the search spec are still under development.  At a minimum, a list of
 key value pairs should be considered to be an "AND" operation testing
 for equality.
 
+Keys should be keys from core, content, or resource metadata.  E.g.
+
+  core.guid
+  core.type
+  core.resource
+  content.somefield
+  
 =head1 BUGS
 
 Please report any bugs or feature using the CPAN Request Tracker.  

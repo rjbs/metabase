@@ -97,8 +97,8 @@ sub __validate_submitter {
   else {
     my $known_secret;
     my $matches = $self->secret_librarian->search(
-      type => 'Metabase-User-Secret',
-      resource => $submitter->resource,
+      'core.type' => 'Metabase-User-Secret',
+      'core.resource' => $submitter->resource,
     );
     $known_secret = $self->secret_librarian->extract( shift @$matches )
       if @$matches;
