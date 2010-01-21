@@ -63,6 +63,17 @@ must provide the C<add> and C<search> methods.
 This interface provides an C<exists> method that calls C<search()> and 
 returns a boolean value.
 
+=head2 C<search>
+
+  for $guid ( @{ $index->search( %spec ) } ) {
+    # do stuff
+  }
+
+Returns an arrayref of GUIDs satisfying the search spec.  Exact semantics
+of the search spec are still under development.  At a minimum, a list of
+key value pairs should be considered to be an "AND" operation testing
+for equality.
+
 =head1 BUGS
 
 Please report any bugs or feature using the CPAN Request Tracker.  
