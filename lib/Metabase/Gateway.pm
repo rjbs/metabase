@@ -65,43 +65,51 @@ sub _validate_resource {
   1;
 }
 
-sub __submitter_profile {
-  my ($self, $profile_struct) = @_;
-  # I hate nearly every variable name in this scope. -- rjbs, 2009-03-31
+sub __validate_submitter {
+  my ($self, $submission) = @_;
 
-  my $profile_guid = $profile_struct->{metadata}{core}{guid}[1];
-  my $given_fact = eval {
-    Metabase::User::Profile->from_struct($profile_struct);
+  # generate fact objects for submitter profile and secret
+  my $submitter = eval {
+    Metabase::User::Profile->from_struct($submission->{submitter});
   };
+  die "invalid submitter profile: $@" unless $submitter; # bad profile provided
 
-  die "invalid submitter profile" unless $given_fact; # bad profile provided
+  my $submitted_secret = eval {
+    Metabase::User::Secret->from_struct($submission->{secret});
+  };
+  die "invalid submitter secret: $@" unless $submitted_secret; # bad secret
 
+  # check whether submitter profile is already in the Metabase
   my $profile_fact = eval {
-    $self->secret_librarian->extract($profile_guid);
+    $self->librarian->extract($submitter->guid);
   };
 
   # if not found, maybe autocreate it
   if ( ! $profile_fact ) {
     die "unknown submitter profile" unless $self->autocreate_profile;
-    $self->secret_librarian->store( $given_fact ); # XXX check fail -- dagolden, 2009-04-05
-    return $given_fact;
+    eval {
+      $self->librarian->store( $submitter ); 
+      $self->secret_librarian->store( $submitted_secret ); 
+    };
+    die "error storing new submitter profile or secret: $@" if $@;
+  }
+  # else try to authenticate
+  else {
+    my $known_secret;
+    my $matches = $self->secret_librarian->search(
+      type => 'Metabase-User-Secret',
+      resource => $submitter->resource,
+    );
+    $known_secret = $self->secret_librarian->extract( shift @$matches )
+      if @$matches;
+
+    die "submitter could not be authenticated"
+      unless defined $known_secret
+      and    $submitted_secret->content eq $known_secret->content;
   }
 
-  my ($profile_secret_fact) = grep { $_->isa('Metabase::User::Secret') }
-                              $profile_fact->facts;
-
-  my ($given_secret_fact)   = grep { $_->isa('Metabase::User::Secret') }
-                              $given_fact->facts;
-
-  my $profile_secret = $profile_secret_fact->content;
-  my $given_secret   = $given_secret_fact->content;
-
-  die "submitter could not be authenticated"
-    unless defined $profile_secret
-    and    defined $given_secret
-    and    $profile_secret eq $given_secret;
-
-  return $profile_fact;
+  # submitter is good!
+  return ($submitter, $submitted_secret);
 }
 
 sub _validate_fact_struct {
@@ -131,16 +139,15 @@ sub _check_permissions {
 }
 
 sub handle_submission {
-  my ($self, $struct) = @_;
-
-  my $fact_struct    = $struct->{fact};
-  my $profile_struct = $struct->{submitter};
+  my ($self, $submission) = @_;
 
   # use Data::Dumper;
   # local $SIG{__WARN__} = sub { warn "@_: " . Dumper($struct); };
 
-  my $profile = eval { $self->__submitter_profile($profile_struct) };
-  die "reason: $@" unless $profile;
+  my $fact_struct    = $submission->{fact};
+
+  my ($profile, $secret) = eval { $self->__validate_submitter( $submission ) };
+  die "reason: $@" unless $profile && $secret;
 
   $self->_validate_fact_struct($fact_struct);
 
@@ -154,7 +161,7 @@ sub handle_submission {
   my $fact = eval { $class->from_struct($fact_struct) }
     or die "Unable to create a '$class' object: $@";
 
-  $self->_check_permissions($profile => submit => $fact);
+  $self->_check_permissions($profile => $secret => submit => $fact);
 
   return $self->enqueue($fact, $profile);
 }
