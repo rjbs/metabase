@@ -5,7 +5,7 @@ all_from('lib/Metabase.pm');
 requires('Metabase::Fact' => 0);
 
 requires('Test::More'   => '0.47');
-requires('JSON::XS'     => 0);
+requires('JSON'         => 2);
 requires('Data::GUID'   => 0);
 requires('Moose'        => 0);
 requires('File::Temp'   => 0);
