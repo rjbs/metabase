@@ -17,7 +17,7 @@ use Test::Metabase::StringFact;
 
 #--------------------------------------------------------------------------#
 
-my $dist_id = 'UNKNOWN/Foo-Bar-1.23.tar.gz';
+my $dist_id = 'cpan:///distfile/UNKNOWN/Foo-Bar-1.23.tar.gz';
 
 #--------------------------------------------------------------------------#
 
@@ -54,7 +54,7 @@ ok( my $guid = $archive->store( $fact->as_struct ), "stored a fact" );
 is( $fact->guid, $guid, "GUID returned matched GUID in fact" );
 
 my $copy_struct = $archive->extract( $guid );
-my $class = Metabase::Fact->class_from_type($copy_struct->{metadata}{core}{type}[1]);
+my $class = Metabase::Fact->class_from_type($copy_struct->{metadata}{core}{type});
 
 ok( my $copy = $class->from_struct( $copy_struct ),
     "got a fact from archive"

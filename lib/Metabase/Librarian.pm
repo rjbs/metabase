@@ -77,7 +77,7 @@ sub extract {
 
     # reconstruct fact meta and extract type to find the class
     my $class = Metabase::Fact->class_from_type(
-      $fact_struct->{metadata}{core}{type}[1]
+      $fact_struct->{metadata}{core}{type}
     );
     
     # XXX: The problem here is that what we get out of the librarian isn't

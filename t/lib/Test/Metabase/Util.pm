@@ -30,7 +30,7 @@ has test_fact => (
     default => sub {
         require Test::Metabase::StringFact;
         Test::Metabase::StringFact->new(
-            resource => 'JOHNDOE/Foo-Bar-1.23.tar.gz',
+            resource => 'cpan:///distfile/JOHNDOE/Foo-Bar-1.23.tar.gz',
             content  => "I smell something fishy.",
         );
     },
@@ -43,7 +43,7 @@ has test_report => (
     default => sub {
         require Test::Metabase::Report;
         my $report = Test::Metabase::Report->open(
-            resource => 'JOHNDOE/Foo-Bar-1.23.tar.gz' );
+            resource => 'cpan:///distfile/JOHNDOE/Foo-Bar-1.23.tar.gz' );
         $report->add(
             'Test::Metabase::StringFact' => "I smell something fishy." );
         $report->add( 'Test::Metabase::StringFact' => "Fish is brain food." );

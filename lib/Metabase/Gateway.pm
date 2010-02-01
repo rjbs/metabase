@@ -151,7 +151,7 @@ sub handle_submission {
 
   $self->_validate_fact_struct($fact_struct);
 
-  my $type = $fact_struct->{metadata}{core}{type}[1];
+  my $type = $fact_struct->{metadata}{core}{type};
 
   die "'$type' is not an approved fact type"
     unless grep { $type eq $_ } $self->approved_types;

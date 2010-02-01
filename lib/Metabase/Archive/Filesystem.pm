@@ -41,7 +41,7 @@ has 'root_dir' => (
 sub store {
     my ($self, $fact_struct) = @_;
 
-    my $guid = $fact_struct->{metadata}{core}{guid}[1];
+    my $guid = $fact_struct->{metadata}{core}{guid};
     unless ( $guid ) {
         Carp::confess "Can't store: no GUID set for fact\n";
     }

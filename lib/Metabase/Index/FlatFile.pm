@@ -40,10 +40,10 @@ sub add {
     Carp::confess( "can't index a Fact without a GUID" ) unless $fact->guid;
 
     my %metadata = (
-      'core.type'           => [ '//str' => $fact->type            ],
-      'core.schema_version' => [ '//num' => $fact->schema_version  ],
-      'core.guid'           => [ '//str' => $fact->guid            ],
-      'core.created_at'     => [ '//num' => $fact->created_at      ],
+      'core.type'           => $fact->type            ,
+      'core.schema_version' => $fact->schema_version  ,
+      'core.guid'           => $fact->guid            ,
+      'core.created_at'     => $fact->created_at      ,
     );
 
     for my $type (qw(content resource)) {
@@ -91,7 +91,7 @@ sub search {
     {
         while ( my $line = <$fh> ) {
             my $parsed = JSON->new->decode($line);
-            push @matches, $parsed->{'core.guid'}[1] if _match($parsed, \%spec);
+            push @matches, $parsed->{'core.guid'} if _match($parsed, \%spec);
         }
     }    
     $fh->close;
@@ -109,7 +109,7 @@ sub _match {
     for my $k ( keys %$spec ) {
         return unless defined($parsed->{$k}) 
                     && defined($spec->{$k}) 
-                    && $parsed->{$k}[1] eq $spec->{$k};
+                    && $parsed->{$k} eq $spec->{$k};
     }
     return 1;
 }

@@ -36,8 +36,8 @@ isa_ok( $fact, 'Test::Metabase::StringFact' );
 ok( my $guid = $archive->store( $fact ), "stored a fact" );
 
 my $fact2 = $archive->extract($guid);
-ok ( $fact2->{metadata}{core}{guid}[1], "extracted a fact " );
-is ( $fact2->{metadata}{core}{guid}[1], $fact->guid, "extracted a fact with the same guid" );
+ok ( $fact2->{metadata}{core}{guid}, "extracted a fact " );
+is ( $fact2->{metadata}{core}{guid}, $fact->guid, "extracted a fact with the same guid" );
 
 ok( $index->add( $fact ), "indexed fact" );
 

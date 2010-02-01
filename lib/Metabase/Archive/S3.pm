@@ -74,8 +74,8 @@ has 's3_bucket' => (
 # here assign only if no GUID already
 sub store {
     my ( $self, $fact_struct ) = @_;
-    my $guid = $fact_struct->{metadata}{core}{guid}[1];
-    my $type = $fact_struct->{metadata}{core}{type}[1];
+    my $guid = $fact_struct->{metadata}{core}{guid};
+    my $type = $fact_struct->{metadata}{core}{type};
 
     unless ($guid) {
         Carp::confess "Can't store: no GUID set for fact\n";

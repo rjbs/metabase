@@ -27,15 +27,18 @@ sub add {
     );
 
     for my $category (qw(content resource)) {
-        my $method = "$category\_metadata";
-        my $data = $fact->$method || {};
+        my $meta_method = "$category\_metadata";
+        my $types_method = "$category\_metadata_types";
+        my $data = $fact->$meta_method || {};
+        my $types = $fact->$types_method || {};
 
         for my $key ( keys %$data ) {
 
           # I'm just starting with a strict-ish set.  We can tighten or loosen
           # parts of this later. -- rjbs, 2009-03-28
             die "invalid metadata key" unless $key =~ /\A[-_a-z0-9.]+\z/;
-            my ( $type, $value ) = @{ $data->{$key} };
+            my $type  = $types->{$key};
+            my $value = $data->{$key};
             if ( $type eq '//str' ) {
                 $metadata{"$category.$key\_s"} = $value;
             } elsif ( $type eq '//num' ) {
