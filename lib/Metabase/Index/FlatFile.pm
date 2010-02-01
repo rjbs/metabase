@@ -39,14 +39,9 @@ sub add {
     my ($self, $fact) = @_;
     Carp::confess( "can't index a Fact without a GUID" ) unless $fact->guid;
 
-    my %metadata = (
-      'core.type'           => $fact->type            ,
-      'core.schema_version' => $fact->schema_version  ,
-      'core.guid'           => $fact->guid            ,
-      'core.created_at'     => $fact->created_at      ,
-    );
+    my %metadata;
 
-    for my $type (qw(content resource)) {
+    for my $type (qw(core content resource)) {
       my $method = "$type\_metadata";
       my $data   = $fact->$method || {};
 

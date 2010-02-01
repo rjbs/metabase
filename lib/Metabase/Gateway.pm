@@ -121,8 +121,6 @@ sub _validate_fact_struct {
     my $meta = $struct->{metadata}{core}{$key};
     die "no '$key' provided in core metadata"
       unless defined $meta;
-    die "invalid '$key' provided in core metadata"
-      unless ref $meta eq 'ARRAY';
     # XXX really should check meta validity: [ //str => 'abc' ], but lets wait
     # until we decide on sugar for metadata types -- dagolden, 2009-03-31
   }
