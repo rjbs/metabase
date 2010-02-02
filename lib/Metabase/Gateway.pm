@@ -6,6 +6,7 @@ use Data::GUID;
 
 use Metabase::Fact;
 use Metabase::User::Profile;
+use Metabase::User::Secret;
 
 # XXX life becomes a lot easier if we say that fact classes MUST have 1-to-1 
 # relationship with a .pm file. -- dagolden, 2009-03-31
