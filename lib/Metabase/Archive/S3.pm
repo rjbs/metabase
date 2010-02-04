@@ -84,7 +84,7 @@ sub store {
     my $content = $fact_struct->{content};
 
     my $object = {
-        guid    => $guid,
+        guid    => lc $guid,
         type    => $type,
         meta    => $fact_struct->{metadata}{core},
         content => $content,
@@ -97,7 +97,7 @@ sub store {
     }
 
     my $s3_object = $self->s3_bucket->object(
-        key          => $self->prefix . $guid,
+        key          => $self->prefix . lc $guid,
         acl_short    => 'public-read',
         content_type => 'application/json',
     );
@@ -112,7 +112,7 @@ sub store {
 sub extract {
     my ( $self, $guid ) = @_;
 
-    my $s3_object = $self->s3_bucket->object( key => $self->prefix . $guid );
+    my $s3_object = $self->s3_bucket->object( key => $self->prefix . lc $guid );
     my $json = $s3_object->get;
 
     if ( $self->compressed ) {

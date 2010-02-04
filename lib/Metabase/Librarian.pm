@@ -76,7 +76,7 @@ sub extract {
     my ($self, $guid) = @_;
     my $fact;
 
-    my $fact_struct = $self->archive->extract( $guid );
+    my $fact_struct = $self->archive->extract( lc $guid );
 
     # reconstruct fact meta and extract type to find the class
     my $class = Metabase::Fact->class_from_type(
@@ -113,7 +113,7 @@ sub extract {
 
 sub exists {
     my ($self, $guid) = @_;
-    return $self->index->exists( $guid );
+    return $self->index->exists( lc $guid );
 }
 
 1;

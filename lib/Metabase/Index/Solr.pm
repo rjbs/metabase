@@ -22,7 +22,7 @@ sub add {
     my %metadata = (
         'core.type_s'           => $fact->type,
         'core.schema_version_i' => $fact->schema_version,
-        'core.guid_s'           => $fact->guid,
+        'core.guid_s'           => lc $fact->guid,
         'core.created_at_i'     => $fact->created_at,
     );
 
@@ -83,7 +83,7 @@ sub search {
 sub exists {
     my ( $self, $guid ) = @_;
 
-    return scalar @{ $self->search( 'core.guid' => $guid ) };
+    return scalar @{ $self->search( 'core.guid' => lc $guid ) };
 }
 
 1;

@@ -96,7 +96,7 @@ sub search {
 
 sub exists {
     my ($self, $guid) = @_;
-    return scalar @{ $self->search( 'core.guid' => $guid ) };
+    return scalar @{ $self->search( 'core.guid' => lc $guid ) };
 }
 
 sub _match {

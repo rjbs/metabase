@@ -43,7 +43,7 @@ sub add {
     my %metadata = (
         'core.type'           => $fact->type,
         'core.schema_version' => $fact->schema_version,
-        'core.guid'           => $fact->guid,
+        'core.guid'           => lc $fact->guid,
         'core.created_at' =>
             DateTime->from_epoch( epoch => $fact->created_at )->iso8601,
     );
@@ -83,7 +83,7 @@ sub add {
     my $response = $self->simpledb->send_request(
         'PutAttributes',
         {   DomainName => 'metabase',
-            ItemName   => $fact->guid,
+            ItemName   => lc $fact->guid,
             @attributes,
         }
     );
@@ -126,7 +126,7 @@ sub search {
 sub exists {
     my ( $self, $guid ) = @_;
 
-    return scalar @{ $self->search( 'core.guid' => $guid ) };
+    return scalar @{ $self->search( 'core.guid' => lc $guid ) };
 }
 
 1;

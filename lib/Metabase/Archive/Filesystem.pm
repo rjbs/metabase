@@ -77,7 +77,7 @@ sub _guid_path {
     my ($self, $guid) = @_;
 
     # convert guid from "abc-def-ghi" => "abc/def" as a place to put the file
-    my $guid_path = $guid;
+    my $guid_path = lc $guid;
     $guid_path =~ s{-}{/}g;
     $guid_path =~ s{/\w+$}{};
     my $fact_path = Path::Class::file( $self->root_dir, $guid_path, $guid );

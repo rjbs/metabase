@@ -62,7 +62,7 @@ has 'schema' => (
 # here assign only if no GUID already
 sub store {
     my ( $self, $fact_struct ) = @_;
-    my $guid = $fact_struct->{metadata}{core}{guid};
+    my $guid = lc $fact_struct->{metadata}{core}{guid};
     my $type = $fact_struct->{metadata}{core}{type};
 
     unless ($guid) {
@@ -95,7 +95,7 @@ sub extract {
     my ( $self, $guid ) = @_;
     my $schema = $self->schema;
 
-    my $fact = $schema->resultset('Fact')->find($guid);
+    my $fact = $schema->resultset('Fact')->find(lc $guid);
     return undef unless $fact;
 
     my $type    = $fact->type;
