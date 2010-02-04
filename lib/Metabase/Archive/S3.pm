@@ -17,7 +17,7 @@ use Net::Amazon::S3;
 use Path::Class ();
 use Compress::Zlib qw(compress uncompress);
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 $VERSION = eval $VERSION;
 
 with 'Metabase::Archive';
