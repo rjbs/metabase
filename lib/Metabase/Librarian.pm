@@ -44,6 +44,9 @@ sub store {
         Carp::confess("GUID conflicts with an existing object");
     }
 
+    # Updated the "updated_at" timestamp
+    $fact->set_updated_at;
+
     my $fact_struct = $fact->as_struct;
 
     # for Reports, store facts and replace content with GUID's
