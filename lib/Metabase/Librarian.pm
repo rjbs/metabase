@@ -45,7 +45,7 @@ sub store {
     }
 
     # Updated the "updated_at" timestamp
-    $fact->set_updated_at;
+    $fact->touch_updated_at;
 
     my $fact_struct = $fact->as_struct;
 

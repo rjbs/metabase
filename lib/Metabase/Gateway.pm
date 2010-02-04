@@ -118,7 +118,7 @@ sub _validate_fact_struct {
 
   die "no content provided" unless defined $struct->{content};
 
-  for my $key ( qw/resource type schema_version guid creator_id/ ) {
+  for my $key ( qw/resource type schema_version guid creator/ ) {
     my $meta = $struct->{metadata}{core}{$key};
     die "no '$key' provided in core metadata"
       unless defined $meta;
