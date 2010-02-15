@@ -28,10 +28,12 @@ has 'simpledb' => (
     lazy    => 1,
     default => sub {
         my $self = shift;
-        return SimpleDB::Class::HTTP->new(
+        my $sdb = SimpleDB::Class::HTTP->new(
             access_key => $self->aws_access_key_id,
             secret_key => $self->aws_secret_access_key
         );
+        $sdb->send_request('CreateDomain', { DomainName => $self->domain });
+        return $sdb;
     },
 );
 
