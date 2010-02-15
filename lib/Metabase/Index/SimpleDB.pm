@@ -144,7 +144,7 @@ Metabase::Index::Solr - Metabase Amazon SimpleDB index
 =head1 SYNOPSIS
 
   require Metabase::Index::SimpleDB;
-  Metabase::Archive::SimpleDB->new(
+  Metabase::Index:SimpleDB->new(
     aws_access_key_id => 'XXX',
     aws_secret_access_key => 'XXX',
     domain     => 'metabase',
