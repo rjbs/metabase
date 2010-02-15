@@ -114,10 +114,11 @@ sub extract {
     return $object;
 }
 
+# DO NOT lc() GUID
 sub delete {
     my ( $self, $guid ) = @_;
 
-    my $s3_object = $self->s3_bucket->object( key => $self->prefix . lc $guid );
+    my $s3_object = $self->s3_bucket->object( key => $self->prefix . $guid );
     $s3_object->delete;
 }
 

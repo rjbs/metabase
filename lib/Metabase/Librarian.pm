@@ -115,10 +115,11 @@ sub exists {
     return $self->index->exists( lc $guid );
 }
 
+# DO NOT lc() the GUID -- we must allow deletion of improperly cased GUIDS from source
 sub delete {
     my ($self, $guid) = @_;
-    $self->index->delete( lc $guid );
-    $self->archive->delete( lc $guid );
+    $self->index->delete( $guid );
+    $self->archive->delete( $guid );
     return 1;
 }
 
