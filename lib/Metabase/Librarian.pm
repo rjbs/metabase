@@ -94,7 +94,6 @@ sub extract {
         # XXX no error checking if extract() fails -- dagolden, 2009-04-09
         push @facts, $self->extract( $g ); 
       }
-      my $core = $fact_struct->{metadata}{core};
 
       my $bogus_content = [ map { $_->as_struct } @facts ];
       my $bogus_string  = JSON->new->encode( $bogus_content );
