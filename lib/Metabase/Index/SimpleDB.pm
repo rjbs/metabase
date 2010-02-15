@@ -84,7 +84,7 @@ sub add {
 
     my $response = $self->simpledb->send_request(
         'PutAttributes',
-        {   DomainName => 'metabase',
+        {   DomainName => $self->domain,
             ItemName   => lc $fact->guid,
             @attributes,
         }
@@ -107,7 +107,7 @@ sub search {
 
     my $response = $self->simpledb->send_request(
         'Select',
-        {   DomainName       => 'metabase',
+        {   DomainName       => $self->domain,
             SelectExpression => $sql,
         }
     );
