@@ -117,6 +117,20 @@ sub exists {
     return scalar @{ $self->search( 'core.guid' => lc $guid ) };
 }
 
+sub delete {
+    my ( $self, $guid ) = @_;
+
+    Carp::confess("can't delete without a GUID") unless $guid;
+
+    my $response = $self->simpledb->send_request(
+        'DeleteAttributes',
+        {   DomainName => $self->domain,
+            ItemName   => lc $guid,
+        }
+    );
+}
+
+
 1;
 
 __END__

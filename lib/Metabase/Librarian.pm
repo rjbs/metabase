@@ -116,6 +116,13 @@ sub exists {
     return $self->index->exists( lc $guid );
 }
 
+sub delete {
+    my ($self, $guid) = @_;
+    $self->index->delete( lc $guid );
+    $self->archive->delete( lc $guid );
+    return 1;
+}
+
 1;
 
 __END__

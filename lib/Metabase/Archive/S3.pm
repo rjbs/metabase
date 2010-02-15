@@ -114,10 +114,11 @@ sub extract {
     return $object;
 }
 
-    return {
-        content  => $content,
-        metadata => { core => $meta },
-    };
+sub delete {
+    my ( $self, $guid ) = @_;
+
+    my $s3_object = $self->s3_bucket->object( key => $self->prefix . lc $guid );
+    $s3_object->delete;
 }
 
 1;
