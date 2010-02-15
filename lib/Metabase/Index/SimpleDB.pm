@@ -42,32 +42,18 @@ sub add {
 
     Carp::confess("can't index a Fact without a GUID") unless $fact->guid;
 
-    my %metadata = (
-        'core.type'           => $fact->type,
-        'core.schema_version' => $fact->schema_version,
-        'core.guid'           => lc $fact->guid,
-        'core.created_at' =>
-            DateTime->from_epoch( epoch => $fact->created_at )->iso8601,
-    );
+    my %metadata;
 
-    for my $category (qw(content resource)) {
-        my $method = "$category\_metadata";
-        my $data = $fact->$method || {};
+    for my $type (qw(core content resource)) {
+      my $method = "$type\_metadata";
+      my $data   = $fact->$method || {};
 
-        for my $key ( keys %$data ) {
-
-          # I'm just starting with a strict-ish set.  We can tighten or loosen
-          # parts of this later. -- rjbs, 2009-03-28
-            die "invalid metadata key" unless $key =~ /\A[-_a-z0-9.]+\z/;
-            my ( $type, $value ) = @{ $data->{$key} };
-            if ( $type eq 'Str' ) {
-                $metadata{"$category.$key"} = $value;
-            } elsif ( $type eq 'Num' ) {
-                $metadata{"$category.$key"} = $value;
-            } else {
-                confess "Unknown type $type";
-            }
-        }
+      for my $key (keys %$data) {
+        # I'm just starting with a strict-ish set.  We can tighten or loosen
+        # parts of this later. -- rjbs, 2009-03-28
+        die "invalid metadata key" unless $key =~ /\A[-_a-z0-9.]+\z/;
+        $metadata{ "$type.$key" } = $data->{$key};
+      }
     }
 
     my $i = 0;
