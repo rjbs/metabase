@@ -139,7 +139,7 @@ __END__
 
 =head1 NAME
 
-Metabase::Index::Solr - Metabase Amazon SimpleDB index
+Metabase::Index::SimpleDB - Metabase Amazon SimpleDB index
 
 =head1 SYNOPSIS
 
