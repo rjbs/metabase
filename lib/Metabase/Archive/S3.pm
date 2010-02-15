@@ -65,7 +65,8 @@ has 's3_bucket' => (
             retry                 => 1,
         );
         my $client = Net::Amazon::S3::Client->new( s3 => $s3 );
-        return $client->bucket( name => $self->bucket );
+        my $method = (grep { $_ eq $self->bucket } $client->buckets) ? 'bucket' : 'create_bucket';
+        return $client->$method( name => $self->bucket );
     }
 );
 
