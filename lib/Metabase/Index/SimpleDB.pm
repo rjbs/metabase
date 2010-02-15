@@ -100,14 +100,14 @@ sub search {
         $value =~ s/'/''/g;
         $value =~ s/"/""/g;
         $key   =~ s/\./X/g;
-        push @bits, qq{$key='$value'};
+        push @bits, qq{$key = '$value'};
     }
 
-    my $sql = 'select ItemName from ' . $self->domain . ' where ' . join( ' and ', @bits );
+    my $sql = 'select * from ' . $self->domain . ' where ' . join( ' and ', @bits );
 
     my $response = $self->simpledb->send_request(
         'Select',
-        {   DomainName       => $self->domain,
+        {   
             SelectExpression => $sql,
         }
     );
