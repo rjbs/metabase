@@ -89,7 +89,7 @@ sub search {
         push @bits, qq{$key = '$value'};
     }
 
-    my $sql = 'select * from ' . $self->domain . ' where ' . join( ' and ', @bits );
+    my $sql = 'select * from `' . $self->domain . '` where ' . join( ' and ', @bits );
 
     my $response = $self->simpledb->send_request(
         'Select',
