@@ -70,9 +70,7 @@ has 's3_bucket' => (
     }
 );
 
-# given fact, store it and return guid; return
-# XXX can we store a fact with a GUID already?  Replaces?  Or error?
-# here assign only if no GUID already
+# given fact, store it and return guid;
 sub store {
     my ( $self, $fact_struct ) = @_;
     my $guid = $fact_struct->{metadata}{core}{guid};
@@ -82,16 +80,7 @@ sub store {
         Carp::confess "Can't store: no GUID set for fact\n";
     }
 
-    my $content = $fact_struct->{content};
-
-    my $object = {
-        guid    => lc $guid,
-        type    => $type,
-        meta    => $fact_struct->{metadata}{core},
-        content => $content,
-    };
-
-    my $json = JSON::XS->new->encode($object);
+    my $json = JSON::XS->new->encode($fact_struct);
 
     if ( $self->compressed ) {
         $json = compress($json);
@@ -99,7 +88,7 @@ sub store {
 
     my $s3_object = $self->s3_bucket->object(
         key          => $self->prefix . lc $guid,
-        acl_short    => 'public-read',
+#        acl_short    => 'public-read',
         content_type => 'application/json',
     );
     $s3_object->put($json);
@@ -121,12 +110,9 @@ sub extract {
     }
 
     my $object  = JSON::XS->new->decode($json);
-    my $type    = $object->{type};
-    my $meta    = $object->{meta};
-    my $content = $object->{content};
 
-    # reconstruct fact meta and extract type to find the class
-    my $class = Metabase::Fact->class_from_type($type);
+    return $object;
+}
 
     return {
         content  => $content,
