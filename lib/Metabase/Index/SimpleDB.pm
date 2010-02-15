@@ -103,7 +103,7 @@ sub search {
         push @bits, qq{$key='$value'};
     }
 
-    my $sql = 'select id from metabase where ' . join( ' and ', @bits );
+    my $sql = 'select id from ' . $self->domain . ' where ' . join( ' and ', @bits );
 
     my $response = $self->simpledb->send_request(
         'Select',
