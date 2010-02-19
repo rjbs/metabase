@@ -8,7 +8,7 @@ use Metabase::Fact;
 use Metabase::User::Profile;
 use Metabase::User::Secret;
 
-# XXX life becomes a lot easier if we say that fact classes MUST have 1-to-1 
+# XXX life becomes a lot easier if we say that fact classes MUST have 1-to-1
 # relationship with a .pm file. -- dagolden, 2009-03-31
 
 has fact_classes => (
@@ -28,6 +28,12 @@ has approved_types => (
 );
 
 has autocreate_profile => (
+  is          => 'ro',
+  isa         => 'Bool',
+  default     => 0,
+);
+
+has disable_security => (
   is          => 'ro',
   isa         => 'Bool',
   default     => 0,
@@ -89,13 +95,13 @@ sub __validate_submitter {
   if ( ! $profile_fact ) {
     die "unknown submitter profile" unless $self->autocreate_profile;
     eval {
-      $self->librarian->store( $submitter ); 
-      $self->secret_librarian->store( $submitted_secret ); 
+      $self->librarian->store( $submitter );
+      $self->secret_librarian->store( $submitted_secret );
     };
     die "error storing new submitter profile or secret: $@" if $@;
   }
   # else try to authenticate
-  else {
+  elsif ( ! $self->disable_security ) {
     my $known_secret;
     my $matches = $self->secret_librarian->search(
       'core.type' => 'Metabase-User-Secret',
@@ -182,7 +188,7 @@ Metabase::Gateway - Manage Metabase fact submission
 
 =head1 SYNOPSIS
 
-  my $mg = Metabase::Gateway->new( 
+  my $mg = Metabase::Gateway->new(
     fact_classes      => \@valid_fact_classes,
     librarian         => $librarian,
     secret_librarian  => $secret_librarian,
@@ -203,7 +209,7 @@ new facts in a Metabase.
 
 =head2 C<new>
 
-  my $mg = Metabase::Gateway->new( 
+  my $mg = Metabase::Gateway->new(
     fact_classes      => \@valid_fact_classes,
     librarian         => $librarian,
     secret_librarian  => $secret_librarian,
@@ -224,6 +230,11 @@ initialized.  Used for validating submitted facts.
 A boolean option.  If true, if a submission is from an unknown user profile,
 the profile will be added to the Metabase.  If false, an exception will be thrown.
 Default is false.
+
+=head2 C<disable_security>
+
+A boolean option.  If true, submitter profiles will not be authenticated.
+(This is generally useful for testing, only.) Default is false.
 
 =head2 C<fact_classes>
 
@@ -258,10 +269,10 @@ managing.  Used internally by handle_submission.
 Extract a fact and profile from a deserialized data structure and add it to the
 Metabase. The fact and profile structs are generated from the C<as_struct> method.
 
-=head1 BUGS   
+=head1 BUGS
 
-Please report any bugs or feature using the CPAN Request Tracker.  
-Bugs can be submitted through the web interface at 
+Please report any bugs or feature using the CPAN Request Tracker.
+Bugs can be submitted through the web interface at
 L<http://rt.cpan.org/Dist/Display.html?Queue=Metabase>
 
 When submitting a bug or request, please include a test-file or a patch to an
@@ -269,7 +280,7 @@ existing test-file that illustrates the bug or desired feature.
 
 =head1 AUTHOR
 
-=over 
+=over
 
 =item *
 
@@ -288,7 +299,7 @@ Ricardo J. B. Signes (RJBS)
 
 Licensed under terms of Perl itself (the "License").
 You may not use this file except in compliance with the License.
-A copy of the License was distributed with this file or you may obtain a 
+A copy of the License was distributed with this file or you may obtain a
 copy of the License from http://dev.perl.org/licenses/
 
 Unless required by applicable law or agreed to in writing, software
