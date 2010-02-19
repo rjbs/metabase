@@ -100,15 +100,9 @@ sub search {
 
     return [] unless $response->{SelectResult};
     return [] unless $response->{SelectResult}->{Item};
-    my @guids;
-    if ( ref( $response->{SelectResult}->{Item} ) eq 'HASH' ) {
-        @guids = values %{ $response->{SelectResult}->{Item} };
-    } else {
-        foreach my $item ( @{ $response->{SelectResult}->{Item} } ) {
-            push @guids, $item->{Name};
-        }
-    }
-    return \@guids;
+    my $items = $response->{SelectResult}{Item};
+    $items = [ $items ] unless ref $items eq 'ARRAY';
+    return [ map { $_->{Name} } @$items ];
 }
 
 sub exists {
