@@ -1,6 +1,7 @@
 package Metabase::Index::SimpleDB;
 use Moose;
 use SimpleDB::Class::HTTP;
+use SQL::Abstract;
 
 with 'Metabase::Index';
 
@@ -37,6 +38,27 @@ has 'simpledb' => (
     },
 );
 
+has 'sql_abstract' => (
+    is      => 'ro',
+    isa     => 'SQL::Abstract',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return SQL::Abstract->new(
+          case => 'lower',
+          quote_char => q{`},
+        );
+    },
+);
+
+sub _format_int {
+    my ($self, $value) = @_;
+    $value ||= 0; # init
+    return sprintf("%015d",$value+1000000000);
+
+
+}
+
 sub add {
     my ( $self, $fact ) = @_;
 
@@ -60,7 +82,6 @@ sub add {
     my @attributes;
     foreach my $key ( keys %metadata ) {
         my $value = $metadata{$key};
-        $key =~ s/\./X/g;
         push @attributes,
             "Attribute.$i.Name"    => $key,
             "Attribute.$i.Value"   => $value,
@@ -78,18 +99,29 @@ sub add {
 }
 
 sub search {
-    my ( $self, %spec ) = @_;
+    my ( $self, %spec) = @_;
 
-    my @bits;
-    foreach my $key ( keys %spec ) {
-        my $value = $spec{$key};
-        $value =~ s/'/''/g;
-        $value =~ s/"/""/g;
-        $key   =~ s/\./X/g;
-        push @bits, qq{$key = '$value'};
+    # extract limit and ordering keys
+    my $limit = delete $spec{-limit};
+    my  %order;
+    for my $k ( /-asc -desc/ ) {
+      $order{$k} = delete $spec{$k} if exists $spec{$k};
+    }
+    if (scalar keys %order > 1) {
+      Carp::confess("Only one of '-asc' or '-desc' allowed");
     }
 
-    my $sql = 'select * from `' . $self->domain . '` where ' . join( ' and ', @bits );
+    my ($stmt, @bind) = $self->sql_abstract->where(\%spec, \%order);
+    my ($where, @rest) = split qr/\?/, $stmt;
+    for my $chunk (@rest) {
+      # using double quotes, so double them first
+      (my $val = shift @bind) =~ s{"}{""}g;
+      $where .= qq{"$val"} . $chunk;
+    }
+    $where .= " limit $limit" if defined $limit && $limit > 0;
+    my $domain = $self->domain;
+
+    my $sql = qq{select ItemName() from `$domain` where $where};
 
     my $response = $self->simpledb->send_request(
         'Select',
