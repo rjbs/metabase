@@ -1,10 +1,8 @@
 package Metabase::Gateway;
 use Moose;
 
-use Metabase::Librarian;
-use Data::GUID;
-
 use Metabase::Fact;
+use Metabase::Librarian;
 use Metabase::User::Profile;
 use Metabase::User::Secret;
 
@@ -25,12 +23,6 @@ has approved_types => (
   lazy        => 1,
   builder     => '_build_approved_types',
   init_arg    => undef,
-);
-
-has autocreate_profile => (
-  is          => 'ro',
-  isa         => 'Bool',
-  default     => 0,
 );
 
 has disable_security => (
@@ -64,6 +56,18 @@ sub _build_approved_types {
   return [ map { $_->type } @approved ];
 }
 
+# for use in handle_XXXX methods
+sub _fatal {
+  my ($self, $code, $reason, $details) = @_;
+  $code ||= 500;
+  $reason ||= "internal gateway error";
+  $details ||= '';
+  chomp $details;
+  my $message = "$code\: $reason";
+  $message .= $details if $details;
+  die "$message\n";
+}
+
 sub _validate_resource {
   my ($self, $request) = @_;
 
@@ -72,59 +76,51 @@ sub _validate_resource {
   1;
 }
 
-sub __validate_submitter {
-  my ($self, $submission) = @_;
+sub _validate_submitter {
+  my ($self, $user_guid, $user_secret) = @_;
 
-  # generate fact objects for submitter profile and secret
-  my $submitter = eval {
-    Metabase::User::Profile->from_struct($submission->{submitter});
-  };
-  die "invalid submitter profile: $@" unless $submitter; # bad profile provided
-
-  my $submitted_secret = eval {
-    Metabase::User::Secret->from_struct($submission->{secret});
-  };
-  die "invalid submitter secret: $@" unless $submitted_secret; # bad secret
+  return 1 if $self->disable_security;
 
   # check whether submitter profile is already in the Metabase
-  my $profile_fact = eval {
-    $self->librarian->extract($submitter->guid);
+  my $profile = eval { $self->librarian->extract($user_guid); 1 }
+    or die "unknown user\n";
+
+  # check if we have a secret on file
+  my $secret;
+  eval { 
+    my $found = $self->librarian->search( 
+        'core.type' => 'Metabase-User-Secret',
+        'core.resource' => $profile->resource,
+    );
+    unless ( defined $found->[0] ) {
+      die "no secret for that user\n";
+    }
+    $secret = $self->secret_librarian->extract($found->[0]);
   };
 
-  # if not found, maybe autocreate it
-  if ( ! $profile_fact ) {
-    die "unknown submitter profile" unless $self->autocreate_profile;
-    eval {
-      $self->librarian->store( $submitter );
-      $self->secret_librarian->store( $submitted_secret );
-    };
-    die "error storing new submitter profile or secret: $@" if $@;
-  }
-  # else try to authenticate
-  elsif ( ! $self->disable_security ) {
-    my $known_secret;
-    my $matches = $self->secret_librarian->search(
-      'core.type' => 'Metabase-User-Secret',
-      'core.resource' => $submitter->resource,
-    );
-    $known_secret = $self->secret_librarian->extract( shift @$matches )
-      if @$matches;
-
-    die "submitter could not be authenticated"
-      unless defined $known_secret
-      and    $submitted_secret->content eq $known_secret->content;
-  }
+  # match against submitted secret
+  die "user authentication failed"
+    unless defined $secret
+    and    $user_secret eq $secret->content;
 
   # submitter is good!
-  return ($submitter, $submitted_secret);
+  return 1;
 }
 
 sub _validate_fact_struct {
-  my ($self, $struct) = @_;
+  my ($self, $struct, @approved) = @_;
 
+  # approved fact type
+  my $type = $struct->{metadata}{core}{type};
+  unless ( grep { $type eq $_ } @approved ) {
+    die "$type is not an approved fact type\n";
+  }
+
+  # has content
   die "no content provided" unless defined $struct->{content};
 
-  for my $key ( qw/resource type schema_version guid creator/ ) {
+  # required metadata
+  for my $key ( qw/resource type schema_version guid creator creation_time/ ) {
     my $meta = $struct->{metadata}{core}{$key};
     die "no '$key' provided in core metadata"
       unless defined $meta;
@@ -134,46 +130,101 @@ sub _validate_fact_struct {
 
   die "submissions must not include resource or content metadata"
     if $struct->{metadata}{content} or $struct->{metadata}{resource};
-}
 
-sub _check_permissions {
-  my ($self, $profile, $action, $fact) = @_;
-
-  # The devil may care, but we don't. -- rjbs, 2009-03-30
   return 1;
 }
 
+sub _check_permissions {
+  my ($self, $user_guid, $action, $fact) = @_;
+
+  # The devil may care, but we don't. -- rjbs, 2009-03-30
+
+  # E.g. do we let a user submit a fact they aren't listed as the creator for?
+  # -- dagolden, 2010-02-28 
+
+  return 1;
+}
+
+sub _thaw_fact {
+  my ($self, $struct, @approved) = @_;
+
+  $self->_validate_fact_struct($struct, @approved);
+  my $type = $struct->{metadata}{core}{type};
+  return Metabase::Fact->class_from_type($type)->from_struct($struct);
+}
+
+# NOTE ON ERRORS: die with _fatal( XXX => reason => details )
 sub handle_submission {
-  my ($self, $submission) = @_;
+  my ($self, $struct, $user_guid, $user_secret) = @_;
 
   # use Data::Dumper;
   # local $SIG{__WARN__} = sub { warn "@_: " . Dumper($struct); };
 
-  my $fact_struct    = $submission->{fact};
+  # authenticate
+  unless ( eval { $self->_validate_submitter( $user_guid, $user_secret ); 1 } ) {
+    $self->_fatal( 401 => "unauthorized" => $@ );
+  }
 
-  my ($profile, $secret) = eval { $self->__validate_submitter( $submission ) };
-  die "reason: $@" unless $profile && $secret;
+  # thaw
+  my $fact = eval { $self->_thaw_fact($struct, $self->approved_types) };
+  unless ( $fact ) {
+    $self->_fatal( 400 => "invalid submission data" => $@ );
+  }
 
-  $self->_validate_fact_struct($fact_struct);
+  # action allowed for this submitter for this fact
+  unless ( eval { $self->_check_permissions($user_guid => submit => $fact) } ) {
+    $self->_fatal( 400 => "cannot accept fact from current submitter" => $@ );
+  }
 
-  my $type = $fact_struct->{metadata}{core}{type};
+  # accepted by librarian
+  my $guid = eval { $self->enqueue($fact) };
+  unless ( $guid ) {
+    $self->_fatal( 500 => "internal gateway error" => $@ );
+  }
 
-  die "'$type' is not an approved fact type"
-    unless grep { $type eq $_ } $self->approved_types;
+  return $guid;
+}
 
-  my $class = Metabase::Fact->class_from_type($type);
+# NOTE ON ERRORS: die with _fatal( XXX => reason => details )
+sub handle_registration {
+  my ($self, $profile_struct, $secret_struct) = @_;
 
-  my $fact = eval { $class->from_struct($fact_struct) }
-    or die "Unable to create a '$class' object: $@";
+  # thaw profile
+  my $profile = eval { $self->_thaw_fact($profile_struct, 'Metabase-User-Profile') };
+  unless ( $profile ) {
+    $self->_fatal( 400 => "invalid submission data" => $@ );
+  }
 
-  $self->_check_permissions($profile => $secret => submit => $fact);
+  # thaw secret 
+  my $secret = eval { $self->_thaw_fact($secret_struct, 'Metabase-User-Secret') };
+  unless ( $secret ) {
+    $self->_fatal( 400 => "invalid submission data" => $@ );
+  }
 
-  return $self->enqueue($fact, $profile);
+  # neither should exist
+  if ( $self->librarian->exists( $profile->guid ) 
+    || $self->secret_librarian->exists( $secret->guid )
+  ) {
+    $self->_fatal( 400 => "already registered" );
+  }
+
+  # store with respective librarians
+  my ($secret_guid, $profile_guid);
+  eval { 
+    $secret_guid = $self->secret_librarian->store( $secret );
+    $profile_guid = $self->librarian->store( $profile );
+  };
+  unless ( $secret_guid && $profile_guid ) {
+    $self->_fatal( 500 => "internal gateway error" => $@ );
+  }
+
+  # profile accepted by librarian
+  return $profile_guid;
 }
 
 sub enqueue {
-  my ($self, $fact, $profile) = @_;
-  return $self->librarian->store($fact, $profile);
+  my ($self, $fact) = @_;
+  return $self->librarian->store($fact);
 }
 
 1;
@@ -194,10 +245,7 @@ Metabase::Gateway - Manage Metabase fact submission
     secret_librarian  => $secret_librarian,
   );
 
-  $mg->handle_submission({
-    fact      => $fact_struct,
-    submitter => $profile_struct
-  });
+  $mg->handle_submission( $fact_struct, $user_guid, $user_secret);
 
 =head1 DESCRIPTION
 
@@ -225,12 +273,6 @@ C<librarian> and C<secret_librarian>.  See below for details.
 Returns a list of approved fact types.  Automatically generated; cannot be
 initialized.  Used for validating submitted facts.
 
-=head2 C<autocreate_profile>
-
-A boolean option.  If true, if a submission is from an unknown user profile,
-the profile will be added to the Metabase.  If false, an exception will be thrown.
-Default is false.
-
 =head2 C<disable_security>
 
 A boolean option.  If true, submitter profiles will not be authenticated.
@@ -254,20 +296,24 @@ data store to isolate user profile facts from public, searchable facts. Required
 
 =head2 C<enqueue>
 
-  $mg->enqueue( $fact, $profile );
+  $mg->enqueue( $fact );
 
 Add a fact from a user (identified by a profile) to the Metabase the gateway is
 managing.  Used internally by handle_submission.
 
 =head2 C<handle_submission>
 
-  $mg->handle_submission({
-    fact      => $fact_struct,
-    submitter => $profile_struct
-  });
+  $mg->handle_submission( $fact_struct, $user_guid, $user_secret);
 
-Extract a fact and profile from a deserialized data structure and add it to the
-Metabase. The fact and profile structs are generated from the C<as_struct> method.
+Extract a fact a deserialized data structure and add it to the
+Metabase. The fact is regenerated from the C<as_struct> method.
+
+=head2 C<handle_registration>
+
+  $mg->handle_registration( $profile_struct, $secret_struct );
+
+Extract a new user profile and secret from deserialized data structures
+and add them via the librarian and secret_librarian, respectively.
 
 =head1 BUGS
 
@@ -294,8 +340,8 @@ Ricardo J. B. Signes (RJBS)
 
 =head1 COPYRIGHT AND LICENSE
 
- Portions copyright (c) 2008-2009 by David A. Golden
- Portions copyright (c) 2008-2009 by Ricardo J. B. Signes
+ Portions Copyright (c) 2008-2010 by David A. Golden
+ Portions Copyright (c) 2008-2009 by Ricardo J. B. Signes
 
 Licensed under terms of Perl itself (the "License").
 You may not use this file except in compliance with the License.
