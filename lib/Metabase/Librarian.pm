@@ -44,8 +44,8 @@ sub store {
         Carp::confess("GUID conflicts with an existing object");
     }
 
-    # Updated the "updated_at" timestamp
-    $fact->touch_updated_at;
+    # Updated the "update_time" timestamp
+    $fact->touch;
 
     my $fact_struct = $fact->as_struct;
 
