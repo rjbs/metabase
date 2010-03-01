@@ -64,24 +64,12 @@ sub add {
 
     Carp::confess("can't index a Fact without a GUID") unless $fact->guid;
 
-    my %metadata;
-
-    for my $type (qw(core content resource)) {
-      my $method = "$type\_metadata";
-      my $data   = $fact->$method || {};
-
-      for my $key (keys %$data) {
-        # I'm just starting with a strict-ish set.  We can tighten or loosen
-        # parts of this later. -- rjbs, 2009-03-28
-        die "invalid metadata key" unless $key =~ /\A[-_a-z0-9.]+\z/;
-        $metadata{ "$type.$key" } = $data->{$key};
-      }
-    }
+    my $metadata = $self->clone_metadata( $fact );
 
     my $i = 0;
     my @attributes;
-    foreach my $key ( keys %metadata ) {
-        my $value = $metadata{$key};
+    foreach my $key ( keys %$metadata ) {
+        my $value = $metadata->{$key};
         push @attributes,
             "Attribute.$i.Name"    => $key,
             "Attribute.$i.Value"   => $value,
@@ -104,7 +92,7 @@ sub search {
     # extract limit and ordering keys
     my $limit = delete $spec{-limit};
     my  %order;
-    for my $k ( /-asc -desc/ ) {
+    for my $k ( qw/-asc -desc/ ) {
       $order{$k} = delete $spec{$k} if exists $spec{$k};
     }
     if (scalar keys %order > 1) {

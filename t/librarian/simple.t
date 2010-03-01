@@ -29,16 +29,12 @@ ok( my $fact = $TEST->test_fact, "created a fact" );
 isa_ok( $fact, 'Test::Metabase::StringFact' );
 
 ok(
-  my $guid = $librarian->store($fact, { user_id => 'Larry' }),
+  my $guid = $librarian->store($fact),
   "stored a fact"
 );
 
-my $matches;
-TODO: {
-  local $TODO = 'resource analysis not implemented';
-  $matches = $librarian->search( 'resource.author' => 'JOHNDOE' );
-  ok( scalar @$matches >= 1, "found guid searching for fact dist_author" );
-}
+my $matches = $librarian->search( 'resource.cpan_id' => 'JOHNDOE' );
+ok( scalar @$matches >= 1, "found guid searching for resource cpan_id" );
 
 $matches = $librarian->search( 'core.guid' => $guid );
 is( scalar @$matches, 1, "found guid searching for guid" );

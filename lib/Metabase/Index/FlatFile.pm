@@ -39,21 +39,11 @@ sub add {
     my ($self, $fact) = @_;
     Carp::confess( "can't index a Fact without a GUID" ) unless $fact->guid;
 
-    my %metadata;
-
-    for my $type (qw(core content resource)) {
-      my $method = "$type\_metadata";
-      my $data   = $fact->$method || {};
-
-      for my $key (keys %$data) {
-        # I'm just starting with a strict-ish set.  We can tighten or loosen
-        # parts of this later. -- rjbs, 2009-03-28
-        die "invalid metadata key" unless $key =~ /\A[-_a-z0-9.]+\z/;
-        $metadata{ "$type.$key" } = $data->{$key};
-      }
-    }
+    my $metadata = $self->clone_metadata( $fact );
     
-    my $line = JSON->new->encode(\%metadata);
+    my $line = eval {JSON->new->encode($metadata)};
+    Carp::confess "Error encoding JSON: $@"
+      unless $line;
 
     my $filename = $self->index_file;
 
@@ -73,10 +63,19 @@ sub add {
 sub search {
     my ($self, %spec) = @_;
 
+    # extract limit and ordering keys
+    my $limit = delete $spec{-limit};
+    my  %order;
+    for my $k ( qw/-asc -desc/ ) {
+      $order{$k} = delete $spec{$k} if exists $spec{$k};
+    }
+    if (scalar keys %order > 1) {
+      Carp::confess("Only one of '-asc' or '-desc' allowed");
+    }
+
     my $filename = $self->index_file;
     
     return [] unless -f $filename;
-
     my $fh = IO::File->new( $filename, "r" )
         or Carp::confess( "Couldn't read from '$filename': $!" );
     $fh->binmode(':raw');

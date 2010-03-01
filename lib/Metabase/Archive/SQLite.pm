@@ -70,7 +70,9 @@ sub store {
     }
 
     my $content = $fact_struct->{content};
-    my $json    = JSON->new->encode($fact_struct->{metadata}{core});
+    my $json    = eval { JSON->new->encode($fact_struct->{metadata}{core}) };
+    Carp::confess "Couldn't convert to JSON: $@"
+      unless $json;
 
     if ( $self->compressed ) {
         $json    = compress($json);

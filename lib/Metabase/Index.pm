@@ -18,6 +18,30 @@ sub exists {
     return scalar @{ $self->search( 'core.guid' => lc $guid ) };
 }
 
+sub clone_metadata {
+  my ($self, $fact) = @_;
+  my %metadata;
+
+  for my $type (qw(core content resource)) {
+    my $method = "$type\_metadata";
+    my $data   = $fact->$method || {};
+
+    for my $key (keys %$data) {
+      # I'm just starting with a strict-ish set.  We can tighten or loosen
+      # parts of this later. -- rjbs, 2009-03-28
+      die "invalid metadata key" unless $key =~ /\A[-_a-z0-9.]+\z/;
+      $metadata{ "$type.$key" } = $data->{$key};
+    }
+  }
+
+  for my $key ( qw/resource creator/ ) {
+    $metadata{"core.$key"} = $metadata{"core.$key"}->resource
+      if exists $metadata{"core.$key"};
+  }
+  
+  return \%metadata;
+}
+
 1;
 
 __END__
