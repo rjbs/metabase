@@ -99,6 +99,7 @@ sub search {
       Carp::confess("Only one of '-asc' or '-desc' allowed");
     }
 
+    # generate SimpleDB dialect of SQL
     my ($stmt, @bind) = $self->sql_abstract->where(\%spec, \%order);
     my ($where, @rest) = split qr/\?/, $stmt;
     for my $chunk (@rest) {
@@ -108,21 +109,29 @@ sub search {
     }
     $where .= " limit $limit" if defined $limit && $limit > 0;
     my $domain = $self->domain;
-
     my $sql = qq{select ItemName() from `$domain` where $where};
 
-    my $response = $self->simpledb->send_request(
-        'Select',
-        {   
-            SelectExpression => $sql,
-        }
-    );
+    # prepare request
+    my $request = { SelectExpression => $sql };
+    my $result = [];
 
-    return [] unless $response->{SelectResult};
-    return [] unless $response->{SelectResult}->{Item};
-    my $items = $response->{SelectResult}{Item};
-    $items = [ $items ] unless ref $items eq 'ARRAY';
-    return [ map { $_->{Name} } @$items ];
+    # gather results until all items received
+    FETCH: {
+      my $response = $self->simpledb->send_request( 'Select', $request );   
+      if ( exists $response->{SelectResult}{Item} ) {
+        my $items = $response->{SelectResult}{Item};
+        # the following may not be necessary as of SimpleDB::Class 1.0000
+        $items = [ $items ] unless ref $items eq 'ARRAY';
+        push @$result, map { $_->{Name} } @$items ;
+        
+      }
+      if ( exists $response->{SelectResult}{NextToken} ) {
+        $request->{NextToken} = $response->{SelectResult}{NextToken};
+        redo FETCH;
+      }
+    }
+
+    return $result;
 }
 
 sub exists {
