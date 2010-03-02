@@ -70,7 +70,7 @@ sub _fatal {
   $details ||= '';
   chomp $details;
   my $message = "$code\: $reason";
-  $message .= $details if $details;
+  $message .= ": $details" if $details;
   die "$message\n";
 }
 
@@ -87,16 +87,22 @@ sub _validate_submitter {
 
   return 1 if $self->disable_security;
 
+  # did we get arguments?
+  die "no user identity provided\n"
+    unless $user_guid;
+  die "no user secret provided\n"
+    unless $user_secret;
+  
   # check whether submitter profile is already in the Metabase
-  my $profile = eval { $self->librarian->extract($user_guid); 1 }
+  my $profile = eval { $self->librarian->extract($user_guid) }
     or die "unknown user\n";
 
   # check if we have a secret on file
   my $secret;
   eval { 
-    my $found = $self->librarian->search( 
+    my $found = $self->secret_librarian->search( 
         'core.type' => 'Metabase-User-Secret',
-        'core.resource' => $profile->resource,
+        'core.resource' => $profile->resource->resource,
     );
     unless ( defined $found->[0] ) {
       die "no secret for that user\n";
@@ -105,9 +111,8 @@ sub _validate_submitter {
   };
 
   # match against submitted secret
-  die "user authentication failed"
-    unless defined $secret
-    and    $user_secret eq $secret->content;
+  die "user authentication failed\n"
+    unless defined $secret && $user_secret eq $secret->content;
 
   # submitter is good!
   return 1;
