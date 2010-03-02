@@ -31,6 +31,12 @@ has disable_security => (
   default     => 0,
 );
 
+has allow_registration => (
+  is          => 'ro',
+  isa         => 'Bool',
+  default     => 1,
+);
+
 has librarian => (
   is       => 'ro',
   isa      => 'Metabase::Librarian',
@@ -189,6 +195,9 @@ sub handle_submission {
 sub handle_registration {
   my ($self, $profile_struct, $secret_struct) = @_;
 
+  $self->_fatal( 400 => "new user registration disabled" )
+    unless $self->allow_registration;
+
   # thaw profile
   my $profile = eval { $self->_thaw_fact($profile_struct, 'Metabase-User-Profile') };
   unless ( $profile ) {
@@ -277,6 +286,11 @@ initialized.  Used for validating submitted facts.
 
 A boolean option.  If true, submitter profiles will not be authenticated.
 (This is generally useful for testing, only.) Default is false.
+
+=head2 C<allow_registration>
+
+A boolean option.  If true, new submitter profiles and secrets may be
+stored. Default is true.
 
 =head2 C<fact_classes>
 
