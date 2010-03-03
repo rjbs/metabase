@@ -37,13 +37,13 @@ has allow_registration => (
   default     => 1,
 );
 
-has librarian => (
+has public_librarian => (
   is       => 'ro',
   isa      => 'Metabase::Librarian',
   required => 1,
 );
 
-has secret_librarian => (
+has private_librarian => (
   is       => 'ro',
   isa      => 'Metabase::Librarian',
   required => 1,
@@ -92,22 +92,22 @@ sub _validate_submitter {
     unless $user_guid;
   die "no user secret provided\n"
     unless $user_secret;
-  
+
   # check whether submitter profile is already in the Metabase
-  my $profile = eval { $self->librarian->extract($user_guid) }
+  my $profile = eval { $self->public_librarian->extract($user_guid) }
     or die "unknown user\n";
 
   # check if we have a secret on file
   my $secret;
-  eval { 
-    my $found = $self->secret_librarian->search( 
+  eval {
+    my $found = $self->private_librarian->search(
         'core.type' => 'Metabase-User-Secret',
         'core.resource' => $profile->resource->resource,
     );
     unless ( defined $found->[0] ) {
       die "no secret for that user\n";
     }
-    $secret = $self->secret_librarian->extract($found->[0]);
+    $secret = $self->private_librarian->extract($found->[0]);
   };
 
   # match against submitted secret
@@ -151,7 +151,7 @@ sub _check_permissions {
   # The devil may care, but we don't. -- rjbs, 2009-03-30
 
   # E.g. do we let a user submit a fact they aren't listed as the creator for?
-  # -- dagolden, 2010-02-28 
+  # -- dagolden, 2010-02-28
 
   return 1;
 }
@@ -209,24 +209,24 @@ sub handle_registration {
     $self->_fatal( 400 => "invalid submission data" => $@ );
   }
 
-  # thaw secret 
+  # thaw secret
   my $secret = eval { $self->_thaw_fact($secret_struct, 'Metabase-User-Secret') };
   unless ( $secret ) {
     $self->_fatal( 400 => "invalid submission data" => $@ );
   }
 
   # neither should exist
-  if ( $self->librarian->exists( $profile->guid ) 
-    || $self->secret_librarian->exists( $secret->guid )
+  if ( $self->public_librarian->exists( $profile->guid )
+    || $self->private_librarian->exists( $secret->guid )
   ) {
     $self->_fatal( 400 => "already registered" );
   }
 
   # store with respective librarians
   my ($secret_guid, $profile_guid);
-  eval { 
-    $secret_guid = $self->secret_librarian->store( $secret );
-    $profile_guid = $self->librarian->store( $profile );
+  eval {
+    $secret_guid = $self->private_librarian->store( $secret );
+    $profile_guid = $self->public_librarian->store( $profile );
   };
   unless ( $secret_guid && $profile_guid ) {
     $self->_fatal( 500 => "internal gateway error" => $@ );
@@ -238,7 +238,7 @@ sub handle_registration {
 
 sub enqueue {
   my ($self, $fact) = @_;
-  return $self->librarian->store($fact);
+  return $self->public_librarian->store($fact);
 }
 
 1;
@@ -256,7 +256,7 @@ Metabase::Gateway - Manage Metabase fact submission
   my $mg = Metabase::Gateway->new(
     fact_classes      => \@valid_fact_classes,
     librarian         => $librarian,
-    secret_librarian  => $secret_librarian,
+    private_librarian  => $private_librarian,
   );
 
   $mg->handle_submission( $fact_struct, $user_guid, $user_secret);
@@ -273,12 +273,12 @@ new facts in a Metabase.
 
   my $mg = Metabase::Gateway->new(
     fact_classes      => \@valid_fact_classes,
-    librarian         => $librarian,
-    secret_librarian  => $secret_librarian,
+    public_librarian  => $public_librarian,
+    private_librarian  => $private_librarian,
   );
 
 Gateway constructor.  Takes three required attributes C<fact_classes>,
-C<librarian> and C<secret_librarian>.  See below for details.
+C<public_librarian> and C<private_librarian>.  See below for details.
 
 =head1 ATTRIBUTES
 
@@ -302,14 +302,15 @@ stored. Default is true.
 Array reference containing a list of valid L<Metabase::Fact> subclasses. Only facts
 from these classes may be added to the Metabase. Required.
 
-=head2 C<librarian>
+=head2 C<public_librarian>
 
 A librarian object to manage fact data. Required.
 
-=head2 C<secret_librarian>
+=head2 C<private_librarian>
 
-A librarian object to manage user profile data.  This is generally kept in a separate
-data store to isolate user profile facts from public, searchable facts. Required.
+A librarian object to manage user authentication data and possibly other
+facts that should be segregated from searchable and retrievable facts.
+This should not be the same as the public_librarian.  Required.
 
 =head1 METHODS
 
@@ -317,22 +318,22 @@ data store to isolate user profile facts from public, searchable facts. Required
 
   $mg->enqueue( $fact );
 
-Add a fact from a user (identified by a profile) to the Metabase the gateway is
-managing.  Used internally by handle_submission.
+Add a fact from a user (identified by a profile) via the public_librarian.
+Used internally by handle_submission.
 
 =head2 C<handle_submission>
 
   $mg->handle_submission( $fact_struct, $user_guid, $user_secret);
 
-Extract a fact a deserialized data structure and add it to the
-Metabase. The fact is regenerated from the C<as_struct> method.
+Extract a fact a deserialized data structure and add it to the Metabase via the
+public_librarian. The fact is regenerated from the C<as_struct> method.
 
 =head2 C<handle_registration>
 
   $mg->handle_registration( $profile_struct, $secret_struct );
 
 Extract a new user profile and secret from deserialized data structures
-and add them via the librarian and secret_librarian, respectively.
+and add them via the public_librarian and private_librarian, respectively.
 
 =head1 BUGS
 
