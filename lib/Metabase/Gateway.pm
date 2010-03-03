@@ -287,6 +287,9 @@ C<public_librarian> and C<private_librarian>.  See below for details.
 Returns a list of approved fact types.  Automatically generated; cannot be
 initialized.  Used for validating submitted facts.
 
+A "type" is a class name with "::" converted to "-", so this attribute
+returns an arrayref of the C<fact_classes> attribute converted to types.
+
 =head2 C<disable_security>
 
 A boolean option.  If true, submitter profiles will not be authenticated.
