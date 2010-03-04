@@ -78,6 +78,8 @@ sub extract {
 
     my $fact_struct = $self->archive->extract( lc $guid );
 
+    Carp::confess "Fact $guid does not exist" unless $fact_struct;
+
     # reconstruct fact meta and extract type to find the class
     my $class = Metabase::Fact->class_from_type(
       $fact_struct->{metadata}{core}{type}

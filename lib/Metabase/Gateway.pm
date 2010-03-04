@@ -27,6 +27,7 @@ has private_librarian => (
 
 # XXX life becomes a lot easier if we say that fact classes MUST have 1-to-1
 # relationship with a .pm file. -- dagolden, 2009-03-31
+
 has fact_classes => (
   is  => 'ro',
   isa => 'ArrayRef[Str]',
@@ -34,6 +35,7 @@ has fact_classes => (
   lazy     => 1,
   builder => '_build_fact_classes',
 );
+
 
 has approved_types => (
   is          =>  'ro',
@@ -127,6 +129,10 @@ sub _validate_submitter {
 
 sub _validate_fact_struct {
   my ($self, $struct, @approved) = @_;
+
+  # exists and has type
+  die "no fact provide" unless defined $struct;
+  die "fact type not provided" unless defined $struct->{metadata}{core}{type};
 
   # approved fact type
   my $type = $struct->{metadata}{core}{type};
