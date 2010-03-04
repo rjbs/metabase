@@ -5,13 +5,13 @@ use SQL::Abstract;
 
 with 'Metabase::Index';
 
-has 'aws_access_key_id' => (
+has 'access_key_id' => (
     is       => 'ro',
     isa      => 'Str',
     required => 1,
 );
 
-has 'aws_secret_access_key' => (
+has 'secret_access_key' => (
     is       => 'ro',
     isa      => 'Str',
     required => 1,
@@ -30,8 +30,8 @@ has 'simpledb' => (
     default => sub {
         my $self = shift;
         my $sdb = SimpleDB::Class::HTTP->new(
-            access_key => $self->aws_access_key_id,
-            secret_key => $self->aws_secret_access_key
+            access_key => $self->access_key_id,
+            secret_key => $self->secret_access_key
         );
         $sdb->send_request('CreateDomain', { DomainName => $self->domain });
         return $sdb;
@@ -169,8 +169,8 @@ Metabase::Index::SimpleDB - Metabase Amazon SimpleDB index
 
   require Metabase::Index::SimpleDB;
   Metabase::Index:SimpleDB->new(
-    aws_access_key_id => 'XXX',
-    aws_secret_access_key => 'XXX',
+    access_key_id => 'XXX',
+    secret_access_key => 'XXX',
     domain     => 'metabase',
   );
 

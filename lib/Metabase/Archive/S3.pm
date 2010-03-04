@@ -22,13 +22,13 @@ $VERSION = eval $VERSION;
 
 with 'Metabase::Archive';
 
-has 'aws_access_key_id' => (
+has 'access_key_id' => (
     is       => 'ro',
     isa      => 'Str',
     required => 1,
 );
 
-has 'aws_secret_access_key' => (
+has 'secret_access_key' => (
     is       => 'ro',
     isa      => 'Str',
     required => 1,
@@ -60,8 +60,8 @@ has 's3_bucket' => (
     default  => sub {
         my $self = shift;
         my $s3   = Net::Amazon::S3->new(
-            aws_access_key_id     => $self->aws_access_key_id,
-            aws_secret_access_key => $self->aws_secret_access_key,
+            aws_access_key_id     => $self->access_key_id,
+            aws_secret_access_key => $self->secret_access_key,
             retry                 => 1,
         );
         my $client = Net::Amazon::S3::Client->new( s3 => $s3 );
@@ -138,8 +138,8 @@ Metabase::Archive::S3 - Metabase storage using Amazon S3
 
   require Metabase::Archive::S3;
   Metabase::Archive::S3->new(
-    aws_access_key_id => 'XXX',
-    aws_secret_access_key => 'XXX',
+    access_key_id => 'XXX',
+    secret_access_key => 'XXX',
     bucket     => 'acme',
     prefix     => 'metabase/',
     compressed => 0,
