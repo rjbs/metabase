@@ -1,19 +1,38 @@
 package Metabase::Gateway;
-use Moose;
+use Moose::Role;
 
 use Metabase::Fact;
 use Metabase::Librarian;
 use Metabase::User::Profile;
 use Metabase::User::Secret;
+use namespace::autoclean;
+
+requires '_build_public_librarian';
+requires '_build_private_librarian';
+requires '_build_fact_classes';
+
+has public_librarian => (
+  is       => 'ro',
+  isa      => 'Metabase::Librarian',
+  lazy     => 1,
+  builder  => '_build_public_librarian',
+);
+
+has private_librarian => (
+  is       => 'ro',
+  isa      => 'Metabase::Librarian',
+  lazy     => 1,
+  builder  => '_build_private_librarian',
+);
 
 # XXX life becomes a lot easier if we say that fact classes MUST have 1-to-1
 # relationship with a .pm file. -- dagolden, 2009-03-31
-
 has fact_classes => (
   is  => 'ro',
   isa => 'ArrayRef[Str]',
   auto_deref => 1,
-  required   => 1,
+  lazy     => 1,
+  builder => '_build_fact_classes',
 );
 
 has approved_types => (
@@ -35,18 +54,6 @@ has allow_registration => (
   is          => 'ro',
   isa         => 'Bool',
   default     => 1,
-);
-
-has public_librarian => (
-  is       => 'ro',
-  isa      => 'Metabase::Librarian',
-  required => 1,
-);
-
-has private_librarian => (
-  is       => 'ro',
-  isa      => 'Metabase::Librarian',
-  required => 1,
 );
 
 # recurse report classes -- less to specify to new()
@@ -240,6 +247,7 @@ sub enqueue {
   my ($self, $fact) = @_;
   return $self->public_librarian->store($fact);
 }
+
 
 1;
 

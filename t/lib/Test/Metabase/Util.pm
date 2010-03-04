@@ -12,17 +12,6 @@ my $store_dir = Path::Class::dir($temp_dir)->subdir('store');
 $store_dir->mkpath;
 close $store_dir->file('metabase.index')->openw;
 
-has test_gateway => (
-    is      => 'ro',
-    isa     => 'Metabase::Gateway',
-    lazy    => 1,
-    default => sub {
-        require Metabase::Analyzer::Test;
-        my $gateway = Metabase::Gateway->new(
-            { fact_classes => ['Test::Metabase::StringFact'], } );
-    }
-);
-
 has test_fact => (
     is      => 'ro',
     isa     => 'Metabase::Fact',
@@ -119,6 +108,18 @@ has test_librarian => (
             'index' => $_[0]->test_index,
         );
     },
+);
+
+has test_gateway => (
+    is      => 'ro',
+    does    => 'Metabase::Gateway',
+    lazy    => 1,
+    default => sub {
+        require Test::Metabase::Gateway;
+        return Test::Metabase::Gateway->new(
+          data_dir => $temp_dir,
+        );
+    }
 );
 
 no Moose;
