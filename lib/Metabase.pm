@@ -9,7 +9,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 $VERSION = eval $VERSION;
 
 1;
@@ -112,21 +112,12 @@ existing test-file that illustrates the bug or desired feature.
 
 =head1 AUTHOR
 
-=over 
-
-=item *
-
-David A. Golden (DAGOLDEN)
-
-=item *
-
-Ricardo J. B. Signes (RJBS)
-
-=back
+  David A. Golden (DAGOLDEN)
+  Ricardo J. B. Signes (RJBS)
 
 =head1 COPYRIGHT AND LICENSE
 
- Portions Copyright (c) 2008 by David A. Golden
+ Portions Copyright (c) 2008-2010 by David A. Golden
  Portions Copyright (c) 2008 by Ricardo J. B. Signes
 
 Licensed under the same terms as Perl itself (the "License").
