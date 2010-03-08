@@ -3,6 +3,9 @@ use Moose;
 use SimpleDB::Class::HTTP;
 use SQL::Abstract;
 
+our $VERSION = '0.003';
+$VERSION = eval $VERSION;
+
 with 'Metabase::Index';
 
 has 'access_key_id' => (
