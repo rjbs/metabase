@@ -2,6 +2,7 @@ package Metabase::Index::SimpleDB;
 use Moose;
 use SimpleDB::Class::HTTP;
 use SQL::Abstract;
+use Try::Tiny;
 
 our $VERSION = '0.003';
 $VERSION = eval $VERSION;
@@ -120,7 +121,13 @@ sub search {
 
     # gather results until all items received
     FETCH: {
-      my $response = $self->simpledb->send_request( 'Select', $request );   
+      my $response;
+      try {
+        $response = $self->simpledb->send_request( 'Select', $request )
+      } catch {
+        Carp::confess("Got error '$@' from '$request'");
+      };
+
       if ( exists $response->{SelectResult}{Item} ) {
         my $items = $response->{SelectResult}{Item};
         # the following may not be necessary as of SimpleDB::Class 1.0000

@@ -25,6 +25,7 @@ requires      ('Net::Amazon::S3'              => 0.52    );
 requires      ('Path::Class'                  => 0.17    );
 requires      ('SQL::Abstract'                => 1.61    );
 requires      ('SimpleDB::Class::HTTP'        => 0.0802  );
+requires      ('Try::Tiny'                    => 0.04    );
 requires      ('base'                         => 2.14    );
 
 build_requires('File::Path'                   => 0       );
