@@ -1,4 +1,12 @@
 Revision history for Metabase
 
-0.01 in progress
+0.003
+    - heavily revised for CPAN Testers 2.0 effort
+    - Metabase::Gateway is now a Moose::Role
+    - Added Amazon Web Service backends
+
+0.002 (never released)
+    - private development version, never released to CPAN
+
+0.001 24 Jun 2009
     - original skeleton created at Oslo QA hackathon 2008
