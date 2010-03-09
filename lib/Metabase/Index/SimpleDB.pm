@@ -113,7 +113,7 @@ sub search {
     }
     $where .= " limit $limit" if defined $limit && $limit > 0;
     my $domain = $self->domain;
-    my $sql = qq{select ItemName() from `$domain` where $where};
+    my $sql = qq{select ItemName() from `$domain` $where};
 
     # prepare request
     my $request = { SelectExpression => $sql };
@@ -125,7 +125,7 @@ sub search {
       try {
         $response = $self->simpledb->send_request( 'Select', $request )
       } catch {
-        Carp::confess("Got error '$@' from '$request'");
+        Carp::confess("Got error '$_' from '$sql'");
       };
 
       if ( exists $response->{SelectResult}{Item} ) {
