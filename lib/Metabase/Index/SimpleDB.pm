@@ -91,7 +91,7 @@ sub add {
 }
 
 sub _get_search_sql {
-  my ( $self, %spec ) = @_;
+  my ( $self, $select, %spec ) = @_;
 
   # extract limit and ordering keys
   my $limit = delete $spec{-limit};
@@ -116,14 +116,51 @@ sub _get_search_sql {
   }
   $where .= " limit $limit" if defined $limit && $limit > 0;
   my $domain = $self->domain;
-  my $sql = qq{select ItemName() from `$domain` $where};
+  my $sql = qq{$select from `$domain` $where};
   return wantarray ? ($sql, $limit) : $sql;
+}
+
+sub count { 
+    my ( $self, %spec) = @_;
+
+    my ($sql, $limit) = $self->_get_search_sql("select count(*)", %spec );
+
+    # prepare request
+    my $request = { SelectExpression => $sql };
+    my $result = 0;
+
+    # gather results until all counts received
+    FETCH: {
+      my $response;
+      try {
+        $response = $self->simpledb->send_request( 'Select', $request )
+      } catch {
+        Carp::confess("Got error '$_' from '$sql'");
+      };
+
+      if ( exists $response->{SelectResult}{Item} ) {
+        my $items = $response->{SelectResult}{Item};
+        # the following may not be necessary as of SimpleDB::Class 1.0000
+        $items = [ $items ] unless ref $items eq 'ARRAY';
+        for my $i (@$items) {
+          next unless $i->{Name} eq 'Domain';
+          $result += $i->{Attribute}{Value};
+        }
+      }
+      if ( exists $response->{SelectResult}{NextToken} ) {
+        last if defined $limit && @$result >= $limit;
+        $request->{NextToken} = $response->{SelectResult}{NextToken};
+        redo FETCH;
+      }
+    }
+
+    return $result;
 }
 
 sub search {
     my ( $self, %spec) = @_;
 
-    my ($sql, $limit) = $self->_get_search_sql( %spec );
+    my ($sql, $limit) = $self->_get_search_sql("select ItemName()", %spec );
 
     # prepare request
     my $request = { SelectExpression => $sql };
