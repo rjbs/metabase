@@ -4,7 +4,7 @@ use SimpleDB::Class::HTTP;
 use SQL::Abstract;
 use Try::Tiny;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 $VERSION = eval $VERSION;
 
 with 'Metabase::Index';

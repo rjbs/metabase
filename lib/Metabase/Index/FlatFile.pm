@@ -13,7 +13,7 @@ use Fcntl ':flock';
 use IO::File ();
 use JSON 2 ();
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 $VERSION = eval $VERSION;
 
 with 'Metabase::Index';

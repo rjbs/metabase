@@ -1,5 +1,7 @@
 Revision history for Metabase
 
+0.004 Mon Mar 15 22:30:34 EDT 2010
+
     - Fixed -limit operator for SimpleDB search
 
 0.003 Mon Mar  8 23:42:52 EST 2010

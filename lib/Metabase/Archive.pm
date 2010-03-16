@@ -7,7 +7,7 @@
 package Metabase::Archive;
 use Moose::Role;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 $VERSION = eval $VERSION;
 
 requires 'store';    # store( $fact_struct ) -- die or return $guid

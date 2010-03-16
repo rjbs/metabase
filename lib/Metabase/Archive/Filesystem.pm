@@ -15,7 +15,7 @@ use File::Slurp ();
 use JSON 2 ();
 use Path::Class ();
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 $VERSION = eval $VERSION;
 
 with 'Metabase::Archive';
