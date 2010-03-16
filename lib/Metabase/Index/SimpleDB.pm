@@ -90,30 +90,40 @@ sub add {
     );
 }
 
+sub _get_search_sql {
+  my ( $self, %spec ) = @_;
+
+  # extract limit and ordering keys
+  my $limit = delete $spec{-limit};
+  my  %order;
+  for my $k ( qw/-asc -desc/ ) {
+    $order{$k} = delete $spec{$k} if exists $spec{$k};
+  }
+  if (scalar keys %order > 1) {
+    Carp::confess("Only one of '-asc' or '-desc' allowed");
+  }
+  if ( $limit && ! scalar keys %order ) {
+    Carp::confess("-limit requires -asc or -desc");
+  }
+
+  # generate SimpleDB dialect of SQL
+  my ($stmt, @bind) = $self->sql_abstract->where(\%spec, \%order);
+  my ($where, @rest) = split qr/\?/, $stmt;
+  for my $chunk (@rest) {
+    # using double quotes, so double them first
+    (my $val = shift @bind) =~ s{"}{""}g;
+    $where .= qq{"$val"} . $chunk;
+  }
+  $where .= " limit $limit" if defined $limit && $limit > 0;
+  my $domain = $self->domain;
+  my $sql = qq{select ItemName() from `$domain` $where};
+  return wantarray ? ($sql, $limit) : $sql;
+}
+
 sub search {
     my ( $self, %spec) = @_;
 
-    # extract limit and ordering keys
-    my $limit = delete $spec{-limit};
-    my  %order;
-    for my $k ( qw/-asc -desc/ ) {
-      $order{$k} = delete $spec{$k} if exists $spec{$k};
-    }
-    if (scalar keys %order > 1) {
-      Carp::confess("Only one of '-asc' or '-desc' allowed");
-    }
-
-    # generate SimpleDB dialect of SQL
-    my ($stmt, @bind) = $self->sql_abstract->where(\%spec, \%order);
-    my ($where, @rest) = split qr/\?/, $stmt;
-    for my $chunk (@rest) {
-      # using double quotes, so double them first
-      (my $val = shift @bind) =~ s{"}{""}g;
-      $where .= qq{"$val"} . $chunk;
-    }
-    $where .= " limit $limit" if defined $limit && $limit > 0;
-    my $domain = $self->domain;
-    my $sql = qq{select ItemName() from `$domain` $where};
+    my ($sql, $limit) = $self->_get_search_sql( %spec );
 
     # prepare request
     my $request = { SelectExpression => $sql };
@@ -136,9 +146,14 @@ sub search {
         
       }
       if ( exists $response->{SelectResult}{NextToken} ) {
+        last if defined $limit && @$result >= $limit;
         $request->{NextToken} = $response->{SelectResult}{NextToken};
         redo FETCH;
       }
+    }
+
+    if ( defined $limit && @$result > $limit ) {
+      splice @$result, $limit;
     }
 
     return $result;

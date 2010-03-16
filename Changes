@@ -1,5 +1,7 @@
 Revision history for Metabase
 
+    - Fixed -limit operator for SimpleDB search
+
 0.003 Mon Mar  8 23:42:52 EST 2010
     - heavily revised for CPAN Testers 2.0 effort
     - Metabase::Gateway is now a Moose::Role
