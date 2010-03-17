@@ -70,7 +70,7 @@ sub store {
     }
 
     my $content = $fact_struct->{content};
-    my $json    = eval { JSON->new->encode($fact_struct->{metadata}{core}) };
+    my $json    = eval { JSON::encode_json($fact_struct->{metadata}{core}) };
     Carp::confess "Couldn't convert to JSON: $@"
       unless $json;
 
@@ -109,7 +109,7 @@ sub extract {
         $content = uncompress($content);
     }
 
-    my $meta = JSON->new->decode($json);
+    my $meta = JSON::decode_json($json);
 
     # reconstruct fact meta and extract type to find the class
     my $class = Metabase::Fact->class_from_type($type);

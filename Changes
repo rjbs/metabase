@@ -1,5 +1,13 @@
 Revision history for Metabase
 
+0.005
+
+    - Remove dependency on JSON::XS and rely on JSON to use it
+      if installed (see Task::Metabase)
+
+    - Ensure JSON encoding includes utf8 encoding to avoid
+      errors compressing wide characters in Metabase::Archive::S3
+
 0.004 Mon Mar 15 22:30:34 EDT 2010
     - Fixed -limit operator for SimpleDB search
     - Reduced numerous prerequisites to lower verisons

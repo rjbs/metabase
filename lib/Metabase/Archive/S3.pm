@@ -12,7 +12,7 @@ use MooseX::Types::Path::Class;
 use Metabase::Fact;
 use Carp       ();
 use Data::GUID ();
-use JSON::XS   ();
+use JSON 2 ();
 use Net::Amazon::S3;
 use Path::Class ();
 use Compress::Zlib qw(compress uncompress);
@@ -80,7 +80,7 @@ sub store {
         Carp::confess "Can't store: no GUID set for fact\n";
     }
 
-    my $json = JSON::XS->new->encode($fact_struct);
+    my $json = JSON::encode_json($fact_struct);
 
     if ( $self->compressed ) {
         $json = compress($json);
@@ -109,7 +109,7 @@ sub extract {
         $json = uncompress($json);
     }
 
-    my $object  = JSON::XS->new->decode($json);
+    my $object  = JSON::decode_json($json);
 
     return $object;
 }

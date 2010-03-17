@@ -14,7 +14,6 @@ requires ('Fcntl'                        => 0       );
 requires ('File::Slurp'                  => 9999    );
 requires ('IO::File'                     => 0       );
 requires ('JSON'                         => 2       );
-requires ('JSON::XS'                     => 2       );
 requires ('Metabase::Fact'               => 0       );
 requires ('Metabase::User::Profile'      => 0       );
 requires ('Metabase::User::Secret'       => 0       );
