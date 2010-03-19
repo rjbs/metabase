@@ -7,7 +7,7 @@
 package Metabase::Index;
 use Moose::Role;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 $VERSION = eval $VERSION;
 
 requires 'add';
