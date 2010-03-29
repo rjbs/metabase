@@ -65,6 +65,7 @@ has 's3_bucket' => (
         my $method = (grep { $_ eq $self->bucket } $client->buckets) ? 'bucket' : 'create_bucket';
         return $client->$method( name => $self->bucket );
     }
+);
 
 has '_json' => (
   is => 'ro',
