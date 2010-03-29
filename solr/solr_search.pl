@@ -1,6 +1,7 @@
 #!/home/acme/bin/perl
 use strict;
 use warnings;
+package main;
 use WebService::Solr;
 use Perl6::Say;
 

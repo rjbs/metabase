@@ -1,6 +1,7 @@
 #!/home/acme/bin/perl
 use strict;
 use warnings;
+package main;
 use Text::Roman;
 use WebService::Solr;
 use Term::ProgressBar::Simple;

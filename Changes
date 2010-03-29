@@ -1,5 +1,9 @@
 Revision history for Metabase
 
+{{$NEXT}}
+
+    - Converted to Dist::Zilla for easier release management
+
 0.005
 
     - Remove dependency on JSON::XS and rely on JSON to use it
