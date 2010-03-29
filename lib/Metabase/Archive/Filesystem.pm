@@ -47,7 +47,7 @@ sub store {
     File::Slurp::write_file( 
         $self->_guid_path( $guid ), 
         {binmode => ':raw'}, 
-        JSON::encode_json($fact_struct),
+        JSON->new->ascii->encode($fact_struct),
     );
 
     return $guid;
@@ -60,7 +60,7 @@ sub extract {
     my ($self, $guid) = @_;
     
     # read the fact
-    my $fact_struct = JSON::decode_json(
+    my $fact_struct = JSON->new->ascii->decode(
       File::Slurp::read_file(
         $self->_guid_path( $guid ),
         binmode => ':raw',

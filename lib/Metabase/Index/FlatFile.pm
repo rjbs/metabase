@@ -38,7 +38,7 @@ sub add {
 
     my $metadata = $self->clone_metadata( $fact );
     
-    my $line = eval {JSON::encode_json($metadata)};
+    my $line = eval {JSON->new->ascii->encode($metadata)};
     Carp::confess "Error encoding JSON: $@"
       unless $line;
 
@@ -81,7 +81,7 @@ sub search {
     flock $fh, LOCK_SH;
     {
         while ( my $line = <$fh> ) {
-            my $parsed = JSON::decode_json($line);
+            my $parsed = JSON->new->ascii->decode($line);
             push @matches, $parsed->{'core.guid'} if _match($parsed, \%spec);
         }
     }    

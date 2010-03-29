@@ -53,7 +53,7 @@ sub store {
       for my $f ( $fact->facts ) {
         push @fact_guids, $self->store( $f );
       }
-      $fact_struct->{content} = JSON::encode_json(\@fact_guids);
+      $fact_struct->{content} = JSON->new->ascii->encode(\@fact_guids);
     }
 
     if ( $self->archive->store( $fact_struct ) 
@@ -88,14 +88,14 @@ sub extract {
     # following block is a wretched hack. -- rjbs, 2009-06-24
     if ($class->isa('Metabase::Report')) {
       my @facts;
-      my $content = JSON::decode_json( $fact_struct->{content} );
+      my $content = JSON->new->ascii->decode( $fact_struct->{content} );
       for my $g ( @$content ) {
         # XXX no error checking if extract() fails -- dagolden, 2009-04-09
         push @facts, $self->extract( $g ); 
       }
 
       my $bogus_content = [ map { $_->as_struct } @facts ];
-      my $bogus_string  = JSON::encode_json( $bogus_content );
+      my $bogus_string  = JSON->new->ascii->encode( $bogus_content );
 
       $fact = $class->from_struct({
         metadata => { core => $fact_struct->{metadata}{core} },
