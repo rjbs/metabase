@@ -19,9 +19,6 @@ use DBD::SQLite ();
 use Compress::Zlib qw(compress uncompress);
 use Metabase::Archive::Schema;
 
-our $VERSION = '0.005';
-$VERSION = eval $VERSION;
-
 with 'Metabase::Archive';
 
 has 'filename' => (

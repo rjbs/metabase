@@ -4,9 +4,6 @@ use SimpleDB::Class::HTTP;
 use SQL::Abstract;
 use Try::Tiny;
 
-our $VERSION = '0.005';
-$VERSION = eval $VERSION;
-
 with 'Metabase::Index';
 
 has 'access_key_id' => (

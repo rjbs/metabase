@@ -13,9 +13,6 @@ use Fcntl ':flock';
 use IO::File ();
 use JSON 2 ();
 
-our $VERSION = '0.005';
-$VERSION = eval $VERSION;
-
 with 'Metabase::Index';
 
 subtype 'File' 

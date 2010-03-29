@@ -14,9 +14,6 @@ use Metabase::Index;
 use Data::GUID ();
 use JSON 2 ();
 
-our $VERSION = '0.005';
-$VERSION = eval $VERSION;
-
 has 'archive' => (
     is => 'ro', 
     isa => 'Metabase::Archive',
