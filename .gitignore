@@ -12,3 +12,4 @@ MANIFEST
 !MANIFEST.SKIP
 inc
 /Metabase-*
+/.build
