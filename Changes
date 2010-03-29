@@ -1,6 +1,8 @@
 Revision history for Metabase
 
 {{$NEXT}}
+
+0.006     2010-03-29 14:29:25 EST5EDT
     
     - JSON will now always encode/decode to/from ASCII
 
