@@ -126,6 +126,9 @@ sub delete {
 
 __END__
 
+=for Pod::Coverage
+  delete
+
 =head1 SYNOPSIS
 
   my $ml = Metabase::Librarian->new( 

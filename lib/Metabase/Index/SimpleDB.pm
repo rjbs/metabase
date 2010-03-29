@@ -224,7 +224,7 @@ sub delete {
 
 __END__
 
-=for Pod::Coverage::TrustPod add search exists
+=for Pod::Coverage::TrustPod add search exists delete count
 
 =head1 SYNOPSIS
 

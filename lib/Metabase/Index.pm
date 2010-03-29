@@ -43,6 +43,8 @@ sub clone_metadata {
 
 __END__
 
+=for Pod::Coverage clone_metadata
+
 =head1 SYNOPSIS
 
   package Metabase::Index::Bar;

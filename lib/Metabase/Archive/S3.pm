@@ -130,9 +130,7 @@ sub delete {
 
 __END__
 
-=pod
-
-=for Pod::Coverage::TrustPod store extract
+=for Pod::Coverage::TrustPod store extract delete
 
 =head1 SYNOPSIS
 
