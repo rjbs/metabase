@@ -65,6 +65,12 @@ has 's3_bucket' => (
         my $method = (grep { $_ eq $self->bucket } $client->buckets) ? 'bucket' : 'create_bucket';
         return $client->$method( name => $self->bucket );
     }
+
+has '_json' => (
+  is => 'ro',
+  required => 1,
+  lazy => 1,
+  default => sub { JSON->new->ascii },
 );
 
 # given fact, store it and return guid;
@@ -77,7 +83,7 @@ sub store {
         Carp::confess "Can't store: no GUID set for fact\n";
     }
 
-    my $json = JSON::encode_json($fact_struct);
+    my $json = $self->_json->encode($fact_struct);
 
     if ( $self->compressed ) {
         $json = compress($json);
@@ -106,7 +112,7 @@ sub extract {
         $json = uncompress($json);
     }
 
-    my $object  = JSON::decode_json($json);
+    my $object  = $self->_json->decode($json);
 
     return $object;
 }
