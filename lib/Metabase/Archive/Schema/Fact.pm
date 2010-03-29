@@ -1,6 +1,9 @@
-package Metabase::Archive::Schema::Fact;
+use 5.006;
 use strict;
 use warnings;
+
+package Metabase::Archive::Schema::Fact;
+
 use base qw/DBIx::Class/;
 __PACKAGE__->load_components(qw/PK ResultSourceProxy::Table/);
 

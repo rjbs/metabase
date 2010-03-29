@@ -1,10 +1,10 @@
-# Copyright (c) 2008-2009 by Ricardo Signes and David Golden. All rights reserved.
-# Licensed under terms of Perl itself (the "License").
-# You may not use this file except in compliance with the License.
-# A copy of the License was distributed with this file or you may obtain a 
-# copy of the License from http://dev.perl.org/licenses/
+use 5.006;
+use strict;
+use warnings;
 
 package Metabase::Librarian;
+# ABSTRACT: Front-end interface to Metabase storage
+
 use Moose;
 use Moose::Util::TypeConstraints;
 use Carp ();
@@ -126,12 +126,6 @@ sub delete {
 
 __END__
 
-=pod
-
-=head1 NAME
-
-Metabase::Librarian - front-end interface to Metabase storage
-
 =head1 SYNOPSIS
 
   my $ml = Metabase::Librarian->new( 
@@ -188,43 +182,13 @@ See L<Metabase::Index> for spec details.
 
 =head1 BUGS
 
+I<...no human would stack books this way...>
+
 Please report any bugs or feature using the CPAN Request Tracker.  
 Bugs can be submitted through the web interface at 
 L<http://rt.cpan.org/Dist/Display.html?Queue=Metabase>
 
 When submitting a bug or request, please include a test-file or a patch to an
 existing test-file that illustrates the bug or desired feature.
-
-=head1 AUTHOR
-
-=over 
-
-=item *
-
-David A. Golden (DAGOLDEN)
-
-=item *
-
-Ricardo J. B. Signes (RJBS)
-
-=back
-
-I<...no human would stack books this way...>
-
-=head1 COPYRIGHT AND LICENSE
-
- Portions copyright (c) 2008-2009 by David A. Golden
- Portions copyright (c) 2008-2009 by Ricardo J. B. Signes
-
-Licensed under terms of Perl itself (the "License").
-You may not use this file except in compliance with the License.
-A copy of the License was distributed with this file or you may obtain a 
-copy of the License from http://dev.perl.org/licenses/
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 =cut

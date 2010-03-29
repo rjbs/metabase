@@ -1,10 +1,10 @@
-# Copyright (c) 2008 by Ricardo Signes. All rights reserved.
-# Licensed under terms of Perl itself (the "License").
-# You may not use this file except in compliance with the License.
-# A copy of the License was distributed with this file or you may obtain a
-# copy of the License from http://dev.perl.org/licenses/
+use 5.006;
+use strict;
+use warnings;
 
 package Metabase::Archive::S3;
+# ABSTRACT: Metabase storage using Amazon S3
+
 use Moose;
 use Moose::Util::TypeConstraints;
 use MooseX::Types::Path::Class;
@@ -133,10 +133,6 @@ __END__
 
 =for Pod::Coverage::TrustPod store extract
 
-=head1 NAME
-
-Metabase::Archive::S3 - Metabase storage using Amazon S3
-
 =head1 SYNOPSIS
 
   require Metabase::Archive::S3;
@@ -167,16 +163,6 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Metabase>
 
 When submitting a bug or request, please include a test-file or a patch to an
 existing test-file that illustrates the bug or desired feature.
-
-=head1 AUTHOR
-
-=over
-
-=item *
-
-Leon Brocard (ACME)
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,21 +1,14 @@
-# Copyright (c) 2008 by Ricardo Signes. All rights reserved.
-# Licensed under terms of Perl itself (the "License").
-# You may not use this file except in compliance with the License.
-# A copy of the License was distributed with this file or you may obtain a 
-# copy of the License from http://dev.perl.org/licenses/
-
-package Metabase;
 use 5.006;
 use strict;
 use warnings;
 
+package Metabase;
+# ABSTRACT: A database framework and API for resource metadata
+
+
 1;
 
 __END__
-
-=head1 NAME
-
-Metabase - a database framework and API for resource metadata
 
 =head1 DESCRIPTION
 
@@ -106,26 +99,5 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Metabase>
 
 When submitting a bug or request, please include a test-file or a patch to an
 existing test-file that illustrates the bug or desired feature.
-
-=head1 AUTHOR
-
-  David A. Golden (DAGOLDEN)
-  Ricardo J. B. Signes (RJBS)
-
-=head1 COPYRIGHT AND LICENSE
-
- Portions Copyright (c) 2008-2010 by David A. Golden
- Portions Copyright (c) 2008 by Ricardo J. B. Signes
-
-Licensed under the same terms as Perl itself (the "License").
-You may not use this file except in compliance with the License.
-A copy of the License was distributed with this file or you may obtain a 
-copy of the License from http://dev.perl.org/licenses/
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 =cut

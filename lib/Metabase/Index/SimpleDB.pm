@@ -1,4 +1,10 @@
+use 5.006;
+use strict;
+use warnings;
+
 package Metabase::Index::SimpleDB;
+# ABSTRACT: Metabase Amazon SimpleDB index
+
 use Moose;
 use SimpleDB::Class::HTTP;
 use SQL::Abstract;
@@ -220,10 +226,6 @@ __END__
 
 =for Pod::Coverage::TrustPod add search exists
 
-=head1 NAME
-
-Metabase::Index::SimpleDB - Metabase Amazon SimpleDB index
-
 =head1 SYNOPSIS
 
   require Metabase::Index::SimpleDB;
@@ -249,16 +251,6 @@ L<http://rt.cpan.org/Dist/Display.html?Queue=Metabase>
 
 When submitting a bug or request, please include a test-file or a patch to an
 existing test-file that illustrates the bug or desired feature.
-
-=head1 AUTHOR
-
-=over
-
-=item *
-
-Leon Brocard (ACME)
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

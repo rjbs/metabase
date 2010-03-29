@@ -1,3 +1,7 @@
+use 5.006;
+use strict;
+use warnings;
+
 package Metabase::Archive::Schema;
 use strict;
 use warnings;
