@@ -1,6 +1,8 @@
 Revision history for Metabase
 
 {{$NEXT}}
+    
+    - JSON will now always encode/decode to/from ASCII
 
     - Converted to Dist::Zilla for easier release management
 
