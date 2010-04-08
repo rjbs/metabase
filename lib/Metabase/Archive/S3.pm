@@ -19,6 +19,14 @@ use Compress::Zlib qw(compress uncompress);
 
 with 'Metabase::Archive';
 
+# Prefix string must have a trailing slash but not leading slash
+subtype 'PrefixStr'
+  => as 'Str'
+  => where { $_ !~ m{^/} && $_ =~ m{/$} };
+
+coerce 'PrefixStr'
+  => from 'Str' => via { s{/$}{}; s{^/}{}; $_ . "/" };
+
 has 'access_key_id' => (
     is       => 'ro',
     isa      => 'Str',
@@ -39,7 +47,7 @@ has 'bucket' => (
 
 has 'prefix' => (
     is       => 'ro',
-    isa      => 'Str',
+    isa      => 'PrefixStr',
     required => 1,
 );
 
