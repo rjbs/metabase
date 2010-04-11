@@ -2,7 +2,7 @@ Revision history for Metabase
 
 {{$NEXT}}
 
-    - Fix a bug in S3 archive code -- NOTE: THIS WILL BREAK
+    - Fix a bug in Metabase::Archive::S3 -- NOTE: THIS WILL BREAK
       ACCESS TO OLD S3 FACTS
 
 0.006     2010-03-29 14:29:25 EST5EDT

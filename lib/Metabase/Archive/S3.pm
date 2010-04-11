@@ -22,7 +22,7 @@ with 'Metabase::Archive';
 # Prefix string must have a trailing slash but not leading slash
 subtype 'PrefixStr'
   => as 'Str'
-  => where { $_ !~ m{^/} && $_ =~ m{/$} };
+  => where { $_ =~ m{^\w} && $_ =~ m{/$} };
 
 coerce 'PrefixStr'
   => from 'Str' => via { s{/$}{}; s{^/}{}; $_ . "/" };
@@ -49,6 +49,7 @@ has 'prefix' => (
     is       => 'ro',
     isa      => 'PrefixStr',
     required => 1,
+    coerce   => 1,
 );
 
 has 'compressed' => (
