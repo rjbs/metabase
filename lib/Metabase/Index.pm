@@ -26,7 +26,7 @@ sub clone_metadata {
     for my $key (keys %$data) {
       # I'm just starting with a strict-ish set.  We can tighten or loosen
       # parts of this later. -- rjbs, 2009-03-28
-      die "invalid metadata key" unless $key =~ /\A[-_a-z0-9.]+\z/;
+      die "invalid metadata key '$key'" unless $key =~ /\A[-_a-z0-9.]+\z/i;
       $metadata{ "$type.$key" } = $data->{$key};
     }
   }

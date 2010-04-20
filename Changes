@@ -2,6 +2,8 @@ Revision history for Metabase
 
 {{$NEXT}}
 
+    - Fact content metadata keys no longer have to be lowercase
+
 0.007     2010-04-11 12:00:49 EST5EDT
 
     - Fix a bug in Metabase::Archive::S3 -- NOTE: THIS WILL BREAK

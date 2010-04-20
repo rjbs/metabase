@@ -7,7 +7,8 @@ use base 'Metabase::Fact::String';
 sub content_metadata {
   my $self = shift;
   return {
-    'size' => [ Num => length $self->content ],
+    'size' => length $self->content,
+    'WIDTH' => length $self->content,
   };
 }
 
