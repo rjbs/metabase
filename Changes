@@ -2,6 +2,8 @@ Revision history for Metabase
 
 {{$NEXT}}
 
+0.009     2010-04-22 07:26:46 EST5EDT
+
     - Don't add undefined values to the index
 
 0.008     2010-04-20 09:54:07 EST5EDT
