@@ -2,6 +2,8 @@ Revision history for Metabase
 
 {{$NEXT}}
 
+    - Don't add undefined values to the index
+
 0.008     2010-04-20 09:54:07 EST5EDT
 
     - Fact content metadata keys no longer have to be lowercase
@@ -12,7 +14,7 @@ Revision history for Metabase
       ACCESS TO OLD S3 FACTS
 
 0.006     2010-03-29 14:29:25 EST5EDT
-    
+
     - JSON will now always encode/decode to/from ASCII
 
     - Converted to Dist::Zilla for easier release management

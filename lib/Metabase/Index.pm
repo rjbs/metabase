@@ -23,7 +23,8 @@ sub clone_metadata {
     my $method = "$type\_metadata";
     my $data   = $fact->$method || {};
 
-    for my $key (keys %$data) {
+    KEY: for my $key (keys %$data) {
+      next KEY unless defined $data->{$key};
       # I'm just starting with a strict-ish set.  We can tighten or loosen
       # parts of this later. -- rjbs, 2009-03-28
       die "invalid metadata key '$key'" unless $key =~ /\A[-_a-z0-9.]+\z/i;
