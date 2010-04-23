@@ -2,6 +2,10 @@ Revision history for Metabase
 
 {{$NEXT}}
 
+    - Add authentication caching.  Adds CHI as a prereq
+
+    - Properly document Metabase::Gateway as a Moose::Role
+
 0.009     2010-04-22 07:26:46 EST5EDT
 
     - Don't add undefined values to the index
