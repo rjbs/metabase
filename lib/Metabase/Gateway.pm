@@ -11,6 +11,7 @@ use Metabase::Fact;
 use Metabase::Librarian;
 use Metabase::User::Profile;
 use Metabase::User::Secret;
+use CHI;
 use namespace::autoclean;
 
 requires '_build_public_librarian';
@@ -42,7 +43,6 @@ has fact_classes => (
   builder => '_build_fact_classes',
 );
 
-
 has approved_types => (
   is          =>  'ro',
   isa         =>  'ArrayRef[Str]',
@@ -63,6 +63,31 @@ has allow_registration => (
   isa         => 'Bool',
   default     => 1,
 );
+
+has authentication_timeout => (
+  is          => 'ro',
+  isa         => 'Int',
+  default     => 600,
+);
+
+has cache_options => (
+  is          => 'ro',
+  isa         => 'HashRef',
+  default     => sub { { driver => 'Memory' } },
+);
+
+has _cache => (
+  is          => 'ro',
+  isa         => 'CHI',
+  lazy        => 1,
+  builder     => '_build_cache',
+);
+
+# create a CHI cache
+sub _build_cache {
+  my ($self) = @_;
+  return CHI->new( %{ $self->cache_options } );
+}
 
 # recurse report classes -- less to specify to new()
 sub _build_approved_types {
@@ -108,25 +133,30 @@ sub _validate_submitter {
   die "no user secret provided\n"
     unless $user_secret;
 
-  # check whether submitter profile is already in the Metabase
-  my $profile = eval { $self->public_librarian->extract($user_guid) }
-    or die "unknown user\n";
+  my $user_resource = "metabase:user:$user_guid";
 
-  # check if we have a secret on file
-  my $secret;
-  eval {
-    my $found = $self->private_librarian->search(
-        'core.type' => 'Metabase-User-Secret',
-        'core.resource' => $profile->resource->resource,
-    );
-    unless ( defined $found->[0] ) {
-      die "no secret for that user\n";
-    }
-    $secret = $self->private_librarian->extract($found->[0]);
-  };
+  my $secret = $self->_cache->get("secret/$user_guid");
+
+  if ( ! defined $secret ) {
+    # check if we have a secret on file
+    eval {
+      my $found = $self->private_librarian->search(
+          'core.type' => 'Metabase-User-Secret',
+          'core.resource' => $user_resource,
+      );
+      unless ( defined $found->[0] ) {
+        die "credentials for $user_resource not found\n";
+      }
+      $secret = $self->private_librarian->extract($found->[0]);
+      # if we haven't died, we have it, so cache it
+      $self->_cache->set(
+        "secret/$user_guid", $secret, $self->authentication_timeout
+      );
+    };
+  }
 
   # match against submitted secret
-  die "user authentication failed\n"
+  die "authentication failed for $user_resource\n"
     unless defined $secret && $user_secret eq $secret->content;
 
   # submitter is good!
@@ -267,85 +297,109 @@ __END__
 
 =head1 SYNOPSIS
 
-  my $mg = Metabase::Gateway->new(
-    fact_classes      => \@valid_fact_classes,
-    librarian         => $librarian,
-    private_librarian  => $private_librarian,
-  );
+=head2 Creating a Gateway class
 
+  use strict;
+  use warnings;
+  package Custom::Metabase;
+
+  use Moose;
+  with 'Metabase::Gateway';
+
+  sub _build_fact_classes { ... }
+  sub _build_public_librarian { ... }
+  sub _build_private_librarian { ... }
+
+=head2 Using a Gateway class
+
+  my $mg = Custom::Gateway->new( @args );
   $mg->handle_submission( $fact_struct, $user_guid, $user_secret);
 
 =head1 DESCRIPTION
 
-The Metabase::Gateway class manages submissions to the Metabase.  It
+The Metabase::Gateway role manages submissions to the Metabase.  It
 provides fact and submitter validation or authorization before storing
 new facts in a Metabase.
 
 =head1 USAGE
 
-=head2 C<new>
+=head2 Required methods
 
-  my $mg = Metabase::Gateway->new(
-    fact_classes      => \@valid_fact_classes,
-    public_librarian  => $public_librarian,
-    private_librarian  => $private_librarian,
-  );
+The following builders must be provided by the class that applies this role.
+All three are lazy.
 
-Gateway constructor.  Takes three required attributes C<fact_classes>,
-C<public_librarian> and C<private_librarian>.  See below for details.
+=head3  C<_build_fact_classes>
 
-=head1 ATTRIBUTES
+This builder must return an array reference of Metabase::Fact subclasses.
 
-=head2 C<approved_types>
+=head3  C<_build_public_librarian>
 
-Returns a list of approved fact types.  Automatically generated; cannot be
-initialized.  Used for validating submitted facts.
+=head3  C<_build_private_librarian>
 
-A "type" is a class name with "::" converted to "-", so this attribute
-returns an arrayref of the C<fact_classes> attribute converted to types.
+These builders must return Metabase::Librarian objects.
 
-=head2 C<disable_security>
+=head2 Configurable attributes
+
+=head3 C<disable_security>
 
 A boolean option.  If true, submitter profiles will not be authenticated.
 (This is generally useful for testing, only.) Default is false.
 
-=head2 C<allow_registration>
+=head3 C<allow_registration>
 
 A boolean option.  If true, new submitter profiles and secrets may be
 stored. Default is true.
 
-=head2 C<fact_classes>
+=head3 C<authentication_timeout>
 
-Array reference containing a list of valid L<Metabase::Fact> subclasses. Only facts
-from these classes may be added to the Metabase. Required.
+Number of seconds to cache user authentication data.  Defaults to 600.
 
-=head2 C<public_librarian>
+=head3 C<cache_options>
 
-A librarian object to manage fact data. Required.
+A hash reference of constructor arguments for a L<CHI> cache. Defaults to
+C<< { driver => 'Memory' } >>.
 
-=head2 C<private_librarian>
+=head2 Generated attributes
+
+=head3 C<approved_types>
+
+Returns a list of approved fact types.  Used for validating submitted facts.
+
+A "type" is a class name with "::" converted to "-", so this attribute
+returns an arrayref of the C<fact_classes> attribute converted to types.
+
+=head3 C<fact_classes>
+
+Array reference containing a list of valid L<Metabase::Fact> subclasses. Only
+facts from these classes may be added to the Metabase.
+
+=head3 C<public_librarian>
+
+A librarian object to manage fact data.
+
+=head3 C<private_librarian>
 
 A librarian object to manage user authentication data and possibly other
 facts that should be segregated from searchable and retrievable facts.
-This should not be the same as the public_librarian.  Required.
+This should not be the same as the public_librarian.
 
-=head1 METHODS
+=head2 Methods provided
 
-=head2 C<enqueue>
+=head3 C<enqueue>
 
   $mg->enqueue( $fact );
 
 Add a fact from a user (identified by a profile) via the public_librarian.
 Used internally by handle_submission.
 
-=head2 C<handle_submission>
+=head3 C<handle_submission>
 
   $mg->handle_submission( $fact_struct, $user_guid, $user_secret);
 
 Extract a fact a deserialized data structure and add it to the Metabase via the
 public_librarian. The fact is regenerated from the C<as_struct> method.
 
-=head2 C<handle_registration>
+=head3 C<handle_registration>
 
   $mg->handle_registration( $profile_struct, $secret_struct );
 
