@@ -2,6 +2,8 @@ Revision history for Metabase
 
 {{$NEXT}}
 
+0.010     2010-04-23 17:40:39 EST5EDT
+
     - Add authentication caching.  Adds CHI as a prereq
 
     - Properly document Metabase::Gateway as a Moose::Role
