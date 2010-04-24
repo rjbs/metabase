@@ -147,17 +147,17 @@ sub _validate_submitter {
       unless ( defined $found->[0] ) {
         die "credentials for $user_resource not found\n";
       }
-      $secret = $self->private_librarian->extract($found->[0]);
+      my $obj = $self->private_librarian->extract($found->[0]);
       # if we haven't died, we have it, so cache it
       $self->_cache->set(
-        "secret/$user_guid", $secret, $self->authentication_timeout
+        "secret/$user_guid", $obj->content, $self->authentication_timeout
       );
     };
   }
 
   # match against submitted secret
   die "authentication failed for $user_resource\n"
-    unless defined $secret && $user_secret eq $secret->content;
+    unless defined $secret && $user_secret eq $secret;
 
   # submitter is good!
   return 1;
