@@ -78,7 +78,7 @@ has cache_options => (
 
 has _cache => (
   is          => 'ro',
-  isa         => 'Object',
+  isa         => 'CHI::Driver',
   lazy        => 1,
   builder     => '_build_cache',
 );
