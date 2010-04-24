@@ -106,7 +106,7 @@ sub _build_approved_types {
 sub _fatal {
   my ($self, $code, $reason, $details) = @_;
   $code ||= 500;
-  $reason ||= "internal gateway error";
+  $reason ||= "unknown error";
   $details ||= '';
   chomp $details;
   my $message = "$code\: $reason";
@@ -240,7 +240,7 @@ sub handle_submission {
   # accepted by librarian
   my $guid = eval { $self->enqueue($fact) };
   unless ( $guid ) {
-    $self->_fatal( 500 => "internal gateway error" => $@ );
+    $self->_fatal( 500 => "submission was not stored" => $@ );
   }
 
   return $guid;
@@ -256,13 +256,13 @@ sub handle_registration {
   # thaw profile
   my $profile = eval { $self->_thaw_fact($profile_struct, 'Metabase-User-Profile') };
   unless ( $profile ) {
-    $self->_fatal( 400 => "invalid submission data" => $@ );
+    $self->_fatal( 400 => "invalid registration profile" => $@ );
   }
 
   # thaw secret
   my $secret = eval { $self->_thaw_fact($secret_struct, 'Metabase-User-Secret') };
   unless ( $secret ) {
-    $self->_fatal( 400 => "invalid submission data" => $@ );
+    $self->_fatal( 400 => "invalid registration credential" => $@ );
   }
 
   # neither should exist
@@ -279,7 +279,7 @@ sub handle_registration {
     $profile_guid = $self->public_librarian->store( $profile );
   };
   unless ( $secret_guid && $profile_guid ) {
-    $self->_fatal( 500 => "internal gateway error" => $@ );
+    $self->_fatal( 500 => "registration failed" => $@ );
   }
 
   # profile accepted by librarian
