@@ -4,6 +4,9 @@ Revision history for Metabase
 
     - Improve diagnostics on failure
 
+    - Fix occasional failures in t/librarian/report.t due to time
+      comparison between original and saved reports
+
 0.012     2010-04-24 15:18:33 EST5EDT
 
     - Fix authentication cache bug (first check was always failing)

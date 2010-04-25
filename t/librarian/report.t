@@ -47,6 +47,12 @@ ok(
   "extracted object from guid from search"
 );
 
+# XXX comparison has issues with update_time not matching -- dagolden, 2010-04-25
+my $update_time = $new_fact->{metadata}{core}{update_time};
+for ( $new_fact, $new_fact->facts, $report, $report->facts ) {
+  $_->{metadata}{core}{update_time} = $update_time;
+}
+
 is( $new_fact->content_as_bytes, $report->content_as_bytes, "fact content matches" );
 
 is( $new_fact->resource, $report->resource, "dist name was indexed as expected" );
