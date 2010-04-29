@@ -80,7 +80,8 @@ sub add {
         push @attributes,
             "Attribute.$i.Name"    => $key,
             "Attribute.$i.Value"   => $value,
-            "Attribute.$i.Replace" => 'true';
+            # XXX not using replace is an optimization -- dagolden, 2010-04-29
+#            "Attribute.$i.Replace" => 'true'; # XXX optimization -- dagolden, 2010-04-29
         $i++;
     }
 
