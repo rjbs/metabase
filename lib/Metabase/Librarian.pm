@@ -15,18 +15,18 @@ use Data::GUID ();
 use JSON 2 ();
 
 has 'archive' => (
-    is => 'ro', 
+    is => 'ro',
     isa => 'Metabase::Archive',
-    required => 1, 
+    required => 1,
 );
 
 has 'index' => (
-    is => 'ro', 
+    is => 'ro',
     isa => 'Metabase::Index',
-    required => 1, 
+    required => 1,
 );
 
-# given fact, store it and return guid; 
+# given fact, store it and return guid;
 sub store {
     my ($self, $fact) = @_;
 
@@ -56,7 +56,7 @@ sub store {
       $fact_struct->{content} = JSON->new->ascii->encode(\@fact_guids);
     }
 
-    if ( $self->archive->store( $fact_struct ) 
+    if ( $self->archive->store( $fact_struct )
       && $self->index  ->add  ( $fact ) ) {
         return $fact->guid;
     } else {
@@ -81,7 +81,7 @@ sub extract {
     my $class = Metabase::Fact->class_from_type(
       $fact_struct->{metadata}{core}{type}
     );
-    
+
     # XXX: The problem here is that what we get out of the librarian isn't
     # exactly what we put in, it seems.  We need to improve the specification
     # for what goes in/out and then test it more thoroughly.  *Clearly* the
@@ -91,7 +91,7 @@ sub extract {
       my $content = JSON->new->ascii->decode( $fact_struct->{content} );
       for my $g ( @$content ) {
         # XXX no error checking if extract() fails -- dagolden, 2009-04-09
-        push @facts, $self->extract( $g ); 
+        push @facts, $self->extract( $g );
       }
 
       my $bogus_content = [ map { $_->as_struct } @facts ];
@@ -131,7 +131,7 @@ __END__
 
 =head1 SYNOPSIS
 
-  my $ml = Metabase::Librarian->new( 
+  my $ml = Metabase::Librarian->new(
     archive => $archive,
     index => $index,
   );
@@ -146,7 +146,7 @@ Metabase storage and indexing objects.
 
 =head2 C<new>
 
-  my $ml = Metabase::Librarian->new( 
+  my $ml = Metabase::Librarian->new(
     archive => $archive,
     index => $index,
   );
@@ -187,8 +187,8 @@ See L<Metabase::Index> for spec details.
 
 I<...no human would stack books this way...>
 
-Please report any bugs or feature using the CPAN Request Tracker.  
-Bugs can be submitted through the web interface at 
+Please report any bugs or feature using the CPAN Request Tracker.
+Bugs can be submitted through the web interface at
 L<http://rt.cpan.org/Dist/Display.html?Queue=Metabase>
 
 When submitting a bug or request, please include a test-file or a patch to an
