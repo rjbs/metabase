@@ -153,7 +153,7 @@ sub iterator {
 
 __END__
 
-=for Pod::Coverage::TrustPod store extract delete
+=for Pod::Coverage::TrustPod store extract delete iterator
 
 =head1 SYNOPSIS
 

@@ -202,6 +202,15 @@ See L<Metabase::Index> for spec details.
 
   if ( $ml->exists( $guid ) ) { do_stuff() }
 
+=head2 C<iterator>
+
+  my $stream = $ml->iterator;
+  until ( $stream->is_done ) {
+    foreach my $fact ( $stream->items ) {
+      ...
+    }
+  }
+
 =head1 BUGS
 
 I<...no human would stack books this way...>
