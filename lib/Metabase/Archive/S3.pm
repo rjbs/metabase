@@ -12,6 +12,7 @@ use MooseX::Types::Path::Class;
 use Metabase::Fact;
 use Carp       ();
 use Data::GUID ();
+use Data::Stream::Bulk::Filter;
 use JSON 2 ();
 use Net::Amazon::S3;
 use Path::Class ();
@@ -116,15 +117,18 @@ sub extract {
     my ( $self, $guid ) = @_;
 
     my $s3_object = $self->s3_bucket->object( key => $self->prefix . lc $guid );
-    my $json = $s3_object->get;
+    return $self->_extract_struct( $s3_object );
+}
 
-    if ( $self->compressed ) {
-        $json = uncompress($json);
-    }
+sub _extract_struct {
+  my ( $self, $s3_object ) = @_;
 
-    my $object  = $self->_json->decode($json);
-
-    return $object;
+  my $json = $s3_object->get;
+  if ( $self->compressed ) {
+    $json = uncompress($json);
+  }
+  my $struct  = $self->_json->decode($json);
+  return $struct;
 }
 
 # DO NOT lc() GUID
@@ -133,6 +137,16 @@ sub delete {
 
     my $s3_object = $self->s3_bucket->object( key => $self->prefix . $guid );
     $s3_object->delete;
+}
+
+sub iterator {
+  my ($self) = @_;
+  return Data::Stream::Bulk::Filter->new(
+    stream => $self->s3_bucket->list( { prefix => $self->prefix } ),
+    filter => sub {
+      return [ map { $self->_extract_struct( $_ ) } @{ $_[0] } ];
+    },
+  );
 }
 
 1;

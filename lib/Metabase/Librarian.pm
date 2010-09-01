@@ -9,6 +9,7 @@ use Moose;
 use Moose::Util::TypeConstraints;
 use Carp ();
 use CPAN::DistnameInfo;
+use Data::Stream::Bulk::Filter ();
 use Metabase::Archive;
 use Metabase::Index;
 use Data::GUID ();
@@ -71,11 +72,16 @@ sub search {
 
 sub extract {
     my ($self, $guid) = @_;
-    my $fact;
-
     my $fact_struct = $self->archive->extract( lc $guid );
 
     Carp::confess "Fact $guid does not exist" unless $fact_struct;
+
+    return $self->_thaw_fact( $fact_struct );
+}
+
+sub _thaw_fact {
+    my ($self, $fact_struct) = @_;
+    my $fact;
 
     # reconstruct fact meta and extract type to find the class
     my $class = Metabase::Fact->class_from_type(
@@ -112,6 +118,16 @@ sub extract {
 sub exists {
     my ($self, $guid) = @_;
     return $self->index->exists( lc $guid );
+}
+
+sub iterator {
+  my ($self) = @_;
+  return Data::Stream::Bulk::Filter->new(
+    stream => $self->archive->iterator,
+    filter => sub {
+      return [ map { $self->_thaw_fact( $_ ) } @{ $_[0] } ];
+    },
+  );
 }
 
 # DO NOT lc() the GUID -- we must allow deletion of improperly cased GUIDS from source
