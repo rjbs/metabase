@@ -11,6 +11,8 @@ Revision history for Metabase
 
     - Load fact classes on demand
 
+    - Require latest Metabase::Fact (0.018)
+
 0.012     2010-04-24 15:18:33 EST5EDT
 
     - Fix authentication cache bug (first check was always failing)
