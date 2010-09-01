@@ -7,6 +7,7 @@ package Metabase::Librarian;
 
 use Moose;
 use Moose::Util::TypeConstraints;
+use Class::MOP ();
 use Carp ();
 use CPAN::DistnameInfo;
 use Data::Stream::Bulk::Filter ();
@@ -87,6 +88,8 @@ sub _thaw_fact {
     my $class = Metabase::Fact->class_from_type(
       $fact_struct->{metadata}{core}{type}
     );
+
+    Class::MOP::load_class( $class );
 
     # XXX: The problem here is that what we get out of the librarian isn't
     # exactly what we put in, it seems.  We need to improve the specification
