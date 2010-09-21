@@ -6,8 +6,8 @@ package Metabase::Index::SimpleDB;
 # ABSTRACT: Metabase Amazon SimpleDB index
 
 use Moose;
-use SimpleDB::Class::HTTP;
-use SQL::Abstract;
+use SimpleDB::Client;
+use SQL::Abstract 1;
 use Try::Tiny;
 
 with 'Metabase::Index';
@@ -32,11 +32,11 @@ has 'domain' => (
 
 has 'simpledb' => (
     is      => 'ro',
-    isa     => 'SimpleDB::Class::HTTP',
+    isa     => 'SimpleDB::Client',
     lazy    => 1,
     default => sub {
         my $self = shift;
-        my $sdb = SimpleDB::Class::HTTP->new(
+        my $sdb = SimpleDB::Client->new(
             access_key => $self->access_key_id,
             secret_key => $self->secret_access_key
         );
