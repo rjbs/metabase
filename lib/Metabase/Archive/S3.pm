@@ -12,7 +12,7 @@ use MooseX::Types::Path::Class;
 use Metabase::Fact;
 use Carp       ();
 use Data::GUID ();
-use Data::Stream::Bulk::Filter;
+use Data::Stream::Bulk::Filter 0.08;
 use JSON 2 ();
 use Net::Amazon::S3;
 use Path::Class ();
