@@ -14,9 +14,9 @@ use Carp        ();
 use Data::GUID  ();
 use JSON 2      ();
 use Path::Class ();
-use DBI         ();
-use DBD::SQLite ();
-use Compress::Zlib qw(compress uncompress);
+use DBI         1 ();
+use DBD::SQLite 1 ();
+use Compress::Zlib 2 qw(compress uncompress);
 use Metabase::Archive::Schema;
 
 with 'Metabase::Archive';

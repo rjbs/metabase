@@ -7,7 +7,7 @@ package Metabase::Gateway;
 
 use Moose::Role;
 
-use Metabase::Fact;
+use Metabase::Fact 0.018;
 use Metabase::Librarian;
 use Metabase::User::Profile;
 use Metabase::User::Secret;

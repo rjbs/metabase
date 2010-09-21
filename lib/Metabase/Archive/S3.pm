@@ -16,7 +16,7 @@ use Data::Stream::Bulk::Filter;
 use JSON 2 ();
 use Net::Amazon::S3;
 use Path::Class ();
-use Compress::Zlib qw(compress uncompress);
+use Compress::Zlib 2 qw(compress uncompress);
 
 with 'Metabase::Archive';
 

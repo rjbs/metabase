@@ -2,6 +2,12 @@ Revision history for Metabase
 
 {{$NEXT}}
 
+    - Now uses SimpleDB::Client instead of SimpleDB::Class
+
+    - Updated dist.ini to @DAGOLDEN style
+
+    - Prerequisites now auto-detected
+
 0.013     2010-09-01 18:29:24 EST5EDT
 
     - Improve diagnostics on failure
