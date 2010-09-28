@@ -17,6 +17,7 @@ use Path::Class ();
 use DBI         1 ();
 use DBD::SQLite 1 ();
 use Compress::Zlib 2 qw(compress uncompress);
+use SQL::Translator 0.11006 (); # required for deploy()
 use Metabase::Archive::Schema;
 
 with 'Metabase::Archive';
