@@ -2,6 +2,8 @@ Revision history for Metabase
 
 {{$NEXT}}
 
+    - No changes.  Released as stable
+
 0.015     2010-09-28 09:41:27 EST5EDT
 
     - Add explicit dependency on SQL::Translator 0.11006 for DBIx::Class
