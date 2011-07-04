@@ -5,9 +5,44 @@ use warnings;
 package Metabase::Query;
 # ABSTRACT: Metabase query language
 
+use Carp ();
 use Moose::Role;
 
-requires 'prepare'; # native
+my @_ops = qw(
+  op_eq
+  op_ne
+  op_gt
+  op_lt
+  op_ge
+  op_le
+  op_or
+  op_and
+  op_not
+  op_like
+  op_between
+);
+
+requires
+  'prepare',  # convert query structure to native query form
+  @_ops;      # implement each op in native form
+
+has '_method_table' => (
+  is    => ro,
+  isa   => 'HashRef',
+  default => sub {
+    # '-eq' => 'op_eq', etc.
+    map { (my $n = $_) =~ s/op_/-/; ($n => $_) } @_ops
+  },
+);
+
+sub dispatch {
+  my ($self, $op_name, $args) = @_;
+  my $op_sub = $self->_method_table->{$op_name};
+  if ( ! $op_method ) {
+    Carp::confess "Query operator '$op_name' is unknown.\n";
+  }
+  return $self->$op_method($args);
+}
 
 1;
 
@@ -18,7 +53,7 @@ __END__
 =head1 SYNOPSIS
 
   package Metabase::Query::SQLite;
-  use Metabase::Query;
+
   use Moose;
   with 'Metabase::Query';
 
@@ -28,35 +63,57 @@ __END__
     my ( $self, $query ) = @_;
 
     # translate into SQLite WHERE clause
+    ...
+
     return $where;
   }
 
+  sub op_eq {
+    my ( $self, $args ) = @_;
+    my $field = _validate_field( $args->[0] ); # no SQL injection!
+    return [ "$field = ?", $arg->[1] ];
+  }
+
+  # XXX SHOW -and with dispatch
+
+  # ... implement all other required ops ...
 
 =head1 DESCRIPTION
 
-This describes the interface for indexing and searching facts.  Implementations
-must provide the C<add> and C<search> methods.
+This role describes the simplified query language for use with Metabase
+and defines the necessary methods to implement it for any particular
+Metabase backend.
 
 =head1 USAGE
 
-=head2 Constraints
+The query is expressed as a data structure of the form:
 
-  { FIELD => COMPARISON }
+  {
+    -where => [ $operator => \@arguments ]
+    -order => [ $direction => \@field_list ]
+    -limit => $number,
+  }
 
-  { FIELD1 => COMPARISION1, FIELD2 => COMPARISON2 } # AND
+XXX revise further
 
-=head2 Comparisons
+  [ OPERATOR => EXPRESSION ]
 
-  { OPERATOR => VALUE }   # operator applied against value
-  VALUE                   # shorthand for equality operator
 
-=head2 Operators
+  [ FIELD => OPERATOR => EXPRESSION ]
 
-  = != > >= < <=
-  between
-  like (?)
+  [ -or => [CONSTRAINT1, CONSTRAINT2, ...] ] # OR
 
-  XXX What about negation?
+  [ -and => [CONSTRAINT1, CONSTRAINT2, ...] ] # AND
+
+  [ -not => CONSTRAINT ]
+
+=head2 Operators and expressions
+
+  COMPARATOR => VALUE         # Any of == != > >= < <=
+
+  -between => VALUE1, VALUE2  # >= VALUE 1 and <= VALUE2
+
+  -like => PATTERN            # where '%' is like regex '.+'
 
 =head2 Ordering
 
@@ -65,7 +122,7 @@ must provide the C<add> and C<search> methods.
   -desc => FIELD
   -desc => [ FIELD1, FIELD2 ]
 
-=head3 Limit results
+=head2 Limit results
 
   -limit => NUMBER
 
