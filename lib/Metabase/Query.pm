@@ -47,7 +47,7 @@ has '_method_table' => (
   isa   => 'HashRef',
   default => sub {
     # '-eq' => 'op_eq', etc.
-    map { (my $n = $_) =~ s/op_/-/; ($n => $_) } keys %ops
+    return { map { (my $n = $_) =~ s/op_/-/; ($n => $_) } keys %ops }
   },
 );
 
@@ -56,7 +56,7 @@ has '_validators' => (
   isa   => 'HashRef',
   default => sub {
     # 'op_eq' => \&coderef
-    map { $_ => $validators{$_} } keys %ops
+    return { map { $_ => $validators{$ops{$_}} } keys %ops }
   },
 );
 
@@ -99,11 +99,15 @@ sub dispatch_query_op {
 =method get_native_query
 
   $result = $self->get_native_query( $query );
+  @result = $self->get_native_query( $query );
 
 Translates the Metabase query data structure into a backend-native
 scalar (string, data-structure, etc).  It validates the structure
 of the query and then calls the C<translate_query> method, which
 must be provided by the class that implements this role.
+
+The C<translate_query> method will be called with the same
+context (scalar or list) as the call to C<get_native_query>.
 
 =cut
 
