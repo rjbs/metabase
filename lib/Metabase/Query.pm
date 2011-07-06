@@ -31,7 +31,7 @@ my %validators = (
   PL  => sub { all {_is_predicate($_)} @_ },
   UP  => sub { @_ == 1 and _is_predicate($_[0]) },
   FV  => sub { @_ == 2 and _field_ok($_[0]) and _value_ok($_[1]) },
-  FHL => sub { @_ == 3 and _field_ok($_[0]) and all {_value_ok($_)} @_[1,2] },
+  FLH => sub { @_ == 3 and _field_ok($_[0]) and all {_value_ok($_)} @_[1,2] },
 );
 
 #--------------------------------------------------------------------------#
