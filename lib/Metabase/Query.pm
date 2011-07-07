@@ -106,6 +106,10 @@ scalar (string, data-structure, etc).  It validates the structure
 of the query and then calls the C<translate_query> method, which
 must be provided by the class that implements this role.
 
+To support the old key-value API, any keys that do not match C<-where>,
+C<-order>, or C<-limit> and do not begin with a minus sign will be treated as
+field names and appended to a C<-where> parameter as equality checks.
+
 The C<translate_query> method will be called with the same
 context (scalar or list) as the call to C<get_native_query>.
 
@@ -113,9 +117,29 @@ context (scalar or list) as the call to C<get_native_query>.
 
 sub get_native_query {
   my ($self, $query) = @_;
-  # XXX validate keys
+
+  # Deal with old API -- convert K/V pairs to -eq joined with -and
+  my %invalid = map { $_ => 1 } keys %$query;
+  delete $invalid{$_} for qw/-where -limit -order/;
+  if ( %invalid ) {
+    my @pred;
+    for my $k ( keys %invalid ) {
+      if ( substr($k, 0, 1) eq '-' ) {
+        Carp::confess "Invalid query parameter '$k'";
+      }
+      push @pred, [ -eq => $k => $query->{$k} ];
+      delete $query->{$k}
+    }
+    if ( exists $query->{'-where'} ) {
+      $query->{'-where'} = [ -and => $query->{'-where'}, @pred ];
+    }
+    else {
+      $query->{'-where'} = [ -and => @pred ];
+    }
+  }
+
   # XXX validate structure
-  # XXX die if invalid
+
   return $self->translate_query( $query );
 }
 
