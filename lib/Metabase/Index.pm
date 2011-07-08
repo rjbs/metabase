@@ -7,12 +7,17 @@ package Metabase::Index;
 
 use Moose::Role;
 
+with 'Metabase::Query';
+
 requires 'add';
-requires 'search';
+requires 'query';
+requires 'count';
+requires 'delete';
 
 sub exists {
     my ($self, $guid) = @_;
-    return scalar @{ $self->search( 'core.guid' => lc $guid ) };
+    # if desired guid in upper case, fix it
+    return scalar @{ $self->search(-where => [-eq =>'core.guid'=>lc $guid])};
 }
 
 sub clone_metadata {
@@ -36,15 +41,21 @@ sub clone_metadata {
     $metadata{"core.$key"} = $metadata{"core.$key"}->resource
       if exists $metadata{"core.$key"};
   }
-  
+
   return \%metadata;
+}
+
+sub search {
+  my ($self, %spec) = @_;
+  my $result = $self->query(%spec);
+  return $result->is_done ? [] : [ $result->all ];
 }
 
 1;
 
 __END__
 
-=for Pod::Coverage clone_metadata
+=for Pod::Coverage some_method
 
 =head1 SYNOPSIS
 
@@ -52,9 +63,9 @@ __END__
   use Metabase::Fact;
   use Moose;
   with 'Metabase::Index';
-  
+
   # define Moose attributes
-  
+
   sub add {
     my ( $self, $fact ) = @_;
     # index a fact
@@ -62,50 +73,109 @@ __END__
 
   sub search {
     my ( $self, %spec ) = @_;
-    # conduct search 
+    # conduct search
     return \@matches;
   }
+
+  # ... implement other required methods ... *
 
 
 =head1 DESCRIPTION
 
-This describes the interface for indexing and searching facts.  Implementations
-must provide the C<add> and C<search> methods.
+This module defines a L<Moose::Role> for indexing and searching facts.
+Implementations for any particular backend indexer must provide all of the
+required methods described below.
 
-=head1 USAGE
+=head1 METHODS
+
+The following methods are provided by the C<Metabase::Index> role.
+
+=head2 C<clone_metadata>
+
+  my $metadata = $index->clone_metadata( $fact )
+
+Assembles all three metadata types ('core', 'resource' and 'content')
+into a single-level hash by joining the type and the metadata name with
+a period.  E.g. the 'guid' field from the core metadata becomes 'core.guid'.
 
 =head2 C<exists>
 
   if ( $index->exists( $guid ) ) { do_stuff() }
 
-This interface provides an C<exists> method that calls C<search()> and 
-returns a boolean value.
+This method that calls C<search()> on the given GUID and returns a boolean
+value.
 
-=head2 C<search>
+=head2 C<search> DEPRECATED
 
-  for $guid ( @{ $index->search( %spec ) } ) {
+  for $guid ( @{ $index->search( %query ) } ) {
     # do stuff
   }
 
-Returns an arrayref of GUIDs satisfying the search spec.  Exact semantics
-of the search spec are still under development.  At a minimum, a list of
-key value pairs should be considered to be an "AND" operation testing
-for equality.
+Returns an arrayref of GUIDs satisfying the query parameters.  The query must
+be given in the form described in L<Metabase::Query>.
 
-Keys should be keys from core, content, or resource metadata.  E.g.
+This method is deprecated in favor of C<query> and is included for
+backwards compatibilty.  It calls C<query> and accumulates all results
+before returning.
+
+=head1 METHODS REQUIRED
+
+The following methods must be implemented by consumers of the
+C<Metabase::Index> role.
+
+Errors should throw exceptions rather than return false values.
+
+=head2 C<add>
+
+  $index->add( $fact );
+
+Adds the given fact to the Metabase Index;
+
+=head2 C<query>
+
+  my $result = $index->search( %query );
+  while ( ! $result->is_done ) {
+    for $guid ( $result->items ) {
+      # do stuff
+    }
+  }
+
+Returns a L<Data::Stream::Bulk> iterator.  Calling the iterator will
+return lists of GUIDs satisfying the query parameters.  The query must
+be given in the form described in L<Metabase::Query>.  Valid fields for search
+are the keys from core, content, or resource metadata.  E.g.
 
   core.guid
   core.type
   core.resource
+  resource.somefield
   content.somefield
-  
-=head1 BUGS
 
-Please report any bugs or feature using the CPAN Request Tracker.  
-Bugs can be submitted through the web interface at 
-L<http://rt.cpan.org/Dist/Display.html?Queue=Metabase>
+See L<Data::Stream::Bulk> for more on the iterator API.
 
-When submitting a bug or request, please include a test-file or a patch to an
-existing test-file that illustrates the bug or desired feature.
+=head2 C<count>
+
+  my $count = $index->count( %query );
+
+Takes query parameters and returns a count of facts satisfying the
+parameters.  The query must be given in the form described in
+L<Metabase::Query>, though C<-order> and C<-limit> clauses should not
+be included.
+
+There is no guarantee that this query will take any less time than calling
+C<query> and counting all the results, though back end implementations are
+encouraged to optimize if possible.  In the worst case, all results could be
+retrieved and then discarded.
+
+=head2 C<delete>
+
+  $index->delete( $guid );
+
+Removes the fact with matching GUID from the index.
+
+=head2 Metabase::Query methods
+
+As C<Metabase::Index> consumes the C<Metabase::Query> role, all
+the required methods from that role must be implemented as well.
 
 =cut
