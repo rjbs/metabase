@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 package Metabase::Archive::Schema::Fact;
+# VERSION
 
 use base qw/DBIx::Class/;
 __PACKAGE__->load_components(qw/PK ResultSourceProxy::Table/);

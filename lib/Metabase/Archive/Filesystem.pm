@@ -4,6 +4,7 @@ use warnings;
 
 package Metabase::Archive::Filesystem;
 # ABSTRACT: Metabase filesystem-based storage
+# VERSION
 
 use Moose;
 use Moose::Util::TypeConstraints;

@@ -4,6 +4,7 @@ use warnings;
 
 package Metabase::Index::SimpleDB;
 # ABSTRACT: Metabase Amazon SimpleDB index
+# VERSION
 
 use Moose;
 use SimpleDB::Client;

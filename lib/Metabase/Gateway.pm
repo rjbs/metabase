@@ -4,6 +4,7 @@ use warnings;
 
 package Metabase::Gateway;
 # ABSTRACT: Manage Metabase fact submission
+# VERSION
 
 use Moose::Role;
 

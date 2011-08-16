@@ -4,6 +4,7 @@ use warnings;
 
 package Metabase::Archive::S3;
 # ABSTRACT: Metabase storage using Amazon S3
+# VERSION
 
 use Moose;
 use Moose::Util::TypeConstraints;

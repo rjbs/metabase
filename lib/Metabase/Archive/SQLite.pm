@@ -4,6 +4,7 @@ use warnings;
 
 package Metabase::Archive::SQLite;
 # ABSTRACT: Metabase storage using SQLite
+# VERSION
 
 use Moose;
 use Moose::Util::TypeConstraints;

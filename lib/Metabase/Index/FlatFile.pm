@@ -4,6 +4,7 @@ use warnings;
 
 package Metabase::Index::FlatFile;
 # ABSTRACT: Metabase flat-file index
+# VERSION
 
 use Moose;
 use Moose::Util::TypeConstraints;

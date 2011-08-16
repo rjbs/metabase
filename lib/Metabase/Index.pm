@@ -4,6 +4,7 @@ use warnings;
 
 package Metabase::Index;
 # ABSTRACT: Interface for Metabase indexing
+# VERSION
 
 use Moose::Role;
 

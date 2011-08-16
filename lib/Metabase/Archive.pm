@@ -4,6 +4,7 @@ use warnings;
 
 package Metabase::Archive;
 # ABSTRACT: Interface for Metabase storage
+# VERSION
 
 use Moose::Role;
 

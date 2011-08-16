@@ -4,6 +4,7 @@ use warnings;
 
 package Metabase::Librarian;
 # ABSTRACT: Front-end interface to Metabase storage
+# VERSION
 
 use Moose 1.00;
 use Moose::Util::TypeConstraints;

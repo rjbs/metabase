@@ -4,6 +4,7 @@ use warnings;
 
 package Metabase::Query;
 # ABSTRACT: Generic Metabase query language role
+# VERSION
 
 use Carp ();
 use List::AllUtils qw/all/;
