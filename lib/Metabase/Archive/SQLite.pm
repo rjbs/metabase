@@ -35,6 +35,12 @@ has 'compressed' => (
     default => 1,
 );
 
+has 'synchronous' => (
+    is      => 'rw',
+    isa     => 'Bool',
+    default => 0,
+);
+
 has 'schema' => (
     is      => 'ro',
     isa     => 'Metabase::Archive::Schema',
@@ -49,6 +55,13 @@ has 'schema' => (
             {   RaiseError => 1,
                 AutoCommit => 1,
             },
+        );
+        $schema->storage->dbh_do(
+          sub {
+            my ($storage,$dbh) = @_;
+            my $toggle = $self->synchronous ? "ON" : "OFF";
+            $dbh->do("PRAGMA synchronous = $toggle");
+          }
         );
         return $schema;
     },
