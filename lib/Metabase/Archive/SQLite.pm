@@ -57,13 +57,6 @@ has 'schema' => (
                 AutoCommit => 1,
             },
         );
-        $schema->storage->dbh_do(
-          sub {
-            my ($storage,$dbh) = @_;
-            my $toggle = $self->synchronous ? "ON" : "OFF";
-            $dbh->do("PRAGMA synchronous = $toggle");
-          }
-        );
         return $schema;
     },
 );
@@ -71,6 +64,13 @@ has 'schema' => (
 sub initialize {
   my ($self, @fact_classes) = @_;
   $self->schema->deploy unless -e $self->filename;
+  $self->schema->storage->dbh_do(
+    sub {
+      my ($storage,$dbh) = @_;
+      my $toggle = $self->synchronous ? "ON" : "OFF";
+      $dbh->do("PRAGMA synchronous = $toggle");
+    }
+  );
   return;
 }
 
