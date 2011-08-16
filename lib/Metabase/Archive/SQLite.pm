@@ -50,10 +50,15 @@ has 'schema' => (
                 AutoCommit => 1,
             },
         );
-        $schema->deploy unless $exists;
         return $schema;
     },
 );
+
+sub initialize {
+  my ($self) = @_;
+  $self->schema->deploy unless -e $self->filename;
+  return;
+}
 
 # given fact, store it and return guid; return
 # XXX can we store a fact with a GUID already?  Replaces?  Or error?

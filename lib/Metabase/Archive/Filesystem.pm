@@ -13,24 +13,33 @@ use Carp ();
 use Data::GUID ();
 use File::Slurp ();
 use JSON 2 ();
-use Path::Class ();
+use MooseX::Types::Path::Class;
 
 with 'Metabase::Archive';
 
-subtype 'ExistingDir' 
-    => as 'Object' 
-        => where { $_->isa( "Path::Class::Dir" ) && -d "$_" };
-
-coerce 'ExistingDir' 
-    => from 'Str' 
-        => via { Path::Class::dir($_) };
-
 has 'root_dir' => (
     is => 'ro', 
-    isa => 'ExistingDir',
+    isa => 'Path::Class::Dir',
     coerce => 1,
     required => 1, 
 );
+
+# Ensure we have a directory we can write to
+sub initialize {
+  my ($self) = @_;
+  my $dir = $self->dir;
+  if ( -d $dir && -w $dir ) {
+    return;
+  }
+  elsif ( ! -d $dir ) {
+    $dir->mkpath;
+    Carp::confess "Could not create directory '$dir': $!"
+      unless -d $dir;
+  }
+  else {
+    Carp::confess "Directory '$dir' not writeable";
+  }
+}
 
 # given fact, store it and return guid; return
 # XXX can we store a fact with a GUID already?  Replaces?  Or error?

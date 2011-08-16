@@ -84,6 +84,9 @@ has '_json' => (
   default => sub { JSON->new->ascii },
 );
 
+# stub -- we actually do initialization in s3_bucket creator
+sub initialize {}
+
 # given fact, store it and return guid;
 sub store {
     my ( $self, $fact_struct ) = @_;

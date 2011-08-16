@@ -7,8 +7,9 @@ package Metabase::Archive;
 
 use Moose::Role;
 
-requires 'store';    # store( $fact_struct ) -- die or return $guid
-requires 'extract';  # extract( $guid ) -- die or return $fact_struct
+requires 'store';     # store( $fact_struct ) -- die or return $guid
+requires 'extract';   # extract( $guid ) -- die or return $fact_struct
+requires 'initialize'; # initialize() -- die or prepare storage backend
 
 1;
 
@@ -34,10 +35,17 @@ __END__
     return $fact;
   }
 
+  sub initialize {
+    my $self = shift;
+    # prepare backend to store data (e.g. create database, etc.)
+    return;
+  }
+
 =head1 DESCRIPTION
 
 This describes the interface for storing and retrieving facts.  Implementations
-must provide the C<store> and C<extract> methods.
+must provide the C<store>, C<extract> and C<initialize> methods. C<initialize>
+must be idempotent.
 
 =head1 BUGS
 

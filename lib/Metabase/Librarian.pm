@@ -28,6 +28,11 @@ has 'index' => (
     required => 1,
 );
 
+sub BUILD {
+  my $self = shift;
+  $self->archive->initialize();
+}
+
 # given fact, store it and return guid;
 sub store {
     my ($self, $fact) = @_;
