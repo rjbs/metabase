@@ -55,7 +55,7 @@ has 'schema' => (
 );
 
 sub initialize {
-  my ($self) = @_;
+  my ($self, @fact_classes) = @_;
   $self->schema->deploy unless -e $self->filename;
   return;
 }

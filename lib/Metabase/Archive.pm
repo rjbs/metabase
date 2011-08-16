@@ -36,7 +36,7 @@ __END__
   }
 
   sub initialize {
-    my $self = shift;
+    my ($self, @fact_classes) = @_;
     # prepare backend to store data (e.g. create database, etc.)
     return;
   }

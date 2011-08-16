@@ -26,7 +26,7 @@ has 'root_dir' => (
 
 # Ensure we have a directory we can write to
 sub initialize {
-  my ($self) = @_;
+  my ($self, @fact_classes) = @_;
   my $dir = $self->dir;
   if ( -d $dir && -w $dir ) {
     return;
