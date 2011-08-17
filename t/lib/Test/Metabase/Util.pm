@@ -45,14 +45,14 @@ has test_archive_class => (
     is       => 'ro',
     isa      => 'Str',
     required => 1,
-    default  => 'Metabase::Archive::SQLite',
+    default  => 'Metabase::Archive::Filesystem',
 );
 
 has test_archive_args => (
     is       => 'ro',
     isa      => 'ArrayRef',
     required => 1,
-    default  => sub { [filename => "$temp_dir/store.db", compressed => 0] },
+    default  => sub { [root_dir => "$temp_dir/archive"] },
 );
 
 has test_archive => (
