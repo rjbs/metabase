@@ -10,6 +10,8 @@ use Moose::Role;
 
 requires 'store';     # store( $fact_struct ) -- die or return $guid
 requires 'extract';   # extract( $guid ) -- die or return $fact_struct
+requires 'delete';
+requires 'iterator';
 requires 'initialize'; # initialize() -- die or prepare storage backend
 
 1;
@@ -36,6 +38,18 @@ __END__
     return $fact;
   }
 
+  sub delete {
+    my ( $self, $guid ) = @_;
+    # delete a fact;
+    return;
+  }
+
+  sub iterator {
+    my ( $self ) = @_;
+    # get iterator as Data::Stream::Bulk object
+    return $iterator;
+  }
+
   sub initialize {
     my ($self, @fact_classes) = @_;
     # prepare backend to store data (e.g. create database, etc.)
@@ -45,8 +59,9 @@ __END__
 =head1 DESCRIPTION
 
 This describes the interface for storing and retrieving facts.  Implementations
-must provide the C<store>, C<extract> and C<initialize> methods. C<initialize>
-must be idempotent.
+must provide the C<store>, C<extract>, C<delete>, C<iterator> and C<initialize>
+methods. C<initialize> must be idempotent. C<iterator> must return a
+L<Data::Stream::Bulk> object.
 
 =head1 BUGS
 
