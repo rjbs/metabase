@@ -95,8 +95,9 @@ sub iterator {
       if ($d) {
         my @results;
         $d->recurse(
-          sub {
-            push @results, $self->_extract_file($_) if ! $_->is_dir
+          callback => sub {
+            my $f = shift;
+            push @results, $self->_extract_file($f) if ! $f->is_dir
           }
         );
         return \@results;
