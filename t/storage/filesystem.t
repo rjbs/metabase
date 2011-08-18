@@ -8,54 +8,22 @@ use strict;
 use warnings;
 
 use Test::More;
-use Test::Exception;
+use Test::Routine;
+use Test::Routine::Util;
 use File::Temp ();
-use File::Path ();
 
-use lib 't/lib';
-use Test::Metabase::StringFact;
+use Metabase::Archive::Filesystem;
 
-#--------------------------------------------------------------------------#
-
-my $dist_id = 'cpan:///distfile/UNKNOWN/Foo-Bar-1.23.tar.gz';
-my $temp_root = 'eg/store';
-
-#--------------------------------------------------------------------------#
-
-plan tests => 9;
-
-require_ok( 'Metabase::Archive::Filesystem' );
-
-# die on missing directory
-my $re_bad_root_dir = qr/\QAttribute (root_dir)\E/;
-throws_ok { Metabase::Archive::Filesystem->new() } $re_bad_root_dir;
-
-my $archive;
-lives_ok {
-    $archive = Metabase::Archive::Filesystem->new(root_dir => "$temp_root");
-} "created store at '$temp_root'";
-
-my $fact = Test::Metabase::StringFact->new(
-    resource => $dist_id,
-    content  => "I smell something fishy.",
-);
-
-isa_ok( $fact, 'Test::Metabase::StringFact' );
-
-ok( my $guid = $archive->store( $fact->as_struct ), "stored a fact" );
-
-is( $fact->guid, $guid, "GUID returned matched GUID in fact" );
-
-my $copy_struct = $archive->extract( $guid );
-my $class = Metabase::Fact->class_from_type($copy_struct->{metadata}{core}{type});
-
-ok( my $copy = $class->from_struct( $copy_struct ),
-    "got a fact from archive"
-);
-
-for my $p ( qw/type content/ ) {
-    is_deeply( $copy->$p, $fact->$p, "second object has same $p" )
+sub _build_archive {
+  return Metabase::Archive::Filesystem->new(
+    root_dir => File::Temp::tempdir( CLEANUP => 1 ),
+  );
 }
 
+run_tests(
+  "Run Archive tests on Metabase::Archive::Filesystem",
+  ["main", "Metabase::Test::Archive"]
+);
 
+done_testing;
 
