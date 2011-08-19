@@ -70,45 +70,60 @@ test "add and count" => sub {
 
 };
 
-## search()
-#my $matches;
-#$matches = $index->search( -where => [ -eq => 'core.guid' => $fact->guid ] );
-#is( scalar @$matches, 1, "Found one fact searching for guid" );
-#
-#$matches = $index->search( -where => [ -eq => 'resource.cpan_id' => 'JOHNDOE'] );
-#is( scalar @$matches, 2, "Found two facts searching for resource cpan_id" );
-#
-#$matches = $index->search( -where => [ -eq => 'core.type' => $fact->type ] ) ;
-#is( scalar @$matches, 2, "Found two facts searching for fact type" );
-#
-#$matches = $index->search( -where => [ -eq => 'content.size' => length $string ] ) ;
-#is( scalar @$matches, 1, "Found one fact searching on content.size" );
-#
-#$matches = $index->search( 'content.size' => length $string ) ;
-#is( scalar @$matches, 1, "Found one fact searching on content.size (old API)" );
-#
-#$matches = $index->search(
-#  'content.size' => length $string, 'core.type' => $fact2->type
-#) ;
-#is( scalar @$matches, 1,
-#  "Found one fact searching on two fields (old API test 2)"
-#);
-#
-#$matches = $index->search(
-#  -where => [ -eq => 'core.guid' => $fact2->guid ],
-#  'content.size' => length $string, 'core.type' => $fact2->type
-#) ;
-#is( scalar @$matches, 1,
-#  "Found one fact searching on three fields (mixed API test)"
-#);
-#
-#is( $matches->[0], $fact2->guid, "Result GUID matches expected fact GUID" );
-#
-#$matches = $index->search( -where => [ -eq => 'resource.author' => "asdljasljfa" ]);
-#is( scalar @$matches, 0, "Found no facts searching for bogus dist_author" );
-#
-#$matches = $index->search( -where => [ -eq => bogus_key => "asdljasljfa"] );
-#is( scalar @$matches, 0, "Found no facts searching on bogus key" );
+test "search" => sub {
+  my $self = shift;
+
+  $self->clear_index;
+
+  my $fact1 = $self->get_test_fact("fact1");
+  my $fact2 = $self->get_test_fact("fact2");
+  my $f2_string = $fact2->content;
+  is( $self->index->count, 0, "Index is empty" );
+  ok( $self->index->add( $fact1 ), "Indexed fact 1" );
+  ok( $self->index->add( $fact2 ), "Indexed fact 2" );
+
+
+  my $matches;
+  $matches = $self->index->search( -where => [ -eq => 'core.guid' => $fact1->guid ] );
+  is( scalar @$matches, 1, "Found one fact searching for guid" );
+
+  $matches = $self->index->search( -where => [ -eq => 'resource.cpan_id' => 'UNKNOWN'] );
+  is( scalar @$matches, 2, "Found two facts searching for resource cpan_id" );
+
+  $matches = $self->index->search( -where => [ -eq => 'core.type' => $fact1->type ] ) ;
+  is( scalar @$matches, 2, "Found two facts searching for fact type" );
+
+  $matches = $self->index->search( -where => [ -eq => 'content.size' => length $f2_string ] ) ;
+  is( scalar @$matches, 1, "Found one fact searching on content.size" );
+
+  $matches = $self->index->search( 'content.size' => length $f2_string ) ;
+  is( scalar @$matches, 1, "Found one fact searching on content.size (old API)" );
+
+  $matches = $self->index->search(
+    'content.size' => length $f2_string, 'core.type' => $fact2->type
+  ) ;
+  is( scalar @$matches, 1,
+    "Found one fact searching on two fields (old API test 2)"
+  );
+
+  $matches = $self->index->search(
+    -where => [ -eq => 'core.guid' => $fact2->guid ],
+    'content.size' => length $f2_string, 'core.type' => $fact2->type
+  ) ;
+  is( scalar @$matches, 1,
+    "Found one fact searching on three fields (mixed API test)"
+  );
+
+  is( $matches->[0], $fact2->guid, "Result GUID matches expected fact GUID" );
+
+  $matches = $self->index->search( -where => [ -eq => 'resource.author' => "asdljasljfa" ]);
+  is( scalar @$matches, 0, "Found no facts searching for bogus dist_author" );
+
+  $matches = $self->index->search( -where => [ -eq => bogus_key => "asdljasljfa"] );
+  is( scalar @$matches, 0, "Found no facts searching on bogus key" );
+};
+
+
 #
 ## search with order and limit
 #
