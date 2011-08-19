@@ -17,21 +17,13 @@ use List::AllUtils qw/any all/;
 use JSON 2 qw/encode_json decode_json/;
 use Regexp::SQL::LIKE 0.001 qw/to_regexp/;
 use Tie::File;
+use MooseX::Types::Path::Class;
 
 with 'Metabase::Index';
 
-subtype 'File'
-    => as 'Object'
-        => where { $_->isa( "Path::Class::File" ) && ( (-f && -w) || ! -e ) }
-        => message { 'must be a writeable file or must not exist' };
-
-coerce 'File'
-    => from 'Str'
-        => via { Path::Class::file($_) };
-
 has 'index_file' => (
     is => 'ro',
-    isa => 'File',
+    isa => 'Path::Class::File',
     coerce => 1,
     required => 1,
 );

@@ -37,17 +37,6 @@ has index => (
 # methods
 #--------------------------------------------------------------------------#
 
-#sub store_all {
-#  my $self = shift;
-#  my @keys = $self->keys_test_fact;
-#  for my $k ( @keys ) {
-#    ok( $self->archive->store( $self->get_test_fact($k)->as_struct ),
-#      "stored $k"
-#    );
-#  }
-#  return scalar @keys;
-#}
-
 #--------------------------------------------------------------------------#
 # tests
 #--------------------------------------------------------------------------#
@@ -68,7 +57,7 @@ test "add and count" => sub {
   is( $self->index->count(-where => [ -eq => 'core.type' => 'CPAN-Testers-Report' ]),
     0, "Count with (false) query condition is 0"
   );
-  is( $self->index->count(-where => [ -eq => 'core.type' => 'Test-Metabase-StringFact']),
+  is( $self->index->count(-where => [ -eq => 'core.type' => 'Metabase-Test-Fact']),
     1, "Count with (true) query condition is 1"
   );
 
