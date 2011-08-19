@@ -3,7 +3,8 @@ use strict;
 use warnings;
 package Metabase::Test::Fact;
 # VERSION
-#
+# ABSTRACT: Test class for Metabase testing
+
 use parent 'Metabase::Fact::String';
 
 sub content_metadata {
@@ -23,5 +24,4 @@ sub validate_content {
 
 1;
 
-# ABSTRACT: Test class for Metabase testing
 

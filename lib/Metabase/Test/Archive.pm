@@ -2,6 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 package Metabase::Test::Archive;
+# ABSTRACT: Test::Routine role for testing Metabase::Archive implementations
 # VERSION
 
 use Metabase::Fact;
@@ -104,6 +105,4 @@ test "deletion" => sub {
 };
 
 1;
-
-# ABSTRACT: Test::Routine role for testing Metabase::Archive implementations
 
