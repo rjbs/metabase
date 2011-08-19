@@ -6,7 +6,6 @@ package Metabase;
 # ABSTRACT: A database framework and API for resource metadata
 # VERSION
 
-
 1;
 
 __END__

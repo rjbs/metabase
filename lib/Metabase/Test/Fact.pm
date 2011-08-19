@@ -1,10 +1,12 @@
 use 5.006;
 use strict;
 use warnings;
-package Metabase::Test::Fact;
-# VERSION
-# ABSTRACT: Test class for Metabase testing
 
+package Metabase::Test::Fact;
+# ABSTRACT: Test class for Metabase testing
+# VERSION
+
+# Metabase::Fact is not a Moose class
 use parent 'Metabase::Fact::String';
 
 sub content_metadata {

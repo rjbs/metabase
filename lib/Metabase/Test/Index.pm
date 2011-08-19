@@ -1,6 +1,7 @@
 use 5.006;
 use strict;
 use warnings;
+
 package Metabase::Test::Index;
 # ABSTRACT: Test::Routine role for testing Metabase::Index implementations
 # VERSION
