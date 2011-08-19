@@ -37,15 +37,28 @@ has index => (
 # methods
 #--------------------------------------------------------------------------#
 
+sub reset {
+  my $self = shift;
+  $self->clear_index;
+  is( $self->index->count, 0, "Index is empty" );
+  my @facts = (
+    $self->get_test_fact("fact1"),
+    $self->get_test_fact("fact2"),
+  );
+
+  $self->index->add($facts[0]);
+  $self->index->add($facts[1]);
+  return @facts;
+}
+
 #--------------------------------------------------------------------------#
 # tests
 #--------------------------------------------------------------------------#
 
 test "add and count" => sub {
   my $self = shift;
-
-  my $fact1 = $self->get_test_fact("fact1");
-  my $fact2 = $self->get_test_fact("fact2");
+  my ($fact1, $fact2) = $self->reset;
+  $self->clear_index;
 
   is( $self->index->count, 0, "Index is empty" );
 
@@ -73,15 +86,8 @@ test "add and count" => sub {
 test "search" => sub {
   my $self = shift;
 
-  $self->clear_index;
-
-  my $fact1 = $self->get_test_fact("fact1");
-  my $fact2 = $self->get_test_fact("fact2");
+  my ($fact1, $fact2) = $self->reset;
   my $f2_string = $fact2->content;
-  is( $self->index->count, 0, "Index is empty" );
-  ok( $self->index->add( $fact1 ), "Indexed fact 1" );
-  ok( $self->index->add( $fact2 ), "Indexed fact 2" );
-
 
   my $matches;
   $matches = $self->index->search( -where => [ -eq => 'core.guid' => $fact1->guid ] );
@@ -121,99 +127,48 @@ test "search" => sub {
 
   $matches = $self->index->search( -where => [ -eq => bogus_key => "asdljasljfa"] );
   is( scalar @$matches, 0, "Found no facts searching on bogus key" );
+
+  $matches = $self->index->search(
+    -where => [ -eq => 'core.type' => $fact1->type ],
+    -order => [ -asc => 'core.guid' ],
+  ) ;
+  is( scalar @$matches, 2, "Ran ordered search" );
+  ok( $matches->[0] lt $matches->[1], "Facts in correct order" );
+
+  $matches = $self->index->search(
+    -where => [ -eq => 'core.type' => $fact1->type ],
+    -order => [ -desc => 'core.guid' ],
+  ) ;
+  is( scalar @$matches, 2, "Ran ordered search (reversed)" );
+  ok( $matches->[0] gt $matches->[1], "Facts in correct order" ) or
+  diag explain $matches;
+
+  $matches = $self->index->search( -limit => 1 );
+  is( scalar @$matches, 1, "Querying with limit 1 returns 1 result" );
+
 };
 
+test "exists()" => sub {
+  my $self = shift;
 
-#
-## search with order and limit
-#
-#$matches = $index->search(
-#  -where => [ -eq => 'core.type' => $fact->type ],
-#  -order => [ -asc => 'core.guid' ],
-#) ;
-#is( scalar @$matches, 2, "Ran ordered search" );
-#ok( $matches->[0] lt $matches->[1], "Facts in correct order" );
-#
-#$matches = $index->search(
-#  -where => [ -eq => 'core.type' => $fact->type ],
-#  -order => [ -desc => 'core.guid' ],
-#) ;
-#is( scalar @$matches, 2, "Ran ordered search (reversed)" );
-#ok( $matches->[0] gt $matches->[1], "Facts in correct order" ) or
-#  diag explain $matches;
-#
-#$matches = $index->search( -limit => 1 );
-#is( scalar @$matches, 1, "Querying with limit 1 returns 1 result" );
-#
-## exists()
-#ok( $index->exists( $fact->guid ), "Checked exists( guid )" );
-#ok( $index->exists( uc $fact->guid ), "Checked exists( GUID )" );
-#ok( ! $index->exists( '2475e04a-a8e7-11e0-bcb0-5f47df37754e' ),
-#  "Checked exists( fakeguid ) - false"
-#);
-#
-#
-## delete()
-#ok( $index->delete( $fact->guid ), "Deleted fact 1 from index" );
-#is( $index->count, 1, "Index has one entry" );
-#ok( $index->delete( $fact2->guid ), "Deleted fact 2 from index" );
-#is( $index->count, 0, "Index is empty" );
-#
-#test "store and retrieve" => sub {
-#  my $self = shift;
-#  $self->clear_archive;
-#
-#  my $fact = $self->get_test_fact('fact1');
-#  my $guid = $self->archive->store( $fact->as_struct );
-#
-#  is( $fact->guid, $guid, "GUID returned matched GUID in fact" );
-#
-#  my $copy_struct = $self->archive->extract( $guid );
-#  my $class = Metabase::Fact->class_from_type($copy_struct->{metadata}{core}{type});
-#
-#  ok( my $copy = $class->from_struct( $copy_struct ),
-#      "got a fact from archive"
-#  );
-#
-#  cmp_deeply( $copy, $fact, "Extracted fact matches original" );
-#};
-#
-#test "iteration" => sub {
-#  my $self = shift;
-#  $self->clear_archive;
-#  my $n_facts = $self->store_all;
-#
-#  my $iter = $self->archive->iterator;
-#  my @facts;
-#  while( my $block = $iter->next ) {
-#      foreach my $item ( @$block ) {
-#          push @facts, $item;
-#      }
-#  }
-#
-#  is( scalar @facts, $n_facts, "iterator found all facts" );
-#};
-#
-#
-#test "deletion" => sub {
-#  my $self = shift;
-#  $self->clear_archive;
-#  my $n_facts = $self->store_all;
-#
-#  my $fact = $self->get_test_fact('fact1');
-#
-#  ok( $self->archive->delete( $fact->guid ), "deleted fact1" );
-#
-#  my $iter = $self->archive->iterator;
-#  my @facts;
-#  while( my $block = $iter->next ) {
-#      foreach my $item ( @$block ) {
-#          push @facts, $item;
-#      }
-#  }
-#
-#  is( scalar @facts, $n_facts-1, "iterator found one less fact" );
-#};
+  my ($fact1, $fact2) = $self->reset;
+  my $f2_string = $fact2->content;
+
+  ok( $self->index->exists( $fact1->guid ), "Checked exists( guid )" );
+  ok( $self->index->exists( uc $fact1->guid ), "Checked exists( GUID )" );
+  ok( ! $self->index->exists( '2475e04a-a8e7-11e0-bcb0-5f47df37754e' ),
+    "Checked exists( fakeguid ) - false"
+  );
+};
+
+test "delete()" => sub {
+  my $self = shift;
+  my ($fact1, $fact2) = $self->reset;
+  ok( $self->index->delete( $fact1->guid ), "Deleted fact 1 from index" );
+  is( $self->index->count, 1, "Index has one entry" );
+  ok( $self->index->delete( $fact2->guid ), "Deleted fact 2 from index" );
+  is( $self->index->count, 0, "Index is empty" );
+};
 
 1;
 
