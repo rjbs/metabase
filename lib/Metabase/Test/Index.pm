@@ -19,37 +19,13 @@ use Moose::Util::TypeConstraints;
 # requirements from composing class
 #--------------------------------------------------------------------------#
 
-requires '_build_archive';
+requires '_build_index';
 
 #--------------------------------------------------------------------------#
 # fixtures
 #--------------------------------------------------------------------------#
 
-my $dist_id = 'cpan:///distfile/UNKNOWN/Foo-Bar-1.23.tar.gz';
-my %fact_content = (
-  fact1 => "Hello World",
-  fact2 => "Everything is fine",
-);
-
-has test_fact => (
-  traits => ['Hash'],
-  is => 'ro',
-  isa => Map[Str, class_type('Metabase::Test::Fact')],
-  default => sub {
-    my %hash;
-    for my $k ( keys %fact_content ) {
-      $hash{$k} = Metabase::Test::Fact->new(
-        resource => $dist_id,
-        content => $fact_content{$k},
-      );
-    };
-    return \%hash;
-  },
-  handles => {
-    get_test_fact => 'get',
-    keys_test_fact => 'keys',
-  },
-);
+with 'Metabase::Test::Factory';
 
 has index => (
   is => 'ro',
