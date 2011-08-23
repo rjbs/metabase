@@ -130,21 +130,25 @@ test "search" => sub {
   is( scalar @$matches, 0, "Found no facts searching on bogus key" );
 
   $matches = $self->index->search(
-    -where => [ -eq => 'core.type' => $fact1->type ],
+    -where => [ -and => [ -eq => 'core.type' => $fact1->type ] => [ -gt => 'core.guid' => 0 ] ],
     -order => [ -asc => 'core.guid' ],
   ) ;
   is( scalar @$matches, 2, "Ran ordered search" );
   ok( $matches->[0] lt $matches->[1], "Facts in correct order" );
 
   $matches = $self->index->search(
-    -where => [ -eq => 'core.type' => $fact1->type ],
+    -where => [ -and => [ -eq => 'core.type' => $fact1->type ] => [ -gt => 'core.guid' => 0 ] ],
     -order => [ -desc => 'core.guid' ],
   ) ;
   is( scalar @$matches, 2, "Ran ordered search (reversed)" );
   ok( $matches->[0] gt $matches->[1], "Facts in correct order" ) or
   diag explain $matches;
 
-  $matches = $self->index->search( -limit => 1 );
+  $matches = $self->index->search(
+    -where => [ -gt => 'core.guid' => 0 ],
+    -order => [ -desc => 'core.guid' ],
+    -limit => 1
+  );
   is( scalar @$matches, 1, "Querying with limit 1 returns 1 result" );
 
 };
