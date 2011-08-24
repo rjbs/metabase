@@ -130,14 +130,19 @@ test "search" => sub {
   is( scalar @$matches, 0, "Found no facts searching on bogus key" );
 
   $matches = $self->index->search(
-    -where => [ -and => [ -eq => 'core.type' => $fact1->type ] => [ -gt => 'core.guid' => 0 ] ],
+    -where => [ -and => [ -eq => 'core.type' => $fact1->type ] => [ -gt => 'content.size' => 0 ] ],
+  ) ;
+  is( scalar @$matches, 2, "Found two facts on compound query" );
+
+  $matches = $self->index->search(
+    -where => [ -and => [ -eq => 'core.type' => $fact1->type ] => [ -ne => 'core.guid' => 0 ] ],
     -order => [ -asc => 'core.guid' ],
   ) ;
   is( scalar @$matches, 2, "Ran ordered search" );
   ok( $matches->[0] lt $matches->[1], "Facts in correct order" );
 
   $matches = $self->index->search(
-    -where => [ -and => [ -eq => 'core.type' => $fact1->type ] => [ -gt => 'core.guid' => 0 ] ],
+    -where => [ -and => [ -eq => 'core.type' => $fact1->type ] => [ -ne => 'core.guid' => 0 ] ],
     -order => [ -desc => 'core.guid' ],
   ) ;
   is( scalar @$matches, 2, "Ran ordered search (reversed)" );
@@ -145,7 +150,7 @@ test "search" => sub {
   diag explain $matches;
 
   $matches = $self->index->search(
-    -where => [ -gt => 'core.guid' => 0 ],
+    -where => [ -ne => 'core.guid' => 0 ],
     -order => [ -desc => 'core.guid' ],
     -limit => 1
   );
