@@ -28,6 +28,8 @@ has 'index_file' => (
     required => 1,
 );
 
+sub initialize {}
+
 sub add {
     my ($self, $fact) = @_;
     Carp::confess( "can't index a Fact without a GUID" ) unless $fact->guid;

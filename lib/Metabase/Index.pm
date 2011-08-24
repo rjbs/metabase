@@ -14,6 +14,7 @@ requires 'add';
 requires 'query';
 requires 'count';
 requires 'delete';
+requires 'initialize';
 
 sub exists {
     my ($self, $guid) = @_;
@@ -173,6 +174,16 @@ retrieved and then discarded.
   $index->delete( $guid );
 
 Removes the fact with matching GUID from the index.
+
+=head2 C<initialize>
+
+  sub initialize {
+    my ($self, @fact_classes) = @_;
+    # prepare backend to store data (e.g. create database, etc.)
+    return;
+  }
+
+Allows a backend to prepare to store various classes.
 
 =head2 Metabase::Query methods
 
