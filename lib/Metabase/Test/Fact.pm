@@ -17,6 +17,13 @@ sub content_metadata {
   };
 }
 
+sub content_metadata_types {
+  return {
+    'size' => "//num",
+    'WIDTH' => "//str",
+  };
+}
+
 sub validate_content {
   my $self = shift;
   $self->SUPER::validate_content;
