@@ -47,8 +47,9 @@ sub reset {
     $self->get_test_fact("fact2"),
   );
 
-  $self->index->add($facts[0]);
-  $self->index->add($facts[1]);
+  $self->index->add($_) for @facts;
+  is( $self->index->count, scalar @facts, "All test facts added" );
+
   return @facts;
 }
 
@@ -68,7 +69,7 @@ test "add and count" => sub {
 
   # count()
   is( $self->index->count, 1, "Index has one entry" );
-  is( $self->index->count(-where => [ -eq => 'core.type' => 'CPAN-Testers-Report' ]),
+  is( $self->index->count(-where => [ -eq => 'core.guid' => '0' ]),
     0, "Count with (false) query condition is 0"
   );
   is( $self->index->count(-where => [ -eq => 'core.type' => 'Metabase-Test-Fact']),
