@@ -58,8 +58,8 @@ sub reset {
 
 test "add and count" => sub {
   my $self = shift;
-  my ($fact1, $fact2) = $self->reset;
   $self->clear_index;
+  my ($fact1, $fact2) = map { $self->get_test_fact("fact$_") } 1..2;
 
   is( $self->index->count, 0, "Index is empty" );
 
