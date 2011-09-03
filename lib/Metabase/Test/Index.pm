@@ -95,7 +95,10 @@ test "search" => sub {
   $matches = $self->index->search( -where => [ -eq => 'core.guid' => $fact1->guid ] );
   is( scalar @$matches, 1, "Found one fact searching for guid" );
 
-  $matches = $self->index->search( -where => [ -eq => 'resource.cpan_id' => 'UNKNOWN'] );
+  $matches = $self->index->search( -where => [
+      -and => [-eq => 'resource.type' => 'Metabase-Resource-cpan-distfile'], [-eq => 'resource.cpan_id' => 'UNKNOWN']
+    ]
+  );
   is( scalar @$matches, 2, "Found two facts searching for resource cpan_id" );
 
   $matches = $self->index->search( -where => [ -eq => 'core.type' => $fact1->type ] ) ;
