@@ -95,6 +95,16 @@ test "search" => sub {
   $matches = $self->index->search( -where => [ -eq => 'core.guid' => $fact1->guid ] );
   is( scalar @$matches, 1, "Found one fact searching for guid" );
 
+  my $count = $self->index->count( -where => [
+    -eq => 'core.type' => $fact1->type
+  ] ) ;
+  is( $count, 2, "Count found two facts constrained on fact type" );
+
+  $matches = $self->index->search( -where => [
+    -eq => 'core.type' => $fact1->type
+  ] ) ;
+  is( scalar @$matches, 2, "Found two facts searching for fact type" );
+
   $matches = $self->index->search( -where => [
       -and =>
         [-eq => 'resource.type' => 'Metabase-Resource-cpan-distfile'],
@@ -102,11 +112,6 @@ test "search" => sub {
     ]
   );
   is( scalar @$matches, 2, "Found two facts searching for resource cpan_id" );
-
-  $matches = $self->index->search( -where => [
-    -eq => 'core.type' => $fact1->type
-  ] ) ;
-  is( scalar @$matches, 2, "Found two facts searching for fact type" );
 
   $matches = $self->index->search( -where => [
     -and =>
