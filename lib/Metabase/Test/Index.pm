@@ -96,18 +96,26 @@ test "search" => sub {
   is( scalar @$matches, 1, "Found one fact searching for guid" );
 
   $matches = $self->index->search( -where => [
-      -and => [-eq => 'resource.type' => 'Metabase-Resource-cpan-distfile'], [-eq => 'resource.cpan_id' => 'UNKNOWN']
+      -and =>
+        [-eq => 'resource.type' => 'Metabase-Resource-cpan-distfile'],
+        [-eq => 'resource.cpan_id' => 'UNKNOWN']
     ]
   );
   is( scalar @$matches, 2, "Found two facts searching for resource cpan_id" );
 
-  $matches = $self->index->search( -where => [ -eq => 'core.type' => $fact1->type ] ) ;
+  $matches = $self->index->search( -where => [
+    -eq => 'core.type' => $fact1->type
+  ] ) ;
   is( scalar @$matches, 2, "Found two facts searching for fact type" );
 
-  $matches = $self->index->search( -where => [ -eq => 'content.size' => length $f2_string ] ) ;
+  $matches = $self->index->search( -where => [
+    -and =>
+      [-eq => 'content.size' => length $f2_string],
+      [-eq => 'core.type' => 'Metabase-Test-Fact'],
+  ] ) ;
   is( scalar @$matches, 1, "Found one fact searching on content.size" );
 
-  $matches = $self->index->search( 'content.size' => length $f2_string ) ;
+  $matches = $self->index->search( 'core.guid' => $fact2->guid ) ;
   is( scalar @$matches, 1, "Found one fact searching on content.size (old API)" );
 
   $matches = $self->index->search(
@@ -127,26 +135,39 @@ test "search" => sub {
 
   is( $matches->[0], $fact2->guid, "Result GUID matches expected fact GUID" );
 
-  $matches = $self->index->search( -where => [ -eq => 'resource.author' => "asdljasljfa" ]);
+  $matches = $self->index->search( -where => [
+    -and =>
+      [-eq => 'resource.type' => 'Metabase-Resource-cpan-distfile'],
+      [-eq => 'resource.cpan_id' => "asdljasljfa" ],
+  ]);
   is( scalar @$matches, 0, "Found no facts searching for bogus dist_author" );
 
   $matches = $self->index->search( -where => [ -eq => bogus_key => "asdljasljfa"] );
   is( scalar @$matches, 0, "Found no facts searching on bogus key" );
 
   $matches = $self->index->search(
-    -where => [ -and => [ -eq => 'core.type' => $fact1->type ] => [ -gt => 'content.size' => 0 ] ],
-  ) ;
+    -where => [ -and =>
+      [ -eq => 'core.type' => $fact1->type ],
+      [ -gt => 'content.size' => 0 ]
+    ]
+  );
   is( scalar @$matches, 2, "Found two facts on compound query" );
 
   $matches = $self->index->search(
-    -where => [ -and => [ -eq => 'core.type' => $fact1->type ] => [ -ne => 'core.guid' => 0 ] ],
+    -where => [ -and =>
+      [ -eq => 'core.type' => $fact1->type ],
+      [ -ne => 'core.guid' => 0 ]
+    ],
     -order => [ -asc => 'core.guid' ],
   ) ;
   is( scalar @$matches, 2, "Ran ordered search" );
   ok( $matches->[0] lt $matches->[1], "Facts in correct order" );
 
   $matches = $self->index->search(
-    -where => [ -and => [ -eq => 'core.type' => $fact1->type ] => [ -ne => 'core.guid' => 0 ] ],
+    -where => [ -and =>
+      [ -eq => 'core.type' => $fact1->type ],
+      [ -ne => 'core.guid' => 0 ]
+    ],
     -order => [ -desc => 'core.guid' ],
   ) ;
   is( scalar @$matches, 2, "Ran ordered search (reversed)" );
