@@ -45,6 +45,9 @@ sub store {
 
     # Don't store existing GUIDs; this should never happen, since we're just
     # generating a new one, but... hey, can't be too safe, right?
+    # XXX maybe delegate this down to archive/index, because if they
+    # have unique constraint enforcement, then there's no reason to do
+    # this extra (negative) query
     if ( $self->index->exists( $fact->guid ) ) {
         Carp::confess("GUID conflicts with an existing object");
     }
