@@ -103,7 +103,7 @@ sub iterator {
         return \@results;
       }
       else {
-        return undef;
+        return;
       }
     }
   );
@@ -126,8 +126,7 @@ sub _guid_path {
 
 __END__
 
-=for Pod::Coverage
-  store extract
+=for Pod::Coverage store extract delete initialize iterator
 
 =head1 SYNOPSIS
 

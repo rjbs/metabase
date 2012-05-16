@@ -24,14 +24,14 @@ Testers project.  When Metabase was initially developed, CPAN Testers reports
 were sent by individual testers to a single email server, which then forwarded
 them to a USENET group, which was considered the authoritative store.  This
 presented problems: some testers couldn't send email, the system wasn't very
-searchable or mirrorable, and the data inside the system was entirely
+searchable, was hard to mirror, and the data inside the system was entirely
 unstructured.
 
 Metabase aimed to avoid all of those problems by being transport-neutral,
-searchable and mirrorable by design, and geared toward storing structured data.
-Simplicity is another design goal: while it has several moving parts, they're
-all simple and designed to be replaceable and extensible, rather than to be a
-perfect design up front.
+searchable and easier to mirror by design, and geared toward storing structured
+data.  Simplicity is another design goal: while it has several moving parts,
+they're all simple and designed to be replaceable and extensible, rather than
+to be a perfect design up front.
 
 =head1 OVERVIEW
 
@@ -71,8 +71,6 @@ Metabase comes with some simple, stupid backends for testing:
 =for :list
 * L<Metabase::Archive::Filesystem>
 * L<Metabase::Index::FlatFile>
-
-=back
 
 Facts stored with in a Metabase are defined as subclasses of L<Metabase::Fact>.
 L<Metabase::Report> is a subclass that relates multiple facts.

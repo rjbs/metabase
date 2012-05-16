@@ -245,9 +245,9 @@ sub op_and {
 
 __END__
 
-=for Pod::Coverage::TrustPod add search delete count
-translate_query op_eq op_ne op_gt op_lt op_ge op_le op_between op_like
-op_not op_or op_and
+=for Pod::Coverage::TrustPod add search delete count LOCK_EX LOCK_SH
+initialize query translate_query op_eq op_ne op_gt op_lt op_ge op_le
+op_between op_like op_not op_or op_and
 
 =head1 SYNOPSIS
 

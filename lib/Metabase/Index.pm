@@ -98,7 +98,7 @@ The following methods are provided by the C<Metabase::Index> role.
 
 Assembles all three metadata types ('core', 'resource' and 'content')
 into a single-level hash by joining the type and the metadata name with
-a period.  E.g. the 'guid' field from the core metadata becomes 'core.guid'.
+a period.  E.g. the C<guid>. field from the core metadata becomes C<core.guid>.
 
 =head2 C<exists>
 
@@ -117,7 +117,7 @@ Returns an arrayref of GUIDs satisfying the query parameters.  The query must
 be given in the form described in L<Metabase::Query>.
 
 This method is deprecated in favor of C<query> and is included for
-backwards compatibilty.  It calls C<query> and accumulates all results
+backwards compatibility.  It calls C<query> and accumulates all results
 before returning.
 
 =head1 METHODS REQUIRED

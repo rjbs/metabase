@@ -107,3 +107,6 @@ test "deletion" => sub {
 
 1;
 
+=for Pod::Coverage store_all
+
+=cut

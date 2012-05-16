@@ -154,8 +154,7 @@ sub delete {
 
 __END__
 
-=for Pod::Coverage
-delete
+=for Pod::Coverage BUILD delete
 
 =head1 SYNOPSIS
 

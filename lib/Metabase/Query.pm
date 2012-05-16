@@ -235,7 +235,7 @@ a single predicate as an argument.
   [ -or  => @predicates ]
   [ -not => $one_predicate ]
 
-=head3 Comparision operators
+=head3 Comparison operators
 
 Most comparison operators are binary and take two arguments.  The first
 must be the field name to which the operation applies.  The second

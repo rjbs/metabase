@@ -212,3 +212,6 @@ test "delete()" => sub {
 
 1;
 
+=for Pod::Coverage reset
+
+=cut
