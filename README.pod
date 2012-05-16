@@ -1,14 +1,12 @@
-use 5.006;
-use strict;
-use warnings;
+=pod
 
-package Metabase;
-# ABSTRACT: A database framework and API for resource metadata
-# VERSION
+=head1 NAME
 
-1;
+Metabase - A database framework and API for resource metadata
 
-__END__
+=head1 VERSION
+
+version 1.000
 
 =head1 DESCRIPTION
 
@@ -68,9 +66,17 @@ the role API.
 
 Metabase comes with some simple, stupid backends for testing:
 
-=for :list
-* L<Metabase::Archive::Filesystem>
-* L<Metabase::Index::FlatFile>
+=over 4
+
+=item *
+
+L<Metabase::Archive::Filesystem>
+
+=item *
+
+L<Metabase::Index::FlatFile>
+
+=back
 
 =back
 
@@ -84,9 +90,64 @@ search capabilities.
 
 =head1 SEE ALSO
 
-=for :list
-* L<Metabase::Backend::AWS>
-* L<Metabase::Backend::MongoDB>
-* L<Metabase::Backend::SQL>
+=over 4
 
-=cut
+=item *
+
+L<Metabase::Backend::AWS>
+
+=item *
+
+L<Metabase::Backend::MongoDB>
+
+=item *
+
+L<Metabase::Backend::SQL>
+
+=back
+
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Metabase>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software.  The code repository is available for
+public review and contribution under the terms of the license.
+
+L<https://github.com/dagolden/metabase>
+
+  git clone https://github.com/dagolden/metabase.git
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+David Golden <dagolden@cpan.org>
+
+=item *
+
+Ricardo Signes <rjbs@cpan.org>
+
+=item *
+
+Leon Brocard <acme@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by David Golden.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+

@@ -263,15 +263,6 @@ Flat-file Metabase index.
 
 =head1 USAGE
 
-See L<Metabase::Index> and L<Metabase::Librarian>.
-
-=head1 BUGS
-
-Please report any bugs or feature using the CPAN Request Tracker.
-Bugs can be submitted through the web interface at
-L<http://rt.cpan.org/Dist/Display.html?Queue=Metabase>
-
-When submitting a bug or request, please include a test-file or a patch to an
-existing test-file that illustrates the bug or desired feature.
+See L<Metabase::Index>, L<Metabase::Query> and L<Metabase::Librarian>.
 
 =cut
