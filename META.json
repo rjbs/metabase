@@ -6,7 +6,7 @@
       "Leon Brocard <acme@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "apache_2_0"
    ],
@@ -86,55 +86,55 @@
    "provides" : {
       "Metabase" : {
          "file" : "lib/Metabase.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       },
       "Metabase::Archive" : {
          "file" : "lib/Metabase/Archive.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       },
       "Metabase::Archive::Filesystem" : {
          "file" : "lib/Metabase/Archive/Filesystem.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       },
       "Metabase::Gateway" : {
          "file" : "lib/Metabase/Gateway.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       },
       "Metabase::Index" : {
          "file" : "lib/Metabase/Index.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       },
       "Metabase::Index::FlatFile" : {
          "file" : "lib/Metabase/Index/FlatFile.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       },
       "Metabase::Librarian" : {
          "file" : "lib/Metabase/Librarian.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       },
       "Metabase::Query" : {
          "file" : "lib/Metabase/Query.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       },
       "Metabase::Test::Archive" : {
          "file" : "lib/Metabase/Test/Archive.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       },
       "Metabase::Test::Archive::Null" : {
          "file" : "lib/Metabase/Test/Archive/Null.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       },
       "Metabase::Test::Fact" : {
          "file" : "lib/Metabase/Test/Fact.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       },
       "Metabase::Test::Factory" : {
          "file" : "lib/Metabase/Test/Factory.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       },
       "Metabase::Test::Index" : {
          "file" : "lib/Metabase/Test/Index.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       }
    },
    "release_status" : "stable",
@@ -150,6 +150,6 @@
          "web" : "https://github.com/dagolden/metabase"
       }
    },
-   "version" : "1.000"
+   "version" : "1.001"
 }
 

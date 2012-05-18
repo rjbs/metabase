@@ -74,7 +74,7 @@ has authentication_timeout => (
 has cache_options => (
   is          => 'ro',
   isa         => 'HashRef',
-  default     => sub { { driver => 'Memory' } },
+  default     => sub { my $hash = {}; return { driver => 'Memory', datastore => $hash } },
 );
 
 has _cache => (

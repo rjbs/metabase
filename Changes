@@ -2,6 +2,10 @@ Revision history for Metabase
 
 {{$NEXT}}
 
+    [FIXED]
+
+    - Fixed bug where default CHI wasn't initialized properly
+
 1.000     2012-05-16 13:23:04 America/New_York
 
     - The 1.000 release reflects a major reorganization of the Metabase
