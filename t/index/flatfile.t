@@ -12,7 +12,7 @@ has tempfile => (
 );
 
 sub _build_tempfile {
-  return File::Temp->new;
+  return File::Temp->new( EXLOCK => 0 );
 }
 
 after clear_index => sub { shift->clear_tempfile };
