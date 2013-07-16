@@ -9,6 +9,7 @@ use warnings;
 
 use Test::More;
 
+use JSON 2 ();
 use Test::Exception;
 use File::Temp ();
 use File::Path ();
@@ -53,6 +54,11 @@ for ( $new_fact, $new_fact->facts, $report, $report->facts ) {
   $_->{metadata}{core}{update_time} = $update_time;
 }
 
-is( $new_fact->content_as_bytes, $report->content_as_bytes, "fact content matches" );
+my $JSON = JSON->new;
+is_deeply(
+  $JSON->decode( $new_fact->content_as_bytes ),
+  $JSON->decode( $report->content_as_bytes   ),
+  "fact content matches",
+);
 
 is( $new_fact->resource, $report->resource, "dist name was indexed as expected" );
