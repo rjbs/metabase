@@ -1,6 +1,8 @@
 Revision history for Metabase
 
 {{$NEXT}}
+
+1.002     2013-07-16 10:36:43 America/New_York
     - Fix a test that had been broken by 5.18's hash ordering changes
 
 1.001     2012-05-18 15:34:47 America/New_York
