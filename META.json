@@ -6,7 +6,7 @@
       "Leon Brocard <acme@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 4.300036, CPAN::Meta::Converter version 2.131560",
    "license" : [
       "apache_2_0"
    ],
@@ -30,6 +30,14 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
@@ -72,84 +80,94 @@
       },
       "test" : {
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
             "File::Find" : "0",
             "File::Path" : "0",
+            "File::Spec::Functions" : "0",
             "File::Temp" : "0",
+            "List::Util" : "0",
             "Metabase::Report" : "0",
             "Path::Class" : "0",
             "Test::Exception" : "0",
             "Test::Routine::Util" : "0",
-            "base" : "0"
+            "base" : "0",
+            "lib" : "0"
          }
       }
    },
    "provides" : {
       "Metabase" : {
          "file" : "lib/Metabase.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "Metabase::Archive" : {
          "file" : "lib/Metabase/Archive.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "Metabase::Archive::Filesystem" : {
          "file" : "lib/Metabase/Archive/Filesystem.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "Metabase::Gateway" : {
          "file" : "lib/Metabase/Gateway.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "Metabase::Index" : {
          "file" : "lib/Metabase/Index.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "Metabase::Index::FlatFile" : {
          "file" : "lib/Metabase/Index/FlatFile.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "Metabase::Librarian" : {
          "file" : "lib/Metabase/Librarian.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "Metabase::Query" : {
          "file" : "lib/Metabase/Query.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "Metabase::Test::Archive" : {
          "file" : "lib/Metabase/Test/Archive.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "Metabase::Test::Archive::Null" : {
          "file" : "lib/Metabase/Test/Archive/Null.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "Metabase::Test::Fact" : {
          "file" : "lib/Metabase/Test/Fact.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "Metabase::Test::Factory" : {
          "file" : "lib/Metabase/Test/Factory.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       },
       "Metabase::Test::Index" : {
          "file" : "lib/Metabase/Test/Index.pm",
-         "version" : "1.001"
+         "version" : "1.002"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-metabase at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Metabase"
+         "mailto" : "bug-Metabase@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Metabase"
       },
-      "homepage" : "https://github.com/dagolden/metabase",
+      "homepage" : "https://metacpan.org/release/Metabase",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/dagolden/metabase.git",
+         "url" : "git://github.com/dagolden/metabase.git",
          "web" : "https://github.com/dagolden/metabase"
       }
    },
-   "version" : "1.001"
+   "version" : "1.002",
+   "x_contributors" : [
+      "Florian Ragwitz <rafl@debian.org>",
+      "Graham Knop <haarg@haarg.org>",
+      "Leon Brocard <acme@astray.com>",
+      "Ricardo SIGNES <rjbs@cpan.org>"
+   ]
 }
 
