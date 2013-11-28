@@ -1,6 +1,8 @@
 Revision history for Metabase
 
 {{$NEXT}}
+
+1.003     2013-11-28 07:46:50 America/New_York
     - Switch from Class::MOP::load_class to Class::Load::load_class
 
 1.002     2013-07-16 10:36:43 America/New_York
