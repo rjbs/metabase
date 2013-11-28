@@ -100,7 +100,7 @@ sub _build_approved_types {
     # XXX $class->can('fact_classes') ?? -- dagolden, 2009-03-31
     push @queue, $class->fact_classes if $class->isa('Metabase::Report');
   }
-  return [ map { Class::MOP::load_class($_); $_->type } @approved ];
+  return [ map { Class::Load::load_class($_); $_->type } @approved ];
 }
 
 # for use in handle_XXXX methods
