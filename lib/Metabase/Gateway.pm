@@ -12,6 +12,7 @@ use Metabase::Fact 0.018;
 use Metabase::Librarian;
 use Metabase::User::Profile;
 use Metabase::User::Secret;
+use Module::Runtime qw( require_module );
 use CHI;
 use namespace::autoclean;
 
@@ -100,7 +101,7 @@ sub _build_approved_types {
     # XXX $class->can('fact_classes') ?? -- dagolden, 2009-03-31
     push @queue, $class->fact_classes if $class->isa('Metabase::Report');
   }
-  return [ map { Class::Load::load_class($_); $_->type } @approved ];
+  return [ map { require_module($_); $_->type } @approved ];
 }
 
 # for use in handle_XXXX methods

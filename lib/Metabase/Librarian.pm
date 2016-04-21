@@ -8,7 +8,7 @@ package Metabase::Librarian;
 
 use Moose 1.00;
 use Moose::Util::TypeConstraints;
-use Class::MOP ();
+use Module::Runtime qw( require_module );
 use Carp ();
 use CPAN::DistnameInfo;
 use Data::Stream::Bulk::Filter ();
@@ -98,7 +98,7 @@ sub _thaw_fact {
       $fact_struct->{metadata}{core}{type}
     );
 
-    Class::MOP::load_class( $class );
+    require_module( $class );
 
     # XXX: The problem here is that what we get out of the librarian isn't
     # exactly what we put in, it seems.  We need to improve the specification
