@@ -5,6 +5,7 @@ use lib 'lib';
 
 use File::Temp;
 use Path::Class;
+use Module::Runtime qw( require_module );
 
 # This is ridiculous. -- rjbs, 2008-04-13
 my $temp_dir = File::Temp::tempdir( CLEANUP => 1 );
@@ -65,7 +66,7 @@ has test_archive => (
 sub _build_test_archive {
     my ($self) = @_;
     my $archive_class = $self->test_archive_class;
-    Class::MOP::load_class($archive_class);
+    require_module($archive_class);
     return $archive_class->new(@{ $self->test_archive_args });
 }
 
@@ -93,7 +94,7 @@ has test_index => (
 sub _build_test_index {
     my ($self) = @_;
     my $index_class = $self->test_index_class;
-    Class::MOP::load_class($index_class);
+    require_module($index_class);
     return $index_class->new(@{ $self->test_index_args });
 }
 
